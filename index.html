@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fuzzy Graph</title>
+    <!-- Alpine.js -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gray-100" x-data="{ 
+    mobileMenuOpen: false,
+    equations: [''],
+    fuzzy_level: 50,
+    sidebarOpen: true,
+    addEquation() {
+        this.equations.push('');
+    },
+    removeEquation(index) {
+        this.equations.splice(index, 1);
+        if (this.equations.length === 0) {
+            this.equations.push('');
+        }
+    }
+}">
+    <!-- Header -->
+    <header class="bg-gray-800 text-white h-16 fixed w-full top-0 left-0 z-50">
+        <div class="flex items-center justify-between h-full px-4">
+            <div class="flex items-center">
+                <h1 class="text-xl font-bold">Fuzzy Graph</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex space-x-4">
+                    <button class="text-white hover:text-blue-200 flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"/>
+                        </svg>
+                        <span>Share</span>
+                    </button>
+                    <button class="text-white hover:text-blue-200 flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M12 21a9 9 0 110-18 9 9 0 010 18z"/>
+                        </svg>
+                        <span>Help</span>
+                    </button>
+                </nav>
+                <!-- Mobile menu button -->
+                <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Navigation Menu -->
+        <div 
+            x-show="mobileMenuOpen"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 transform -translate-y-2"
+            x-transition:enter-end="opacity-100 transform translate-y-0"
+            x-transition:leave="transition ease-in duration-150"
+            x-transition:leave-start="opacity-100 transform translate-y-0"
+            x-transition:leave-end="opacity-0 transform -translate-y-2"
+            class="absolute top-16 right-0 w-48 bg-gray-800 shadow-lg md:hidden rounded-bl-lg"
+        >
+            <div class="px-2 py-3 space-y-2">
+                <button class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"/>
+                    </svg>
+                    <span>Share</span>
+                </button>
+                <button class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M12 21a9 9 0 110-18 9 9 0 010 18z"/>
+                    </svg>
+                    <span>Help</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="flex flex-col md:flex-row pt-16">
+        <!-- Main Content -->
+        <main class="flex-1 order-1 md:order-2 transition-all duration-300" 
+            :class="{ 'md:ml-64': sidebarOpen, 'md:ml-0': !sidebarOpen }">
+            <!-- Sidebar Show Button (Desktop) -->
+            <button 
+                @click="sidebarOpen = true" 
+                class="hidden md:flex items-center justify-center w-6 h-12 bg-gray-800 bg-opacity-50 hover:bg-opacity-75 text-white rounded-r fixed left-0 top-1/2 transform -translate-y-1/2 transition-opacity duration-300"
+                :class="{ 'opacity-0 pointer-events-none': sidebarOpen, 'opacity-100': !sidebarOpen }"
+            >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+            </button>
+            <canvas 
+                id="mainCanvas"
+                class="w-full h-[calc(100vh-4rem-100px)] md:h-[calc(100vh-4rem)] bg-white"
+                :class="{ 'md:ml-0': !sidebarOpen }"
+            ></canvas>
+        </main>
+
+        <!-- Sidebar - Fixed to bottom on mobile, left side on desktop -->
+        <aside class="bg-gray-100 text-gray-800 w-full md:w-64 fixed transition-all duration-300 order-2 md:order-1 z-40"
+            :class="{
+                'bottom-0 md:bottom-auto md:top-16 md:left-0': sidebarOpen,
+                'bottom-[-300px] md:bottom-auto md:top-16 md:left-[-256px]': !sidebarOpen
+            }">
+            <!-- Top Control Bar -->
+            <div class="bg-gray-800 text-white p-2 flex justify-between items-center">
+                <span class="font-semibold">Equations</span>
+                <button @click="sidebarOpen = false" class="p-1 hover:bg-gray-700 rounded">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        :class="{ 'rotate-90 md:rotate-180': true }">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+            </div>
+            <!-- Sidebar Content -->
+            <div class="p-4 flex flex-col space-y-4 max-h-[calc(100vh-10rem)] md:max-h-[calc(100vh-7rem)] overflow-y-auto">
+                <!-- Dynamic Text Boxes -->
+                <template x-for="(equation, index) in equations" :key="index">
+                    <div class="flex items-center space-x-2">
+                        <input 
+                            type="text" 
+                            x-model="equations[index]"
+                            @keydown.enter="addEquation()"
+                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            placeholder="Enter equation..."
+                        >
+                        <button 
+                            @click="removeEquation(index)"
+                            class="text-gray-500 hover:text-red-500 focus:outline-none"
+                            :disabled="equations.length === 1"
+                        >
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </template>
+
+                <!-- Fuzzy Level Slider -->
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">
+                        Fuzzy Level: <span x-text="fuzzy_level"></span>
+                    </label>
+                    <input 
+                        type="range" 
+                        x-model="fuzzy_level" 
+                        min="0" 
+                        max="100" 
+                        class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                    >
+                </div>
+            </div>
+        </aside>
+
+        <!-- Mobile Show Button (when panel is hidden) -->
+        <button 
+            @click="sidebarOpen = true" 
+            class="md:hidden fixed bottom-0 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-50 hover:bg-opacity-75 text-white px-4 py-2 rounded-t transition-all duration-300"
+            :class="{ 'opacity-0 pointer-events-none': sidebarOpen, 'opacity-100': !sidebarOpen }"
+        >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        // Initialize canvas
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas size to match its display size
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+
+        // Initial resize
+        resizeCanvas();
+
+        // Resize canvas when window is resized
+        window.addEventListener('resize', resizeCanvas);
+    </script>
+</body>
+</html> 
