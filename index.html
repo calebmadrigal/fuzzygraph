@@ -114,7 +114,6 @@
             }">
             <!-- Top Control Bar -->
             <div class="bg-gray-400 text-white p-2 flex justify-between items-center">
-                <span class="font-semibold">Equations</span>
                 <button @click="sidebarOpen = false" class="p-1 hover:bg-gray-700 rounded">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                         :class="{ 'rotate-90 md:rotate-180': true }">
@@ -124,27 +123,33 @@
             </div>
             <!-- Sidebar Content -->
             <div class="p-4 flex flex-col space-y-4 max-h-[calc(100vh-10rem)] md:max-h-[calc(100vh-7rem)] overflow-y-auto">
-                <!-- Dynamic Text Boxes -->
-                <template x-for="(equation, index) in equations" :key="index">
-                    <div class="flex items-center space-x-2">
-                        <input 
-                            type="text" 
-                            x-model="equations[index]"
-                            @keydown.enter="addEquation()"
-                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            placeholder="Enter equation..."
-                        >
-                        <button 
-                            @click="removeEquation(index)"
-                            class="text-gray-500 hover:text-red-500 focus:outline-none"
-                            :disabled="equations.length === 1"
-                        >
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
-                        </button>
+                <!-- Equations Section -->
+                <div>
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Equations</h3>
+                    <div class="space-y-2">
+                        <!-- Dynamic Text Boxes -->
+                        <template x-for="(equation, index) in equations" :key="index">
+                            <div class="flex items-center space-x-2">
+                                <input 
+                                    type="text" 
+                                    x-model="equations[index]"
+                                    @keydown.enter="addEquation()"
+                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    placeholder="Enter equation..."
+                                >
+                                <button 
+                                    @click="removeEquation(index)"
+                                    class="text-gray-500 hover:text-red-500 focus:outline-none"
+                                    :disabled="equations.length === 1"
+                                >
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </template>
                     </div>
-                </template>
+                </div>
 
                 <!-- Controls Section -->
                 <div class="mt-6">
