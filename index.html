@@ -15,6 +15,7 @@
     fuzzy_level: 50,
     color_map: 'viridis',
     invert_color: false,
+    color_cycles: 1,
     sidebarOpen: true,
     utilsMenuOpen: false,
     showAxis: true,
@@ -277,6 +278,18 @@
                                 :class="invert_color ? 'translate-x-5' : 'translate-x-0'"
                             ></span>
                         </button>
+                    </div>
+
+                    <!-- Colormap Cycles -->
+                    <div class="flex items-center justify-between mt-4">
+                        <span class="text-sm font-medium text-gray-700">Colormap cycles</span>
+                        <input 
+                            type="number" 
+                            x-model="color_cycles"
+                            min="1"
+                            step="1"
+                            class="w-20 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-right"
+                        >
                     </div>
                 </div>
 
