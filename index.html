@@ -107,10 +107,10 @@
         <main class="flex-1 order-1 md:order-2 transition-all duration-300 relative" 
             :class="{ 'md:ml-64': sidebarOpen, 'md:ml-0': !sidebarOpen }">
             <!-- Zoom Controls -->
-            <div class="absolute top-4 right-4 z-10 flex flex-col gap-2">
+            <div class="absolute top-4 right-4 z-10 flex flex-col gap-0.5">
                 <button 
                     @click="zoom = Math.min(zoom + 0.1, 5)"
-                    class="p-2 bg-gray-800 bg-opacity-75 hover:bg-opacity-100 text-white rounded-lg shadow-lg transition-colors duration-200"
+                    class="p-1.5 bg-gray-800 bg-opacity-75 hover:bg-opacity-100 text-white rounded-t-lg shadow-lg transition-colors duration-200"
                 >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -118,7 +118,7 @@
                 </button>
                 <button 
                     @click="zoom = Math.max(zoom - 0.1, 0.1)"
-                    class="p-2 bg-gray-800 bg-opacity-75 hover:bg-opacity-100 text-white rounded-lg shadow-lg transition-colors duration-200"
+                    class="p-1.5 bg-gray-800 bg-opacity-75 hover:bg-opacity-100 text-white rounded-b-lg shadow-lg transition-colors duration-200"
                 >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 12H6" />
