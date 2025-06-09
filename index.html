@@ -19,8 +19,10 @@
     utilsMenuOpen: false,
     showAxis: true,
     zoom: 1,
+    nextId: 1,
     addEquation() {
         this.equations.push('');
+        setTimeout(() => document.getElementById(`eq-${this.equations.length - 1}`).focus(), 0);
     },
     removeEquation(index) {
         this.equations.splice(index, 1);
@@ -202,6 +204,7 @@
                                     type="text" 
                                     x-model="equations[index]"
                                     @keydown.enter="addEquation()"
+                                    :id="'eq-' + index"
                                     class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     placeholder="Enter equation..."
                                 >
