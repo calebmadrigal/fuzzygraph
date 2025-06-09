@@ -18,6 +18,7 @@
     sidebarOpen: true,
     utilsMenuOpen: false,
     showAxis: true,
+    zoom: 1,
     addEquation() {
         this.equations.push('');
     },
@@ -113,6 +114,26 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
                     </svg>
                 </button>
+
+                <!-- Zoom Buttons -->
+                <div class="flex flex-col gap-2 mt-2">
+                    <button 
+                        @click="zoom = Math.min(zoom + 0.1, 5)"
+                        class="p-2 bg-gray-800 bg-opacity-75 hover:bg-opacity-100 text-white rounded-lg shadow-lg transition-colors duration-200"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                    </button>
+                    <button 
+                        @click="zoom = Math.max(zoom - 0.1, 0.1)"
+                        class="p-2 bg-gray-800 bg-opacity-75 hover:bg-opacity-100 text-white rounded-lg shadow-lg transition-colors duration-200"
+                    >
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 12H6" />
+                        </svg>
+                    </button>
+                </div>
 
                 <!-- Floating Menu -->
                 <div
