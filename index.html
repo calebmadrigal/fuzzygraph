@@ -99,8 +99,18 @@
     <!-- Main Container -->
     <div class="flex flex-col md:flex-row pt-16 bg-gray-300">
         <!-- Main Content -->
-        <main class="flex-1 order-1 md:order-2 transition-all duration-300" 
+        <main class="flex-1 order-1 md:order-2 transition-all duration-300 relative" 
             :class="{ 'md:ml-64': sidebarOpen, 'md:ml-0': !sidebarOpen }">
+            <!-- Utilities Button -->
+            <div class="absolute top-4 right-4 z-10">
+                <button 
+                    class="p-3 bg-gray-800 bg-opacity-75 hover:bg-opacity-100 text-white rounded-full shadow-lg transition-colors duration-200"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
+                    </svg>
+                </button>
+            </div>
             <!-- Sidebar Show Button (Desktop) -->
             <button 
                 @click="sidebarOpen = true" 
@@ -114,7 +124,6 @@
             <canvas 
                 id="mainCanvas"
                 class="w-full h-[calc(100vh-4rem-100px)] md:h-[calc(100vh-4rem)] bg-white"
-                :class="{ 'md:ml-0': !sidebarOpen }"
             ></canvas>
         </main>
 
