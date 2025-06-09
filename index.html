@@ -13,6 +13,7 @@
     mobileMenuOpen: false,
     equations: [''],
     fuzzy_level: 50,
+    color_map: 'viridis',
     sidebarOpen: true,
     addEquation() {
         this.equations.push('');
@@ -105,7 +106,7 @@
         </main>
 
         <!-- Sidebar - Fixed to bottom on mobile, left side on desktop -->
-        <aside class="bg-gray-300 text-gray-800 w-full md:w-64 fixed transition-all duration-300 order-2 md:order-1 z-40"
+        <aside name="sidebar" class="bg-gray-300 text-gray-800 w-full md:w-64 fixed transition-all duration-300 order-2 md:order-1 z-40"
             :class="{
                 'bottom-0 md:bottom-auto md:top-16 md:left-0': sidebarOpen,
                 'bottom-[-300px] md:bottom-auto md:top-16 md:left-[-256px]': !sidebarOpen
@@ -156,6 +157,28 @@
                         max="100" 
                         class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                     >
+                </div>
+
+                <!-- Color Section -->
+                <div class="mt-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Color</h3>
+                    <!-- Color Map Dropdown -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">
+                            Color Map
+                        </label>
+                        <select 
+                            x-model="color_map" 
+                            class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        >
+                            <option value="viridis">Viridis</option>
+                            <option value="plasma">Plasma</option>
+                            <option value="inferno">Inferno</option>
+                            <option value="magma">Magma</option>
+                            <option value="cividis">Cividis</option>
+                            <option value="rainbow">Rainbow</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </aside>
