@@ -158,10 +158,10 @@
                 </button>
             </div>
             <!-- Sidebar Content -->
-            <div class="p-4 flex flex-col space-y-4 max-h-[calc(100vh-10rem)] md:max-h-[calc(100vh-7rem)] overflow-y-auto">
+            <div class="p-4 flex flex-col space-y-8 max-h-[calc(100vh-10rem)] md:max-h-[calc(100vh-7rem)] overflow-y-auto">
                 <!-- Equations Section -->
                 <div>
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Equations</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200">Equations</h3>
                     <div class="space-y-2">
                         <!-- Dynamic Text Boxes -->
                         <template x-for="(equation, index) in equations" :key="index">
@@ -189,8 +189,8 @@
                 </div>
 
                 <!-- Controls Section -->
-                <div class="mt-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Controls</h3>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200">Controls</h3>
                     <!-- Fuzzy Level Slider -->
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700">
@@ -225,8 +225,8 @@
                 </div>
 
                 <!-- Color Section -->
-                <div class="mt-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Color</h3>
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200">Color</h3>
                     <!-- Color Map Dropdown -->
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700">
