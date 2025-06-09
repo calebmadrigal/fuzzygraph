@@ -16,6 +16,7 @@
     color_map: 'viridis',
     invert_color: false,
     color_cycles: 1,
+    color_start_offset: 0,
     sidebarOpen: true,
     showAxis: true,
     zoom: 1,
@@ -270,6 +271,19 @@
                             x-model="color_cycles"
                             min="1"
                             step="1"
+                            class="w-20 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-right"
+                        >
+                    </div>
+
+                    <!-- Color Start Offset -->
+                    <div class="flex items-center justify-between mt-4">
+                        <span class="text-sm font-medium text-gray-700">Color start offset</span>
+                        <input 
+                            type="number" 
+                            x-model="color_start_offset"
+                            min="0"
+                            max="1"
+                            step="0.1"
                             class="w-20 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-right"
                         >
                     </div>
