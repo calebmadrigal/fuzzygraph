@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fuzzy Graph</title>
     <!-- Alpine.js -->
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!--<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>-->
+    <script defer src="js/alpine.min.js"></script>
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!--<script src="https://cdn.tailwindcss.com"></script>-->
+    <script src="css/tailwind.min.css"></script>
 </head>
 <body class="min-h-screen" x-data="{ 
     mobileMenuOpen: false,
@@ -146,7 +148,7 @@
         <aside class="bg-gray-300 text-gray-800 w-full md:w-64 fixed transition-all duration-300 order-2 md:order-1 z-40"
             :class="{
                 'bottom-0 md:bottom-auto md:top-16 md:left-0': sidebarOpen,
-                'bottom-[-600px] md:bottom-auto md:top-16 md:left-[-256px]': !sidebarOpen
+                'bottom-[-1000px] md:bottom-auto md:top-16 md:left-[-1000px]': !sidebarOpen
             }">
             <!-- Top Control Bar -->
             <div class="bg-gray-400 text-white p-2 flex justify-between items-center">
@@ -158,7 +160,7 @@
                 </button>
             </div>
             <!-- Sidebar Content -->
-            <div class="p-4 flex flex-col space-y-8 max-h-[calc(100vh-10rem)] md:max-h-[calc(100vh-7rem)] overflow-y-auto">
+            <div class="p-4 flex flex-col space-y-8 max-h-[50vh] md:max-h-[calc(100vh-7rem)] overflow-y-auto">
                 <!-- Equations Section -->
                 <div>
                     <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200">Equations</h3>
