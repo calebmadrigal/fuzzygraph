@@ -321,9 +321,8 @@
             console.log('handleChange()');
             var appConfig = Object.entries(Alpine.store('app'))
             console.log(appConfig);
-
+						setUrlFromParams();
         }
-
 
         /////////////////////////////////////////////////////////////////////////////////////// URL Handling
         
@@ -369,11 +368,24 @@
           }
         };
         
-        var setUrlFromParams = function(graphParams) {
-          var hashStr = "#?equation=" + encodeURIComponent(graphParams['equation']);
-          ['fuzzyValue', 'xCenter', 'yCenter', 'yWidth'].forEach(function (param) {
-            hashStr = hashStr + "&" + param + "=" + encodeURIComponent(graphParams[param]);
-          });
+        var setUrlFromParams = function() {
+					const appStore = Alpine.store('app');
+
+					// Filter out functions from the store, keeping only non-function properties
+					const appData = Object.fromEntries(
+							Object.entries(appStore).filter(([key, value]) => typeof value !== 'function')
+					);
+
+					// Create URLSearchParams from filtered appData
+					const params = new URLSearchParams();
+					for (const [key, value] of Object.entries(appData)) {
+							// Handle arrays (like equations) by joining or serializing appropriately
+							const paramValue = Array.isArray(value) ? JSON.stringify(value) : value;
+							params.append(key, paramValue);
+					}
+
+					// Construct the hash string
+					const hashStr = `#?${params.toString()}`;
           window.location.hash = hashStr;
         };
 
