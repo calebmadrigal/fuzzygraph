@@ -10,30 +10,37 @@
     <!-- Tailwind CSS -->
     <!--<script src="https://cdn.tailwindcss.com"></script>-->
     <script src="css/tailwind.min.css"></script>
+    <script>
+        // Initialize Alpine store
+        document.addEventListener('alpine:init', () => {
+            Alpine.store('app', {
+                mobileMenuOpen: true,
+                equations: ['y=x^2'],
+                fuzzy_level: 50,
+                color_map: 'viridis',
+                invert_color: true,
+                color_cycles: 1,
+                color_start_offset: 0,
+                sidebarOpen: true,
+                showAxis: true,
+                zoom: 1,
+                nextId: 1,
+                addEquation() {
+                    this.equations.push('');
+                    setTimeout(() => document.getElementById(`eq-${this.equations.length - 1}`).focus(), 0);
+                },
+                removeEquation(index) {
+                    this.equations.splice(index, 1);
+                    if (this.equations.length === 0) {
+                        this.equations.push('');
+                    }
+                }
+            });
+        });
+
+    </script>
 </head>
-<body class="min-h-screen" x-data="{ 
-    mobileMenuOpen: false,
-    equations: [''],
-    fuzzy_level: 50,
-    color_map: 'viridis',
-    invert_color: false,
-    color_cycles: 1,
-    color_start_offset: 0,
-    sidebarOpen: true,
-    showAxis: true,
-    zoom: 1,
-    nextId: 1,
-    addEquation() {
-        this.equations.push('');
-        setTimeout(() => document.getElementById(`eq-${this.equations.length - 1}`).focus(), 0);
-    },
-    removeEquation(index) {
-        this.equations.splice(index, 1);
-        if (this.equations.length === 0) {
-            this.equations.push('');
-        }
-    }
-}">
+<body class="min-h-screen" x-data>
     <!-- Header -->
     <header class="bg-gray-800 text-white h-16 fixed w-full top-0 left-0 z-50">
         <div class="flex items-center justify-between h-full px-4">
@@ -71,7 +78,7 @@
                     </button>
                 </nav>
                 <!-- Mobile menu button -->
-                <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden p-2">
+                <button @click="$store.app.mobileMenuOpen = !$store.app.mobileMenuOpen" class="md:hidden p-2">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
                     </svg>
@@ -80,7 +87,7 @@
         </div>
         <!-- Mobile Navigation Menu -->
         <div 
-            x-show="mobileMenuOpen"
+            x-show="$store.app.mobileMenuOpen"
             x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0 transform -translate-y-2"
             x-transition:enter-end="opacity-100 transform translate-y-0"
@@ -116,11 +123,11 @@
     <div class="flex flex-col md:flex-row pt-16 bg-gray-300">
         <!-- Main Content -->
         <main class="flex-1 order-1 md:order-2 transition-all duration-300 relative" 
-            :class="{ 'md:ml-64': sidebarOpen, 'md:ml-0': !sidebarOpen }">
+            :class="{ 'md:ml-64': $store.app.sidebarOpen, 'md:ml-0': !$store.app.sidebarOpen }">
             <!-- Zoom Controls -->
             <div class="absolute top-4 right-4 z-10 flex flex-col gap-0.5">
                 <button 
-                    @click="zoom = Math.min(zoom + 0.1, 5)"
+                    @click="$store.app.zoom = Math.min($store.app.zoom + 0.1, 5)"
                     class="p-1.5 bg-gray-800 bg-opacity-75 hover:bg-opacity-100 text-white rounded-t-lg shadow-lg transition-colors duration-200"
                 >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -128,7 +135,7 @@
                     </svg>
                 </button>
                 <button 
-                    @click="zoom = Math.max(zoom - 0.1, 0.1)"
+                    @click="$store.app.zoom = Math.max($store.app.zoom - 0.1, 0.1)"
                     class="p-1.5 bg-gray-800 bg-opacity-75 hover:bg-opacity-100 text-white rounded-b-lg shadow-lg transition-colors duration-200"
                 >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -138,9 +145,9 @@
             </div>
             <!-- Sidebar Show Button (Desktop) -->
             <button 
-                @click="sidebarOpen = true" 
+                @click="$store.app.sidebarOpen = true" 
                 class="hidden md:flex items-center justify-center w-6 h-12 bg-gray-800 bg-opacity-50 hover:bg-opacity-75 text-white rounded-r fixed left-0 top-1/2 transform -translate-y-1/2 transition-opacity duration-300"
-                :class="{ 'opacity-0 pointer-events-none': sidebarOpen, 'opacity-100': !sidebarOpen }"
+                :class="{ 'opacity-0 pointer-events-none': $store.app.sidebarOpen, 'opacity-100': !$store.app.sidebarOpen }"
             >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -155,12 +162,12 @@
         <!-- Sidebar - Fixed to bottom on mobile, left side on desktop -->
         <aside class="bg-gray-300 text-gray-800 w-full md:w-64 fixed transition-all duration-300 order-2 md:order-1 z-40"
             :class="{
-                'bottom-0 md:bottom-auto md:top-16 md:left-0': sidebarOpen,
-                'bottom-[-1000px] md:bottom-auto md:top-16 md:left-[-1000px]': !sidebarOpen
+                'bottom-0 md:bottom-auto md:top-16 md:left-0': $store.app.sidebarOpen,
+                'bottom-[-1000px] md:bottom-auto md:top-16 md:left-[-1000px]': !$store.app.sidebarOpen
             }">
             <!-- Top Control Bar -->
             <div class="bg-gray-400 text-white p-2 flex justify-between items-center">
-                <button @click="sidebarOpen = false" class="p-1 hover:bg-gray-700 rounded">
+                <button @click="$store.app.sidebarOpen = false" class="p-1 hover:bg-gray-700 rounded">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
                         :class="{ 'rotate-90 md:rotate-180': true }">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19l7-7-7-7"/>
@@ -174,23 +181,24 @@
                     <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200">Equations</h3>
                     <div class="space-y-2">
                         <!-- Dynamic Text Boxes -->
-                        <template x-for="(equation, index) in equations" :key="index">
+                        <template x-for="(equation, index) in $store.app.equations" :key="index">
                             <div class="flex items-center space-x-2">
                                 <input 
                                     type="text" 
-                                    x-model="equations[index]"
-                                    @keydown.enter="addEquation()"
+                                    x-model="$store.app.equations[index]"
+                                    @keydown.enter="$store.app.addEquation()"
                                     :id="'eq-' + index"
                                     class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     placeholder="Enter equation..."
                                 >
                                 <button 
-                                    @click="removeEquation(index)"
+                                    @click="$store.app.removeEquation(index)"
                                     class="text-gray-500 hover:text-red-500 focus:outline-none"
-                                    :disabled="equations.length === 1"
+                                    :disabled="$store.app.equations.length === 1"
                                 >
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        >
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                     </svg>
                                 </button>
                             </div>
@@ -204,11 +212,11 @@
                     <!-- Fuzzy Level Slider -->
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700">
-                            Fuzzy Level: <span x-text="fuzzy_level"></span>
+                            Fuzzy Level: <span x-text="$store.app.fuzzy_level"></span>
                         </label>
                         <input 
                             type="range" 
-                            x-model="fuzzy_level" 
+                            x-model="$store.app.fuzzy_level" 
                             min="0" 
                             max="100" 
                             class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
@@ -221,15 +229,16 @@
                         <button 
                             type="button" 
                             class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                            :class="showAxis ? 'bg-blue-600' : 'bg-gray-200'"
-                            @click="showAxis = !showAxis"
+                            :class="$store.app.showAxis ? 'bg-blue-600' : 'bg-gray-200'"
+                            @click="$store.app.showAxis = !$store.app.showAxis"
                             role="switch"
-                            :aria-checked="showAxis"
+                            :aria-checked="$store.app.showAxis"
                         >
                             <span 
                                 class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-                                :class="showAxis ? 'translate-x-5' : 'translate-x-0'"
-                            ></span>
+                                :class="$store.app.showAxis ? 'translate-x-5' : 'translate-x-0'"
+                            >
+                            </span>
                         </button>
                     </div>
                 </div>
@@ -243,13 +252,13 @@
                             Color Map
                         </label>
                         <select 
-                            x-model="color_map" 
-                            class="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            x-model="$store.app.color_map" 
+                            ="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         >
                             <option value="viridis">Viridis</option>
                             <option value="plasma">Plasma</option>
                             <option value="inferno">Inferno</option>
-                            <option value="magma">Magma</option>
+                            <option value="magma">Magna</option>
                             <option value="cividis">Cividis</option>
                             <option value="rainbow">Rainbow</option>
                         </select>
@@ -261,15 +270,16 @@
                         <button 
                             type="button" 
                             class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                            :class="invert_color ? 'bg-blue-600' : 'bg-gray-200'"
-                            @click="invert_color = !invert_color"
+                            :class="$store.app.invert_color ? 'bg-blue-600' : 'bg-gray-200'"
+                            @click="$store.app.invert_color = !$store.app.invert_color"
                             role="switch"
-                            :aria-checked="invert_color"
+                            :aria-checked="$store.app.invert_color"
                         >
                             <span 
                                 class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-                                :class="invert_color ? 'translate-x-5' : 'translate-x-0'"
-                            ></span>
+                                :class="$store.app.invert_color ? 'translate-x-5' : 'translate-x-0'"
+                            >
+                            </span>
                         </button>
                     </div>
 
@@ -278,10 +288,10 @@
                         <span class="text-sm font-medium text-gray-700">Colormap cycles</span>
                         <input 
                             type="number" 
-                            x-model="color_cycles"
+                            x-model="$store.app.color_cycles"
                             min="1"
                             step="1"
-                            class="w-20 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-right"
+                            class="w-20 px-2 py-1 border bg-gray-300 rounded-md border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-right"
                         >
                     </div>
 
@@ -290,26 +300,24 @@
                         <span class="text-sm font-medium text-gray-700">Color start offset</span>
                         <input 
                             type="number" 
-                            x-model="color_start_offset"
+                            x-model="$store.app.color_start_offset"
                             min="0"
                             max="1"
                             step="0.1"
-                            class="w-20 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-right"
+                            class="w-20 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:border-transparent text-right"
                         >
+                        </div>
                     </div>
+
                 </div>
-
             </div>
-
-            
-
         </aside>
 
         <!-- Mobile Show Button (when panel is hidden) -->
         <button 
-            @click="sidebarOpen = true" 
-            class="md:hidden fixed bottom-0 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-50 hover:bg-opacity-75 text-white px-4 py-2 rounded-t transition-all duration-300"
-            :class="{ 'opacity-0 pointer-events-none': sidebarOpen, 'opacity-100': !sidebarOpen }"
+            @click="$store.app.sidebarOpen = true" 
+            class="md-hidden fixed bottom-0 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-50 hover:bg-opacity-75 text-white px-4 py-2 rounded-t transition-all duration-300"
+            :class="{ 'opacity-0 pointer-events-none': $store.app.sidebarOpen, 'opacity-100': !$store.app.sidebarOpen }"
         >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
@@ -336,4 +344,4 @@
         window.addEventListener('resize', resizeCanvas);
     </script>
 </body>
-</html> 
+</html>
