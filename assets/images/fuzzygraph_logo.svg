@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="68.923615mm"
+   height="12.209777mm"
+   viewBox="0 0 68.923615 12.209777"
+   version="1.1"
+   id="svg4645"
+   inkscape:version="1.1.1 (c3084ef, 2021-09-22)"
+   sodipodi:docname="fuzzygraph_logo.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview4647"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="1.8057824"
+     inkscape:cx="84.450927"
+     inkscape:cy="118.2313"
+     inkscape:window-width="1476"
+     inkscape:window-height="863"
+     inkscape:window-x="16"
+     inkscape:window-y="38"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs4642">
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter21685"
+       x="-0.038038509"
+       y="-0.12275791"
+       width="1.076077"
+       height="1.2455158">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="0.50141432"
+         id="feGaussianBlur21687" />
+    </filter>
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-34.628594,-7.5549999)">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.5833px;line-height:1.25;font-family:'Arial Black';-inkscape-font-specification:'Arial Black, ';mix-blend-mode:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583;filter:url(#filter21685)"
+       x="35.046509"
+       y="16.334135"
+       id="text19887"><tspan
+         sodipodi:role="line"
+         id="tspan19885"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Arial Black';-inkscape-font-specification:'Arial Black, ';stroke-width:0.264583"
+         x="35.046509"
+         y="16.334135">Fuzzy</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       x="69.456207"
+       y="16.4189"
+       id="text26331"><tspan
+         sodipodi:role="line"
+         id="tspan26329"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:'Arial Black';-inkscape-font-specification:'Arial Black, ';stroke-width:0.264583"
+         x="69.456207"
+         y="16.4189">Graph</tspan></text>
+  </g>
+</svg>

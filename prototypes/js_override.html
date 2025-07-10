@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript Executor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        textarea {
+            width: 300px;
+            height: 100px;
+            margin-bottom: 10px;
+        }
+        #valueDisplay {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <textarea id="codeInput" placeholder="Enter JavaScript code here..."></textarea><br>
+    <button onclick="executeCode()">Execute</button><br>
+    <div>Current value: <span id="valueDisplay">1337</span></div>
+
+    <script>
+        // Global variable
+        let value = 1337;
+
+        // Function to update the display
+        function updateDisplay() {
+            document.getElementById('valueDisplay').textContent = value;
+        }
+
+        // Function to execute code from textarea
+        function executeCode() {
+            const code = document.getElementById('codeInput').value;
+            try {
+                // Create a new function to execute the code in the global scope
+                const func = new Function('value', `with ({ value: value }) { ${code}; return value; }`);
+                value = func(value); // Update global value with the returned value
+                updateDisplay(); // Update the display
+            } catch (error) {
+                alert('Error executing code: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
