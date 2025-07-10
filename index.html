@@ -10,35 +10,6 @@
     <!-- Tailwind CSS -->
     <!--<script src="https://cdn.tailwindcss.com"></script>-->
     <script src="js/tailwind.js"></script>
-    <script>
-        // Initialize Alpine store
-        document.addEventListener('alpine:init', () => {
-            Alpine.store('app', {
-                mobileMenuOpen: true,
-                equations: ['y=x^2'],
-                fuzzy_level: 50,
-                color_map: 'viridis',
-                invert_color: true,
-                color_cycles: 1,
-                color_start_offset: 0,
-                sidebarOpen: true,
-                showAxis: true,
-                zoom: 1,
-                nextId: 1,
-                addEquation() {
-                    this.equations.push('');
-                    setTimeout(() => document.getElementById(`eq-${this.equations.length - 1}`).focus(), 0);
-                },
-                removeEquation(index) {
-                    this.equations.splice(index, 1);
-                    if (this.equations.length === 0) {
-                        this.equations.push('');
-                    }
-                }
-            });
-        });
-
-    </script>
 </head>
 <body class="min-h-screen" x-data>
     <!-- Header -->
@@ -185,8 +156,9 @@
                             <div class="flex items-center space-x-2">
                                 <input 
                                     type="text" 
-                                    x-model="$store.app.equations[index]"
                                     @keydown.enter="$store.app.addEquation()"
+                                    @input.debounce.500ms="$store.app.updateEquation(index, $event.target.value)"
+                                                                      :value="$store.app.equations[index]"
                                     :id="'eq-' + index"
                                     class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     placeholder="Enter equation..."
@@ -342,6 +314,108 @@
 
         // Resize canvas when window is resized
         window.addEventListener('resize', resizeCanvas);
+
+
+        /////////////////////////////////////////////////////////////////////////////////////// Handle changes
+        function handleChange() {
+            console.log('handleChange()');
+            var appConfig = Object.entries(Alpine.store('app'))
+            console.log(appConfig);
+
+        }
+
+
+        /////////////////////////////////////////////////////////////////////////////////////// URL Handling
+        
+        var getParameterByName = function(name, url) {
+          // Copied from:
+          // http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+          if (!url) url = window.location.href;
+          name = name.replace(/[\[\]]/g, "\\$&");
+          var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+              results = regex.exec(url);
+          if (!results) return null;
+          if (!results[2]) return '';
+          return decodeURIComponent(results[2].replace(/\+/g, " "));
+        };
+        
+        var setParamsFromUrl = function (graphParams) {
+          // Try to get equation from url
+          var urlFragmentId = window.location.hash.substr(1);
+        
+          var getParamFromUrl = function (param) {
+            var paramValFromUrl = getParameterByName(param, urlFragmentId);
+            if (paramValFromUrl) {
+              // if 'equation' param, compile it
+              if (param == 'equation') {
+                graphParams[param] = paramValFromUrl;
+                var equationCompiled = parseEquationString(paramValFromUrl);
+                if (equationCompiled) {
+                  graphParams['equationCompiled'] = equationCompiled;
+                }
+              }
+              // Otherwise, it's a numeric value, so parse it as a float
+              else {
+                graphParams[param] = parseFloat(paramValFromUrl);
+              }
+              console.log("Got url param:" + param + " -> " + paramValFromUrl);
+            }
+          };
+        
+          for (var param in graphParams) {
+            if (graphParams.hasOwnProperty(param)) {
+              getParamFromUrl(param);
+            }
+          }
+        };
+        
+        var setUrlFromParams = function(graphParams) {
+          var hashStr = "#?equation=" + encodeURIComponent(graphParams['equation']);
+          ['fuzzyValue', 'xCenter', 'yCenter', 'yWidth'].forEach(function (param) {
+            hashStr = hashStr + "&" + param + "=" + encodeURIComponent(graphParams[param]);
+          });
+          window.location.hash = hashStr;
+        };
+
+        // Initialize Alpine store
+        document.addEventListener('alpine:init', () => {
+            Alpine.store('app', {
+                mobileMenuOpen: true,
+                equations: ['y=x^2'],
+                fuzzy_level: 50,
+                color_map: 'viridis',
+                invert_color: true,
+                color_cycles: 1,
+                color_start_offset: 0,
+                sidebarOpen: true,
+                showAxis: true,
+                zoom: 1,
+                nextId: 1,
+                addEquation() {
+                    this.equations.push('');
+                    setTimeout(() => document.getElementById(`eq-${this.equations.length - 1}`).focus(), 0);
+                },
+                updateEquation(index, value) {
+                    this.equations = [
+                        ...this.equations.slice(0, index),
+                        value,
+                        ...this.equations.slice(index + 1)
+                    ];
+                },
+                removeEquation(index) {
+                    this.equations.splice(index, 1);
+                    if (this.equations.length === 0) {
+                        this.equations.push('');
+                    }
+                }
+            });
+
+            Alpine.effect(() => {
+                handleChange();
+            });
+
+        });
+
     </script>
 </body>
 </html>
