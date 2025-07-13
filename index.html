@@ -309,22 +309,6 @@
         }
 
         function getParameterByName(name, url) {
-            // Copied from:
-            // http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
-            if (!url) url = window.location.href;
-            name = name.replace(/[\[\]]/g, "\\$&");
-            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-                results = regex.exec(url);
-            if (!results) return null;
-            if (!results[2]) return '';
-            return decodeURIComponent(results[2].replace(/\+/g, " "));
-        }
-
-        function isBooleanString(str) {
-            return /^(true|false)$/i.test(str);
-        }
-
-        function getParameterByName(name, url) {
             if (!url) url = window.location.href;
             name = name.replace(/[\[\]]/g, "\\$&");
             var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)");
@@ -402,7 +386,7 @@
             window.location.hash = hashStr;
         }
 
-        const defaultState = {
+        const defaultConfig = {
             mobileMenuOpen: true,
             equations: ['y=x^2'],
             fuzzy_level: 50,
@@ -419,17 +403,6 @@
         // Initialize Alpine store
         document.addEventListener('alpine:init', () => {
             Alpine.store('app', {
-                mobileMenuOpen: true,
-                equations: ['y=x^2'],
-                fuzzy_level: 50,
-                color_map: 'viridis',
-                invert_color: true,
-                color_cycles: 1,
-                color_start_offset: 0,
-                sidebarOpen: true,
-                showAxis: true,
-                zoom: 1,
-                nextId: 1,
                 addEquation() {
                     this.equations.push('');
                     setTimeout(() => document.getElementById(`eq-${this.equations.length - 1}`).focus(), 0);
@@ -449,6 +422,8 @@
                 }
             });
 
+            Object.assign(Alpine.store('app'), defaultConfig)
+
             Alpine.effect(() => {
                 if (firstPass) {
                     setParamsFromUrl();
@@ -459,8 +434,6 @@
                 }
             });
 
-            // If there are any configuration in the url query, set them
-            // NOTE: must be called in 'alpine:init' since it relies on Alpine being defined
         });
 
 
