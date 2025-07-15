@@ -366,10 +366,7 @@
 
             // Update the store with parsed values
             if (Object.keys(configFromUrl).length > 0) {
-                Alpine.store('app', {
-                    ...Alpine.store('app'),
-                    ...configFromUrl
-                });
+                Object.assign(Alpine.store('app'), configFromUrl);
             }
 
             console.log("Parsed config from URL:", configFromUrl);
