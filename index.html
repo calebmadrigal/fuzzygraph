@@ -288,12 +288,21 @@
         // Resize canvas when window is resized
         window.addEventListener('resize', resizeCanvas);
 
+        function updateGraph() {
+          const canvas = document.getElementById('mainCanvas');
+          const ctx = canvas.getContext('2d');
+          ctx.beginPath();
+          ctx.arc(100, 100, 50, 0, 2 * Math.PI); // (x, y, radius, startAngle, endAngle)
+          ctx.stroke();
+        }
+
 
         /////////////////////////////////////////////////////////////////////////////////////// Handle changes
         function handleChange() {
             console.log('handleChange()');
             var appConfig = Object.entries(Alpine.store('app'))
             console.log(appConfig);
+            updateGraph();
             setUrlFromParams();
         }
 
