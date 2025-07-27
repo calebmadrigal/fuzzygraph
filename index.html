@@ -11,6 +11,8 @@
     <!-- Tailwind CSS -->
     <!--<script src="https://cdn.tailwindcss.com"></script>-->
     <script src="js/tailwind.js"></script>
+    <script src="js/fuzzygraph.js"></script>
+    <script src="https://unpkg.com/mathjs@14.5.3/lib/browser/math.js"></script>
 </head>
 
 <body class="min-h-screen" x-data>
@@ -131,7 +133,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
             </button>
-            <canvas id="mainCanvas" class="w-full h-[calc(100vh-4rem-100px)] md:h-[calc(100vh-4rem)] bg-white"></canvas>
+            <canvas id="mainCanvas" class="w-full h-[calc(100vh-4rem)] md:h-[calc(100vh-4rem)] bg-white"></canvas>
         </main>
 
         <!-- Sidebar - Fixed to bottom on mobile, left side on desktop -->
@@ -261,7 +263,7 @@
 
     <!-- Mobile Show Button (when panel is hidden) -->
     <button @click="$store.app.sidebarOpen = true"
-        class="md-hidden fixed bottom-0 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-50 hover:bg-opacity-75 text-white px-4 py-2 rounded-t transition-all duration-300"
+        class="md:hidden fixed bottom-0 left-1/2 transform -translate-x-1/2 bg-gray-800 bg-opacity-50 hover:bg-opacity-75 text-white px-4 py-2 rounded-t transition-all duration-300"
         :class="{ 'opacity-0 pointer-events-none': $store.app.sidebarOpen, 'opacity-100': !$store.app.sidebarOpen }">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
@@ -277,9 +279,19 @@
 
         // Set canvas size to match its display size
         function resizeCanvas() {
-            const rect = canvas.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = rect.height;
+            // const rect = canvas.getBoundingClientRect();
+
+            const dpr = window.devicePixelRatio || 1;
+            const displayWidth = canvas.clientWidth;
+            const displayHeight = canvas.clientHeight;
+            canvas.width = displayWidth * dpr;
+            canvas.height = displayHeight * dpr;
+            ctx.scale(dpr, dpr);
+
+            // canvas.width = rect.width;
+            // canvas.height = rect.height;
+
+            updateGraph();
         }
 
         // Initial resize
@@ -290,10 +302,7 @@
 
         function updateGraph() {
           const canvas = document.getElementById('mainCanvas');
-          const ctx = canvas.getContext('2d');
-          ctx.beginPath();
-          ctx.arc(100, 100, 50, 0, 2 * Math.PI); // (x, y, radius, startAngle, endAngle)
-          ctx.stroke();
+          drawGraph(canvas);
         }
 
 
@@ -302,7 +311,8 @@
             console.log('handleChange()');
             var appConfig = Object.entries(Alpine.store('app'))
             console.log(appConfig);
-            updateGraph();
+            // updateGraph();
+            resizeCanvas();
             setUrlFromParams();
         }
 
@@ -438,6 +448,12 @@
                 else {
                     handleChange();
                 }
+            });
+
+            // Watch for sidebarOpen changes specifically
+            Alpine.effect(() => {
+                Alpine.store('app').sidebarOpen;
+                setTimeout(() => resizeCanvas(), 300); // Delay to match transition duration
             });
 
         });
