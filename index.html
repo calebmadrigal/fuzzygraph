@@ -12,7 +12,8 @@
     <!--<script src="https://cdn.tailwindcss.com"></script>-->
     <script src="js/tailwind.js"></script>
     <script src="js/fuzzygraph.js"></script>
-    <script src="https://unpkg.com/mathjs@14.5.3/lib/browser/math.js"></script>
+    <!-- <script src="https://unpkg.com/mathjs@14.5.3/lib/browser/math.js"></script> -->
+    <script src="js/math.js"></script>
 </head>
 
 <body class="min-h-screen" x-data>
@@ -271,7 +272,7 @@
     </button>
     </div>
 
-    <script defer>
+    <script >
         var firstPass = true;
         // Initialize canvas
         const canvas = document.getElementById('mainCanvas');
@@ -291,7 +292,10 @@
             // canvas.width = rect.width;
             // canvas.height = rect.height;
 
-            updateGraph();
+            // TODO: This is because alpine has not loaded on the first pass... Fix this in a better way
+            if (!firstPass) {
+                updateGraph();
+            }
         }
 
         // Initial resize
@@ -302,9 +306,14 @@
 
         function updateGraph() {
           const canvas = document.getElementById('mainCanvas');
-          drawGraph(canvas);
-        }
+          const graphConfig = getAppConfig();
 
+          // Compile equations
+          graphConfig['equationFunction'] = parseEquationString(graphConfig['equations'][0]);
+
+          // Actually draw graph
+          displayGraph(graphConfig, canvas);
+        }
 
         /////////////////////////////////////////////////////////////////////////////////////// Handle changes
         function handleChange() {
@@ -413,6 +422,9 @@
             sidebarOpen: true,
             showAxis: true,
             zoom: 1,
+            xCenter: 0,
+            yCenter: 0,
+            yWidth: 6,
             nextId: 1
         };
 
