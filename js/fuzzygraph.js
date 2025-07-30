@@ -125,12 +125,14 @@ function makeColorMapper(minInput, maxInput) {
     return mapper;
 }
 
-function displayTruthyGraph(pixelValues, minValue, maxValue, fuzzyValue, canvasElem) {
+function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, canvasElem) {
   var context = canvasElem.getContext('2d');
   var canvasWidth = context.canvas.width;
   var canvasHeight = context.canvas.height;
   var imageData = context.createImageData(canvasWidth, canvasHeight);
   var pixelData = imageData.data;
+
+  console.log(`displayFuzzyGraph() - minValue = ${minValue}, maxValue = ${maxValue}, fuzzyValue = ${fuzzyValue}`);
 
   // Function to modify the value to make the graph look more interesting
   // We do this because the value is a measure of error, but we want more error
@@ -174,13 +176,22 @@ function displayGraph(graphParams, canvasElem) {
       canvasWidth,
       canvasHeight);
 
-  displayTruthyGraph(pixelValues['pixelValues'],
+  displayFuzzyGraph(pixelValues['pixelValues'],
       pixelValues['min'],
       pixelValues['max'],
-      graphParams['fuzzyValue'],
+      graphParams['fuzzy_level'],
       canvasElem);
 }
 
+//function zoomIn(graphParams, canvasElem) {
+//  graphParams['yWidth'] = graphParams['yWidth'] * (1/ZOOM_RATE);
+//  displayGraph(graphParams, canvasElem);
+//}
+//
+//function zoomOut(graphParams, canvasElem) {
+//  graphParams['yWidth'] = graphParams['yWidth'] * ZOOM_RATE;
+//  displayGraph(graphParamsGlobal, canvasElem);
+//}
 
 
 // // // // // // // TEST STUFF

@@ -311,6 +311,9 @@
           // Compile equations
           graphConfig['equationFunction'] = parseEquationString(graphConfig['equations'][0]);
 
+          // TODO: Is this needed?
+          Alpine.store('app').equationFunction = graphConfig['equationFunction'];
+
           // Actually draw graph
           displayGraph(graphConfig, canvas);
         }
@@ -414,7 +417,7 @@
         const defaultConfig = {
             mobileMenuOpen: true,
             equations: ['y=x^2'],
-            fuzzy_level: 50,
+            fuzzy_level: 10,
             color_map: 'viridis',
             invert_color: true,
             color_cycles: 1,
