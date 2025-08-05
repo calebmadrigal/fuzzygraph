@@ -112,14 +112,14 @@
             :class="{ 'md:ml-64': $store.app.sidebarOpen, 'md:ml-0': !$store.app.sidebarOpen }">
             <!-- Zoom Controls -->
             <div class="absolute top-4 right-4 z-10 flex flex-col gap-0.5">
-                <button @click="$store.app.yWidth = $store.app.yWidth * (1/1.2)"
+                <button @click="$store.app.yWidth = $store.app.yWidth * (1/1.2); updateGraph();"
                     class="p-1.5 bg-gray-800 bg-opacity-75 hover:bg-opacity-100 text-white rounded-t-lg shadow-lg transition-colors duration-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
                 </button>
-                <button @click="$store.app.yWidth = $store.app.yWidth * 1.2"
+                <button @click="$store.app.yWidth = $store.app.yWidth * 1.2; updateGraph();"
                     class="p-1.5 bg-gray-800 bg-opacity-75 hover:bg-opacity-100 text-white rounded-b-lg shadow-lg transition-colors duration-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 12H6" />
