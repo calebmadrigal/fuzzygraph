@@ -171,27 +171,25 @@ function displayGraph(graphParams, canvasElem) {
       canvasWidth,
       canvasHeight);
 
+  const t1 = performance.now();
   var pixelValues = calculateFuncForWindow(graphParams['equationFunction'],
       window,
       canvasWidth,
       canvasHeight);
+  const t2 = performance.now();
 
   displayFuzzyGraph(pixelValues['pixelValues'],
       pixelValues['min'],
       pixelValues['max'],
       graphParams['fuzzy_level'],
       canvasElem);
-}
+  const t3 = performance.now();
 
-//function zoomIn(graphParams, canvasElem) {
-//  graphParams['yWidth'] = graphParams['yWidth'] * (1/ZOOM_RATE);
-//  displayGraph(graphParams, canvasElem);
-//}
-//
-//function zoomOut(graphParams, canvasElem) {
-//  graphParams['yWidth'] = graphParams['yWidth'] * ZOOM_RATE;
-//  displayGraph(graphParamsGlobal, canvasElem);
-//}
+  const elapsed1 = t2-t1;
+  const elapsed2 = t3-t2;
+
+  console.log(`displayGraph() metrics - calculateFuncForWindow_time = ${elapsed1}, displayFuzzyGraph_time = ${elapsed2}`);
+}
 
 
 // // // // // // // TEST STUFF
