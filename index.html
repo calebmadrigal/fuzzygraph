@@ -134,7 +134,12 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
             </button>
-            <canvas id="mainCanvas" class="w-full h-[calc(100vh-4rem)] md:h-[calc(100vh-4rem)] bg-white"></canvas>
+            <canvas id="mainCanvas"
+                    class="w-full h-[calc(100vh-4rem)] md:h-[calc(100vh-4rem)] bg-white"
+                    @mousedown="$store.app.startDrag($event)"
+                    @mouseup="$store.app.endDrag($event)"
+                    @mouseleave="$store.app.endDrag($event)">
+            </canvas>
         </main>
 
         <!-- Sidebar - Fixed to bottom on mobile, left side on desktop -->
@@ -320,10 +325,7 @@
 
         /////////////////////////////////////////////////////////////////////////////////////// Handle changes
         function handleChange() {
-            console.log('handleChange()');
             var appConfig = Object.entries(Alpine.store('app'))
-            console.log(appConfig);
-            // updateGraph();
             resizeCanvas();
             setUrlFromParams();
         }
@@ -415,7 +417,6 @@
         }
 
         const defaultConfig = {
-            mobileMenuOpen: true,
             equations: ['y=x^2'],
             fuzzy_level: 10,
             color_map: 'viridis',
@@ -428,11 +429,17 @@
             xCenter: 0,
             yCenter: 0,
             yWidth: 6,
-            nextId: 1
+            nextId: 1,
+            mobileMenuOpen: true,
+            isDragging: false,
+            dragStartX: 0,
+            dragStartY: 0
         };
 
         // Initialize Alpine store
         document.addEventListener('alpine:init', () => {
+            // Alpine.store('app', {});
+
             Alpine.store('app', {
                 addEquation() {
                     this.equations.push('');
@@ -450,10 +457,41 @@
                     if (this.equations.length === 0) {
                         this.equations.push('');
                     }
+                },
+
+                startDrag(event) {
+                    this.dragStartX = event.x;
+                    this.dragStartY = event.y;
+                    this.isDragging = true;
+                },
+                endDrag() {
+                    if (this.isDragging) {
+                        this.updatePosition(event);
+                    }
+                    this.isDragging = false;
+                },
+                updatePosition(event) {
+                    const canvas = event.target;
+                    var xWidth = getXWidth(this.yWidth, canvas.width, canvas.height);
+                    this.xWidth = xWidth;
+
+                    var xOffsetPixels = event.x - this.dragStartX;
+                    var yOffsetPixels =  event.y - this.dragStartY;
+
+                    // First, we have to convert the offset in pixels into the offset in our graphing window
+                    var xOffset = xOffsetPixels * (xWidth / canvas.clientWidth);
+                    var yOffset = yOffsetPixels * (this.yWidth / canvas.clientHeight);
+
+                    // Then we need to move the center of our graphing window accordingly
+                    this.xCenter = this.xCenter - xOffset;
+                    this.yCenter = this.yCenter + yOffset;  // Due to flipped y, negate yOffset (and -1*-1 = 1)
+
+                    this.isDragging = false;
+                    updateGraph();
                 }
             });
 
-            Object.assign(Alpine.store('app'), defaultConfig)
+            Object.assign(Alpine.store('app'), defaultConfig);
 
             Alpine.effect(() => {
                 if (firstPass) {
