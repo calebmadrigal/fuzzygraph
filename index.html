@@ -112,14 +112,14 @@
             :class="{ 'md:ml-64': $store.app.sidebarOpen, 'md:ml-0': !$store.app.sidebarOpen }">
             <!-- Zoom Controls -->
             <div class="absolute top-4 right-4 z-10 flex flex-col gap-0.5">
-                <button @click="$store.app.yWidth = $store.app.yWidth * (1/1.2); updateGraph();"
+                <button @click="$store.app.yHeight = $store.app.yHeight * (1/1.2); updateGraph();"
                     class="p-1.5 bg-gray-800 bg-opacity-75 hover:bg-opacity-100 text-white rounded-t-lg shadow-lg transition-colors duration-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
                 </button>
-                <button @click="$store.app.yWidth = $store.app.yWidth * 1.2; updateGraph();"
+                <button @click="$store.app.yHeight = $store.app.yHeight * 1.2; updateGraph();"
                     class="p-1.5 bg-gray-800 bg-opacity-75 hover:bg-opacity-100 text-white rounded-b-lg shadow-lg transition-colors duration-200">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 12H6" />
@@ -192,9 +192,9 @@
                     <!-- Fuzzy Level Slider -->
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700">
-                            Fuzzy Level: <span x-text="$store.app.fuzzy_level"></span>
+                            Fuzzy Level: <span x-text="$store.app.fuzzyLevel"></span>
                         </label>
-                        <input type="range" x-model="$store.app.fuzzy_level" min="0" max="200"
+                        <input type="range" x-model="$store.app.fuzzyLevel" min="0" max="200"
                             class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
                     </div>
 
@@ -203,12 +203,12 @@
                         <span class="text-sm font-medium text-gray-700">Show Axis</span>
                         <button type="button"
                             class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                            :class="$store.app.showAxis ? 'bg-blue-600' : 'bg-gray-200'"
-                            @click="$store.app.showAxis = !$store.app.showAxis" role="switch"
-                            :aria-checked="$store.app.showAxis">
+                            :class="$store.app.showAxes ? 'bg-blue-600' : 'bg-gray-200'"
+                            @click="$store.app.showAxes = !$store.app.showAxes" role="switch"
+                            :aria-checked="$store.app.showAxes">
                             <span
                                 class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-                                :class="$store.app.showAxis ? 'translate-x-5' : 'translate-x-0'">
+                                :class="$store.app.showAxes ? 'translate-x-5' : 'translate-x-0'">
                             </span>
                         </button>
                     </div>
@@ -223,7 +223,7 @@
                             Color Map
                         </label>
                         <select
-                            x-model="$store.app.color_map"="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            x-model="$store.app.colorMap"="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             <option value="viridis">Viridis</option>
                             <option value="plasma">Plasma</option>
                             <option value="inferno">Inferno</option>
@@ -238,12 +238,12 @@
                         <span class="text-sm font-medium text-gray-700">Invert Color</span>
                         <button type="button"
                             class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                            :class="$store.app.invert_color ? 'bg-blue-600' : 'bg-gray-200'"
-                            @click="$store.app.invert_color = !$store.app.invert_color" role="switch"
-                            :aria-checked="$store.app.invert_color">
+                            :class="$store.app.invertColor ? 'bg-blue-600' : 'bg-gray-200'"
+                            @click="$store.app.invertColor = !$store.app.invertColor" role="switch"
+                            :aria-checked="$store.app.invertColor">
                             <span
                                 class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
-                                :class="$store.app.invert_color ? 'translate-x-5' : 'translate-x-0'">
+                                :class="$store.app.invertColor ? 'translate-x-5' : 'translate-x-0'">
                             </span>
                         </button>
                     </div>
@@ -251,14 +251,14 @@
                     <!-- Colormap Cycles -->
                     <div class="flex items-center justify-between mt-4">
                         <span class="text-sm font-medium text-gray-700">Colormap cycles</span>
-                        <input type="number" x-model="$store.app.color_cycles" min="1" step="1"
+                        <input type="number" x-model="$store.app.colorCycles" min="1" step="1"
                             class="w-20 px-2 py-1 border bg-gray-300 rounded-md border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-right">
                     </div>
 
                     <!-- Color Start Offset -->
                     <div class="flex items-center justify-between mt-4">
                         <span class="text-sm font-medium text-gray-700">Color start offset</span>
-                        <input type="number" x-model="$store.app.color_start_offset" min="0" max="1" step="0.1"
+                        <input type="number" x-model="$store.app.colorOffset" min="0" max="1" step="0.1"
                             class="w-20 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:border-transparent text-right">
                     </div>
                 </div>
@@ -288,7 +288,7 @@
             // const rect = canvas.getBoundingClientRect();
 
             const dpr = window.devicePixelRatio || 1;
-            const displayWidth = canvas.clientWidth;
+            const displayWidth= canvas.clientWidth;
             const displayHeight = canvas.clientHeight;
             canvas.width = displayWidth * dpr;
             canvas.height = displayHeight * dpr;
@@ -422,17 +422,17 @@
 
         const defaultConfig = {
             equations: ['y=x^2'],
-            fuzzy_level: 10,
-            color_map: 'viridis',
-            invert_color: true,
-            color_cycles: 1,
-            color_start_offset: 0,
+            fuzzyLevel: 10,
+            colorMap: 'viridis',
+            invertColor: true,
+            colorCycles: 1,
+            colorOffset: 0,
             sidebarOpen: true,
-            showAxis: true,
+            showAxes: true,
             zoom: 1,
             xCenter: 0,
             yCenter: 0,
-            yWidth: 6,
+            yHeight: 6,
             nextId: 1,
             mobileMenuOpen: true,
             isDragging: false,
@@ -476,7 +476,7 @@
                 },
                 updatePosition(event) {
                     const canvas = event.target;
-                    var xWidth = getXWidth(this.yWidth, canvas.width, canvas.height);
+                    var xWidth = getXWidth(this.yHeight, canvas.width, canvas.height);
                     this.xWidth = xWidth;
 
                     var xOffsetPixels = event.x - this.dragStartX;
@@ -484,7 +484,7 @@
 
                     // First, we have to convert the offset in pixels into the offset in our graphing window
                     var xOffset = xOffsetPixels * (xWidth / canvas.clientWidth);
-                    var yOffset = yOffsetPixels * (this.yWidth / canvas.clientHeight);
+                    var yOffset = yOffsetPixels * (this.yHeight / canvas.clientHeight);
 
                     // Then we need to move the center of our graphing window accordingly
                     this.xCenter = this.xCenter - xOffset;

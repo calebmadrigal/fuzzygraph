@@ -59,32 +59,32 @@ function getXMax(xWidth, xCenter) {
   return xWidth / 2 + xCenter;
 }
 
-function getYMin(yWidth, yCenter) {
-  return -1 * yWidth / 2 + yCenter;
+function getYMin(yHeight, yCenter) {
+  return -1 * yHeight / 2 + yCenter;
 }
 
-function getYMax(yWidth, yCenter) {
-  return yWidth / 2 + yCenter;
+function getYMax(yHeight, yCenter) {
+  return yHeight / 2 + yCenter;
 }
 
-function getHeightToWidthMultiplier(xWidth, yWidth) {
-  return xWidth / yWidth;
+function getHeightToWidthMultiplier(xWidth, yHeight) {
+  return xWidth / yHeight;
 }
 
-function getXWidth(yWidth, canvasWidth, canvasHeight) {
-  return yWidth * getHeightToWidthMultiplier(canvasWidth, canvasHeight);
+function getXWidth(yHeight, canvasWidth, canvasHeight) {
+  return yHeight * getHeightToWidthMultiplier(canvasWidth, canvasHeight);
 }
 
-function calcWindowBounds(xCenter, yCenter, yWidth, canvasWidth, canvasHeight) {
-  // Calculate xWidth based on yWidth
-  var xWidth = getXWidth(yWidth, canvasWidth, canvasHeight);
+function calcWindowBounds(xCenter, yCenter, yHeight, canvasWidth, canvasHeight) {
+  // Calculate xWidth based on yHeight
+  var xWidth = getXWidth(yHeight, canvasWidth, canvasHeight);
 
   // Calculate x and y min and max based on window size and center
   return {
     'xMin': getXMin(xWidth, xCenter),
     'xMax': getXMax(xWidth, xCenter),
-    'yMin': getYMin(yWidth, yCenter),
-    'yMax': getYMax(yWidth, yCenter)
+    'yMin': getYMin(yHeight, yCenter),
+    'yMax': getYMax(yHeight, yCenter)
   };
 }
 
@@ -95,7 +95,7 @@ function calculateFuncForWindow(func, window, canvasWidth, canvasHeight) {
   var minValue = 9999999;
   var maxValue = -9999999;
   var maxCutoff = 100;
-	console.log(`calculateFuncForWindow() - canvasWidth = ${canvasWidth}, canvasHeight = ${canvasHeight}`);
+  console.log(`calculateFuncForWindow() - canvasWidth = ${canvasWidth}, canvasHeight = ${canvasHeight}`);
   var pixelValues = new Array(canvasWidth * canvasHeight);
 
   // Calculate values for each pixel, and find the min and max values
@@ -132,6 +132,70 @@ function makeColorMapper(minInput, maxInput) {
     };
 
     return mapper;
+}
+
+function drawAxes(canvasContext) {
+  // Grid settings
+  const gridSize = 50; // Grid cell size in pixels
+  const axisColor = '#000000';
+  const gridColor = '#e0e0e0';
+  const labelOffset = 15; // Offset for axis labels
+
+  // Draw grid
+  ctx.beginPath();
+  ctx.strokeStyle = gridColor;
+
+  // Vertical grid lines
+  for (let x = 0; x <= width; x += gridSize) {
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, height);
+  }
+
+  // Horizontal grid lines
+  for (let y = 0; y <= height; y += gridSize) {
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y);
+  }
+  ctx.stroke();
+
+  // Draw axes
+  ctx.beginPath();
+  ctx.strokeStyle = axisColor;
+  ctx.lineWidth = 2;
+
+  // X-axis
+  ctx.moveTo(0, height / 2);
+  ctx.lineTo(width, height / 2);
+
+  // Y-axis
+  ctx.moveTo(width / 2, 0);
+  ctx.lineTo(width / 2, height);
+  ctx.stroke();
+
+  // Draw axis labels
+  ctx.font = '12px Arial';
+  ctx.fillStyle = axisColor;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+
+  // X-axis labels
+  for (let x = 0; x <= width; x += gridSize) {
+      const value = (x - width / 2) / gridSize; // Convert pixel to coordinate
+      if (value !== 0) { // Skip origin
+          ctx.fillText(value, x, height / 2 + labelOffset);
+      }
+  }
+
+  // Y-axis labels
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  for (let y = 0; y <= height; y += gridSize) {
+      const value = (height / 2 - y) / gridSize; // Convert pixel to coordinate
+      if (value !== 0) { // Skip origin
+          ctx.fillText(value, width / 2 - labelOffset, y);
+      }
+  }
+
 }
 
 function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, canvasElem) {
@@ -172,11 +236,13 @@ function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, canvasEl
 }
 
 function displayGraph(graphParams, canvasElem) {
+  console.log('~~~~ displayGraph ~~~');
+  console.log(graphParams);
   const canvasWidth = canvasElem.width;
   const canvasHeight = canvasElem.height;
   var window = calcWindowBounds(graphParams['xCenter'],
       graphParams['yCenter'],
-      graphParams['yWidth'],
+      graphParams['yHeight'],
       canvasWidth,
       canvasHeight);
 
@@ -190,8 +256,15 @@ function displayGraph(graphParams, canvasElem) {
   displayFuzzyGraph(pixelValues['pixelValues'],
       pixelValues['min'],
       pixelValues['max'],
-      graphParams['fuzzy_level'],
+      graphParams['fuzzyLevel'],
       canvasElem);
+
+  //if (graphParams['showAxes']) {
+    //var context = canvasElem.getContext('2d');
+    //drawAxes(context);
+    //console.log('drawAxes TODO')
+  //}
+
   const t3 = performance.now();
 
   const elapsed1 = t2-t1;
