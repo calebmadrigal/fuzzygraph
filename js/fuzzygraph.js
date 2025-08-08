@@ -35,8 +35,17 @@ function parseEquationString(eq_str) {
     return null;
   }
 
-  var left_eq = math.evaluate('f(x, y) = ' + split_result[0], {});
-  var right_eq = math.evaluate('f(x, y) = ' + split_result[1], {});
+  try {
+    var left_eq = math.evaluate('f(x, y) = ' + split_result[0], {});
+    var right_eq = math.evaluate('f(x, y) = ' + split_result[1], {});
+
+    // Call the function for each side of the equation to see if either throws an exception.
+    // No need to render the graph (which won't happen if we return null) we can't calculate anything
+    left_eq(0.01, 0.01);
+    right_eq(0.01, 0.01);
+  } catch (error) {
+    return null;
+  }
   var error_func = function (x, y) { return Math.abs(left_eq(x, y) - right_eq(x, y)); };
 
   return error_func;

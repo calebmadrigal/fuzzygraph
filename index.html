@@ -168,7 +168,7 @@
                         <template x-for="(equation, index) in $store.app.equations" :key="index">
                             <div class="flex items-center space-x-2">
                                 <input type="text" @keydown.enter="$store.app.addEquation()"
-                                    @input.debounce.500ms="$store.app.updateEquation(index, $event.target.value)"
+                                    @input.debounce.1000ms="$store.app.updateEquation(index, $event.target.value)"
                                     :value="$store.app.equations[index]" :id="'eq-' + index"
                                     class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     placeholder="Enter equation...">
@@ -314,13 +314,17 @@
           const graphConfig = getAppConfig();
 
           // Compile equations
-          graphConfig['equationFunction'] = parseEquationString(graphConfig['equations'][0]);
+          parsedEquation = parseEquationString(graphConfig['equations'][0]);
+          if (parsedEquation) {
+            graphConfig['equationFunction'] = parsedEquation;
 
-          // TODO: Is this needed?
-          Alpine.store('app').equationFunction = graphConfig['equationFunction'];
+            // TODO: Is this needed?
+            Alpine.store('app').equationFunction = graphConfig['equationFunction'];
 
-          // Actually draw graph
-          displayGraph(graphConfig, canvas);
+            // Actually draw graph (only if equation parses)
+            displayGraph(graphConfig, canvas);
+          }
+
         }
 
         /////////////////////////////////////////////////////////////////////////////////////// Handle changes
