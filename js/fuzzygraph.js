@@ -134,69 +134,123 @@ function makeColorMapper(minInput, maxInput) {
     return mapper;
 }
 
-function drawAxes(canvasContext) {
-  // Grid settings
-  const gridSize = 50; // Grid cell size in pixels
-  const axisColor = '#000000';
-  const gridColor = '#e0e0e0';
-  const labelOffset = 15; // Offset for axis labels
+
+//////// START AXES STUFF
+
+function drawAxes(canvas, xCenter, yCenter, xMin, xMax, yMin, yMax) {
+  // NOTE: This function written by ChatGPT 5 and modified by Caleb.
+  const ctx = canvas.getContext('2d');
+
+  // HiDPI handling (keeps result crisp if CSS size differs from width/height)
+  const dpr = window.devicePixelRatio || 1;
+  if (canvas._backingStore !== dpr) {
+    canvas._backingStore = dpr;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = Math.max(1, Math.round(rect.width * dpr));
+    canvas.height = Math.max(1, Math.round(rect.height * dpr));
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+  }
+
+  const W = canvas.width, H = canvas.height;
+  ctx.setTransform(1,0,0,1,0,0);
+
+  const spanX = Math.max(1e-12, xMax - xMin);
+  const spanY = Math.max(1e-12, yMax - yMin);
+
+  const scale = Math.min(W / spanX, H / spanY); // px per world unit (same on both axes)
+
+  const showSpanX = W / scale;
+  const showSpanY = H / scale;
+
+  const vxMin = xCenter - showSpanX/2, vxMax = xCenter + showSpanX/2;
+  const vyMin = yCenter - showSpanY/2, vyMax = yCenter + showSpanY/2;
+
+  const toCX = x => (x - xCenter) * scale + W/2;
+  const toCY = y => H/2 - (y - yCenter) * scale;
+
+  // Nice step (…, 0.1, 0.2, 0.5, 1, 2, 5, 10, …)
+  function niceStep(raw) {
+    const pow10 = 10 ** Math.floor(Math.log10(raw));
+    const f = raw / pow10;
+    const nf = f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10;
+    return nf * pow10;
+  }
+  function fmtLabel(v, step) {
+    const dec = Math.max(0, -Math.floor(Math.log10(step)));
+    const s = v.toFixed(Math.min(10, dec));
+    return Math.abs(+s) < 1e-12 ? '0' : s;
+  }
+
+  // Choose tick step from target pixel spacing
+  const targetPx = 80 * dpr;
+  const step = niceStep(targetPx / scale); // SAME step for both axes
+
+  // Grid ticks
+  const firstX = Math.ceil(vxMin / step) * step;
+  const firstY = Math.ceil(vyMin / step) * step;
 
   // Draw grid
+  ctx.lineWidth = Math.max(1, Math.floor(dpr));
+  ctx.strokeStyle = '#e3e3e3';
   ctx.beginPath();
-  ctx.strokeStyle = gridColor;
-
-  // Vertical grid lines
-  for (let x = 0; x <= width; x += gridSize) {
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, height);
+  for (let x = firstX; x <= vxMax + 1e-12; x += step) {
+    const cx = toCX(x);
+    ctx.moveTo(cx, 0); ctx.lineTo(cx, H);
   }
-
-  // Horizontal grid lines
-  for (let y = 0; y <= height; y += gridSize) {
-      ctx.moveTo(0, y);
-      ctx.lineTo(width, y);
+  for (let y = firstY; y <= vyMax + 1e-12; y += step) {
+    const cy = toCY(y);
+    ctx.moveTo(0, cy); ctx.lineTo(W, cy);
   }
   ctx.stroke();
 
-  // Draw axes
-  ctx.beginPath();
-  ctx.strokeStyle = axisColor;
-  ctx.lineWidth = 2;
+  // Axes
+  ctx.strokeStyle = '#e3e3e3';
+  ctx.lineWidth = Math.max(1.5, 1.5 * dpr);
+  if (vxMin <= 0 && 0 <= vxMax) { ctx.beginPath(); ctx.moveTo(toCX(0), 0); ctx.lineTo(toCX(0), H); ctx.stroke(); }
+  if (vyMin <= 0 && 0 <= vyMax) { ctx.beginPath(); ctx.moveTo(0, toCY(0)); ctx.lineTo(W, toCY(0)); ctx.stroke(); }
 
-  // X-axis
-  ctx.moveTo(0, height / 2);
-  ctx.lineTo(width, height / 2);
+  // Labels — SAME frequency on both axes
+  const pxPerTick = step * scale;                  // pixels between ticks
+  const minLabelPx = 45 * dpr;                     // desired spacing for labels
+  const labelEvery = Math.max(1, Math.round(minLabelPx / pxPerTick)); // shared N
 
-  // Y-axis
-  ctx.moveTo(width / 2, 0);
-  ctx.lineTo(width / 2, height);
-  ctx.stroke();
+  ctx.font = `${Math.round(12 * dpr)}px sans-serif`;
+  ctx.fillStyle = '#e3e3e3';
 
-  // Draw axis labels
-  ctx.font = '12px Arial';
-  ctx.fillStyle = axisColor;
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'top';
-
-  // X-axis labels
-  for (let x = 0; x <= width; x += gridSize) {
-      const value = (x - width / 2) / gridSize; // Convert pixel to coordinate
-      if (value !== 0) { // Skip origin
-          ctx.fillText(value, x, height / 2 + labelOffset);
-      }
+  // X labels
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  let k = 0;
+  for (let x = firstX; x <= vxMax + 1e-12; x += step, k++) {
+    if (Math.abs(x) < 1e-12) continue;             // skip 0; origin gets its own
+    if (k % labelEvery !== 0) continue;
+    const cx = toCX(x);
+    const cy = (vyMin <= 0 && 0 <= vyMax) ? toCY(0) + 4 * dpr : H - 16 * dpr;
+    ctx.fillText(fmtLabel(x, step), cx, cy);
   }
 
-  // Y-axis labels
-  ctx.textAlign = 'right';
-  ctx.textBaseline = 'middle';
-  for (let y = 0; y <= height; y += gridSize) {
-      const value = (height / 2 - y) / gridSize; // Convert pixel to coordinate
-      if (value !== 0) { // Skip origin
-          ctx.fillText(value, width / 2 - labelOffset, y);
-      }
+  // Y labels
+  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  k = 0;
+  for (let y = firstY; y <= vyMax + 1e-12; y += step, k++) {
+    if (Math.abs(y) < 1e-12) continue;
+    if (k % labelEvery !== 0) continue;            // SAME N as X
+    const cy = toCY(y);
+    const cx = (vxMin <= 0 && 0 <= vxMax) ? toCX(0) - 4 * dpr : 22 * dpr;
+    ctx.fillText(fmtLabel(y, step), cx, cy);
   }
 
+  // Origin label
+  if (vxMin <= 0 && 0 <= vxMax && vyMin <= 0 && 0 <= vyMax) {
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top'; ctx.fillStyle = '#e3e3e3';
+    ctx.fillText('0', toCX(0) + 3 * dpr, toCY(0) + 3 * dpr);
+  }
 }
+
+//////// END AXIS STUFF
+
+
+
 
 function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, canvasElem) {
   var context = canvasElem.getContext('2d');
@@ -259,11 +313,10 @@ function displayGraph(graphParams, canvasElem) {
       graphParams['fuzzyLevel'],
       canvasElem);
 
-  //if (graphParams['showAxes']) {
-    //var context = canvasElem.getContext('2d');
-    //drawAxes(context);
-    //console.log('drawAxes TODO')
-  //}
+  if (graphParams['showAxes']) {
+    const windowBounds = calcWindowBounds(graphParams['xCenter'], graphParams['yCenter'], graphParams['yHeight'], canvasWidth, canvasHeight);
+		drawAxes(canvasElem, graphParams['xCenter'], graphParams['yCenter'], windowBounds['xMin'], windowBounds['xMax'], windowBounds['yMin'], windowBounds['yMax']);
+  }
 
   const t3 = performance.now();
 

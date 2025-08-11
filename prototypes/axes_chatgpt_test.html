@@ -1,0 +1,131 @@
+<canvas id="plot" width="800" height="500"></canvas>
+<script>
+/**
+ * Draw axes + square grid with nice ticks.
+ * @param {HTMLCanvasElement} canvas
+ * @param {number} xCenter  - world x at canvas center
+ * @param {number} yCenter  - world y at canvas center
+ * @param {number} xMin     - desired min x (used for target span)
+ * @param {number} xMax     - desired max x
+ * @param {number} yMin     - desired min y
+ * @param {number} yMax     - desired max y
+ */
+function drawAxesGrid(canvas, xCenter, yCenter, xMin, xMax, yMin, yMax) {
+  const ctx = canvas.getContext('2d');
+
+  // HiDPI handling (keeps result crisp if CSS size differs from width/height)
+  const dpr = window.devicePixelRatio || 1;
+  if (canvas._backingStore !== dpr) {
+    canvas._backingStore = dpr;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = Math.max(1, Math.round(rect.width * dpr));
+    canvas.height = Math.max(1, Math.round(rect.height * dpr));
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+  }
+
+  const W = canvas.width, H = canvas.height;
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.clearRect(0,0,W,H);
+
+  const spanX = Math.max(1e-12, xMax - xMin);
+  const spanY = Math.max(1e-12, yMax - yMin);
+
+  const scale = Math.min(W / spanX, H / spanY); // px per world unit (same on both axes)
+
+  const showSpanX = W / scale;
+  const showSpanY = H / scale;
+
+  const vxMin = xCenter - showSpanX/2, vxMax = xCenter + showSpanX/2;
+  const vyMin = yCenter - showSpanY/2, vyMax = yCenter + showSpanY/2;
+
+  const toCX = x => (x - xCenter) * scale + W/2;
+  const toCY = y => H/2 - (y - yCenter) * scale;
+
+  // Nice step (…, 0.1, 0.2, 0.5, 1, 2, 5, 10, …)
+  function niceStep(raw) {
+    const pow10 = 10 ** Math.floor(Math.log10(raw));
+    const f = raw / pow10;
+    const nf = f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10;
+    return nf * pow10;
+  }
+  function fmtLabel(v, step) {
+    const dec = Math.max(0, -Math.floor(Math.log10(step)));
+    const s = v.toFixed(Math.min(10, dec));
+    return Math.abs(+s) < 1e-12 ? '0' : s;
+  }
+
+  // Choose tick step from target pixel spacing
+  const targetPx = 80 * dpr;
+  const step = niceStep(targetPx / scale); // SAME step for both axes
+
+  // Grid ticks
+  const firstX = Math.ceil(vxMin / step) * step;
+  const firstY = Math.ceil(vyMin / step) * step;
+
+  // Draw grid
+  ctx.lineWidth = Math.max(1, Math.floor(dpr));
+  ctx.strokeStyle = '#e3e3e3';
+  ctx.beginPath();
+  for (let x = firstX; x <= vxMax + 1e-12; x += step) {
+    const cx = toCX(x);
+    ctx.moveTo(cx, 0); ctx.lineTo(cx, H);
+  }
+  for (let y = firstY; y <= vyMax + 1e-12; y += step) {
+    const cy = toCY(y);
+    ctx.moveTo(0, cy); ctx.lineTo(W, cy);
+  }
+  ctx.stroke();
+
+  // Axes
+  ctx.strokeStyle = '#000';
+  ctx.lineWidth = Math.max(1.5, 1.5 * dpr);
+  if (vxMin <= 0 && 0 <= vxMax) { ctx.beginPath(); ctx.moveTo(toCX(0), 0); ctx.lineTo(toCX(0), H); ctx.stroke(); }
+  if (vyMin <= 0 && 0 <= vyMax) { ctx.beginPath(); ctx.moveTo(0, toCY(0)); ctx.lineTo(W, toCY(0)); ctx.stroke(); }
+
+  // Labels — SAME frequency on both axes
+  const pxPerTick = step * scale;                  // pixels between ticks
+  const minLabelPx = 45 * dpr;                     // desired spacing for labels
+  const labelEvery = Math.max(1, Math.round(minLabelPx / pxPerTick)); // shared N
+
+  ctx.font = `${Math.round(12 * dpr)}px sans-serif`;
+  ctx.fillStyle = '#222';
+
+  // X labels
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  let k = 0;
+  for (let x = firstX; x <= vxMax + 1e-12; x += step, k++) {
+    if (Math.abs(x) < 1e-12) continue;             // skip 0; origin gets its own
+    if (k % labelEvery !== 0) continue;
+    const cx = toCX(x);
+    const cy = (vyMin <= 0 && 0 <= vyMax) ? toCY(0) + 4 * dpr : H - 16 * dpr;
+    ctx.fillText(fmtLabel(x, step), cx, cy);
+  }
+
+  // Y labels
+  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+  k = 0;
+  for (let y = firstY; y <= vyMax + 1e-12; y += step, k++) {
+    if (Math.abs(y) < 1e-12) continue;
+    if (k % labelEvery !== 0) continue;            // SAME N as X
+    const cy = toCY(y);
+    const cx = (vxMin <= 0 && 0 <= vxMax) ? toCX(0) - 4 * dpr : 22 * dpr;
+    ctx.fillText(fmtLabel(y, step), cx, cy);
+  }
+
+  // Origin label
+  if (vxMin <= 0 && 0 <= vxMax && vyMin <= 0 && 0 <= vyMax) {
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top'; ctx.fillStyle = '#000';
+    ctx.fillText('0', toCX(0) + 3 * dpr, toCY(0) + 3 * dpr);
+  }
+}
+
+// --- Example usage:
+const canvas = document.getElementById('plot');
+// Draw with center at (0,0) and target bounds [-10,10] x [-6,6]
+drawAxesGrid(canvas, 2, 2, -10, 10, -6, 6);
+
+// You can later pan/zoom while preserving square grid, e.g.:
+// drawAxesGrid(canvas, 2.5, -1.2, -8, 8, -8, 8);
+</script>
+
