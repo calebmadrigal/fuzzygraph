@@ -122,23 +122,11 @@ function calculateFuncForWindow(func, window, canvasWidth, canvasHeight) {
 
 // // // // // // // Display Graph
 
-function makeColorMapper(minInput, maxInput) {
-    var colorChannelRange = [0, 255];
-    var colorMapper = makeLinearMapper([minInput, maxInput], colorChannelRange, true);
-
-    var mapper = function(val) {
-        var colorVal = colorMapper(val);
-        return [colorVal, colorVal, 100];
-    };
-
-    return mapper;
-}
-
 
 //////// START AXES STUFF
 
 function drawAxes(canvas, xCenter, yCenter, xMin, xMax, yMin, yMax) {
-  // NOTE: This function written by ChatGPT 5 and modified by Caleb.
+  // NOTE: This function written by ChatGPT 5 and modified by Caleb Madrigal.
   const ctx = canvas.getContext('2d');
 
   // HiDPI handling (keeps result crisp if CSS size differs from width/height)
@@ -250,9 +238,36 @@ function drawAxes(canvas, xCenter, yCenter, xMin, xMax, yMin, yMax) {
 //////// END AXIS STUFF
 
 
+// // // // // // // START Color stuff
 
+function truthygraphColormap(minInput, maxInput) {
+    var colorChannelRange = [0, 255];
+    var colorMapper = makeLinearMapper([minInput, maxInput], colorChannelRange, true);
 
-function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, canvasElem) {
+    var mapper = function(val) {
+        var colorVal = colorMapper(val);
+        return [colorVal, colorVal, 100];
+    };
+
+    return mapper;
+}
+
+function getColormap(colormapName, invertColor, minInput, maxInput) {
+  // Transform min and max inputs to [0, 1] so that it can be plugged into colorma
+  //console.log(`[***] minInput = ${minInput}, maxInput = ${maxInput}`);
+  const valueNormalizer = makeLinearMapper([minInput, maxInput], [0, 1], false);
+  var mapper = function(val) {
+    const normalizedValue = valueNormalizer(val);
+    //console.log(`val: ${val}, normalizedValue: ${normalizedValue}`);
+    return evaluate_cmap(normalizedValue, colormapName, invertColor);
+  }
+
+  return mapper;
+}
+
+// // // // // // // END Color stuff
+
+function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, colormapName, invertColor, canvasElem) {
   var context = canvasElem.getContext('2d');
   var canvasWidth = context.canvas.width;
   var canvasHeight = context.canvas.height;
@@ -269,7 +284,8 @@ function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, canvasEl
   };
 
   // Determine the color scale based on the min and max values
-  var colorMapper = makeColorMapper(valueModifier(maxValue), valueModifier(minValue));
+  //var colorMapper = truthygraphColormap(valueModifier(maxValue), valueModifier(minValue));
+  var colorMapper = getColormap(colormapName, invertColor, valueModifier(minValue), valueModifier(maxValue));
 
   // Set the color for each pixel based on the values
   for (var x = 0; x < canvasWidth; x++) {
@@ -311,6 +327,8 @@ function displayGraph(graphParams, canvasElem) {
       pixelValues['min'],
       pixelValues['max'],
       graphParams['fuzzyLevel'],
+      graphParams['colorMap'],
+      graphParams['invertColor'],
       canvasElem);
 
   if (graphParams['showAxes']) {

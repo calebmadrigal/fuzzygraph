@@ -14,6 +14,7 @@
     <script src="js/fuzzygraph.js"></script>
     <!-- <script src="https://unpkg.com/mathjs@14.5.3/lib/browser/math.js"></script> -->
     <script src="js/math.js"></script>
+    <script src="js/js-colormaps.js"></script>
 </head>
 
 <body class="min-h-screen" x-data>
@@ -222,7 +223,12 @@
                         <label class="block text-sm font-medium text-gray-700">
                             Color Map
                         </label>
-                        <select
+                        <select x-model="$store.app.colorMap" name="colors">
+                            <template x-for="c in getColorMapList()">
+                              <option :value="c" x-text="c"></option>
+                            </template>
+                        </select>
+                        <!-- <select
                             x-model="$store.app.colorMap"="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                             <option value="viridis">Viridis</option>
                             <option value="plasma">Plasma</option>
@@ -230,7 +236,7 @@
                             <option value="magma">Magna</option>
                             <option value="cividis">Cividis</option>
                             <option value="rainbow">Rainbow</option>
-                        </select>
+                        </select> -->
                     </div>
 
                     <!-- Invert Color Switch -->
@@ -418,6 +424,11 @@
             }
             const hashStr = `#?${params.toString()}`;
             window.location.hash = hashStr;
+        }
+
+        function getColorMapList() {
+            var colorMapList = Object.keys(data);
+            return colorMapList;
         }
 
         const defaultConfig = {
