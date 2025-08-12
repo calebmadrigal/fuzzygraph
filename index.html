@@ -224,19 +224,10 @@
                             Color Map
                         </label>
                         <select x-model="$store.app.colorMap" name="colors">
-                            <template x-for="c in getColorMapList()">
-                              <option :value="c" x-text="c"></option>
+                            <template x-for="c in getColorMapList()" :key="c">
+                              <option :value="c" :selected="c === $store.app.colorMap" x-text="c"></option>
                             </template>
                         </select>
-                        <!-- <select
-                            x-model="$store.app.colorMap"="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            <option value="viridis">Viridis</option>
-                            <option value="plasma">Plasma</option>
-                            <option value="inferno">Inferno</option>
-                            <option value="magma">Magna</option>
-                            <option value="cividis">Cividis</option>
-                            <option value="rainbow">Rainbow</option>
-                        </select> -->
                     </div>
 
                     <!-- Invert Color Switch -->
