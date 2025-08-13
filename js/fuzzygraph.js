@@ -280,7 +280,7 @@ function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, colormap
   // We do this because the value is a measure of error, but we want more error
   // to look like a more intense value on the graph
   var valueModifier = function (value) {
-    return Math.pow(maxValue - value, MAX_FUZZY - fuzzyValue);
+    return Math.pow(maxValue - value, (MAX_FUZZY+1) - fuzzyValue);  // +1 to prevent the value from ever being 0
   };
 
   // Determine the color scale based on the min and max values
