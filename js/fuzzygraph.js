@@ -1,7 +1,7 @@
 // fuzzygraph.js
 // Logic to draw fuzzy graphs on a canvas
 
-ZOOM_RATE = 1.2;
+ZOOM_RATE = 1.5;
 MAX_FUZZY = 200;
 
 // // // // // // // Math stuff
