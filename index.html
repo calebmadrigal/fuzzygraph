@@ -217,7 +217,7 @@
 
                 <!-- Color Section -->
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200">Color</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200">Color Map</h3>
                     <!-- Color Map Dropdown -->
                     <div class="relative inline-block max-w-full sm:w-64 w-full">
                         <select x-model="$store.app.colorMap" name="colors"
@@ -346,11 +346,11 @@
         /////////////////////////////////////////////////////////////////////////////////////// URL Handling
 
         function getAppConfig() {
-            const sessionVars = ['isDragging', 'dragStartX', 'dragStartY', 'nextId'];
+            const sessionVars = ['isDragging', 'dragStartX', 'dragStartY', 'nextId', 'xWidth'];
             const appStore = Alpine.store('app');
             // Filter out functions from the store, keeping only non-function properties
             const appConfig = Object.fromEntries(
-                Object.entries(appStore).filter(([key, value]) => (typeof value !== 'function' && !(key in sessionVars)))
+                Object.entries(appStore).filter(([key, value]) => (typeof value !== 'function' && !(sessionVars.includes(key))))
             );
             return appConfig;
         }
@@ -436,20 +436,21 @@
         }
 
         const defaultConfig = {
-            version: '0.1',
-            equations: ['y=x^2'],
             fuzzyLevel: 100,
             colorMap: 'viridis',
             invertColor: true,
             // colorCycles: 1,
             // colorOffset: 0,
-            sidebarOpen: true,
-            showAxes: true,
-            zoom: 1,
+            equations: ['y=x^2'],
             xCenter: 0,
             yCenter: 0,
             yHeight: 6,
+            sidebarOpen: true,
+            showAxes: true,
             mobileMenuOpen: true,
+            version: '0',
+
+            // non-persistent
             isDragging: false,
             dragStartX: 0,
             dragStartY: 0,
