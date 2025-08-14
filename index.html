@@ -193,7 +193,7 @@
                     <!-- Fuzzy Level Slider -->
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700">
-                            Fuzzy Level: <span x-text="$store.app.fuzzyLevel"></span>
+                            Fuzzy Level: <span x-text="parseInt(($store.app.fuzzyLevel / 200) * 100) + '%'"></span>
                         </label>
                         <input type="range" x-model="$store.app.fuzzyLevel" min="0" max="200"
                             class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
@@ -219,15 +219,27 @@
                 <div>
                     <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200">Color</h3>
                     <!-- Color Map Dropdown -->
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">
-                            Color Map
-                        </label>
-                        <select x-model="$store.app.colorMap" name="colors">
+                    <div class="relative inline-block max-w-full sm:w-64 w-full">
+                        <select x-model="$store.app.colorMap" name="colors"
+                          class="block w-full min-w-0 truncate appearance-none rounded-lg border border-gray-300 bg-white py-2 pl-3 pr-10 text-base text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
                             <template x-for="c in getColorMapList()" :key="c">
-                              <option :value="c" :selected="c === $store.app.colorMap" x-text="c"></option>
+                                <option :value="c" :selected="c === $store.app.colorMap" x-text="c"></option>
                             </template>
                         </select>
+                        <!-- Dropdown arrow -->
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                          <svg
+                            class="h-4 w-4 text-gray-400"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </div>
                     </div>
 
                     <!-- Invert Color Switch -->
@@ -246,18 +258,18 @@
                     </div>
 
                     <!-- Colormap Cycles -->
-                    <div class="flex items-center justify-between mt-4">
+                    <!-- <div class="flex items-center justify-between mt-4">
                         <span class="text-sm font-medium text-gray-700">Colormap cycles</span>
                         <input type="number" x-model="$store.app.colorCycles" min="1" step="1"
                             class="w-20 px-2 py-1 border bg-gray-300 rounded-md border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-right">
-                    </div>
+                    </div> -->
 
                     <!-- Color Start Offset -->
-                    <div class="flex items-center justify-between mt-4">
+                    <!-- <div class="flex items-center justify-between mt-4">
                         <span class="text-sm font-medium text-gray-700">Color start offset</span>
                         <input type="number" x-model="$store.app.colorOffset" min="0" max="1" step="0.1"
                             class="w-20 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:border-transparent text-right">
-                    </div>
+                    </div> -->
                 </div>
 
             </div>
@@ -333,10 +345,11 @@
         /////////////////////////////////////////////////////////////////////////////////////// URL Handling
 
         function getAppConfig() {
+            const sessionVars = ['isDragging', 'dragStartX', 'dragStartY', 'nextId'];
             const appStore = Alpine.store('app');
             // Filter out functions from the store, keeping only non-function properties
             const appConfig = Object.fromEntries(
-                Object.entries(appStore).filter(([key, value]) => typeof value !== 'function')
+                Object.entries(appStore).filter(([key, value]) => (typeof value !== 'function' && !(key in sessionVars)))
             );
             return appConfig;
         }
@@ -424,22 +437,22 @@
         const defaultConfig = {
             version: '0.1',
             equations: ['y=x^2'],
-            fuzzyLevel: 10,
+            fuzzyLevel: 100,
             colorMap: 'viridis',
             invertColor: true,
-            colorCycles: 1,
-            colorOffset: 0,
+            // colorCycles: 1,
+            // colorOffset: 0,
             sidebarOpen: true,
             showAxes: true,
             zoom: 1,
             xCenter: 0,
             yCenter: 0,
             yHeight: 6,
-            nextId: 1,
             mobileMenuOpen: true,
             isDragging: false,
             dragStartX: 0,
-            dragStartY: 0
+            dragStartY: 0,
+            nextId: 1,
         };
 
         // Initialize Alpine store

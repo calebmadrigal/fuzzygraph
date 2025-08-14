@@ -88,10 +88,9 @@ function calcWindowBounds(xCenter, yCenter, yHeight, canvasWidth, canvasHeight) 
   };
 }
 
-function calculateFuncForWindow(func, window, canvasWidth, canvasHeight) {
-  var pixel_to_x_mapper = makeLinearMapper([0, canvasWidth], [window['xMin'], window['xMax']], false);
-  var pixel_to_y_mapper = makeLinearMapper([canvasHeight, 0], [window['yMin'], window['yMax']], false);
-
+function calculateFuncForWindow(func, windowBounds, canvasWidth, canvasHeight) {
+  var pixel_to_x_mapper = makeLinearMapper([0, canvasWidth], [windowBounds['xMin'], windowBounds['xMax']], false);
+  var pixel_to_y_mapper = makeLinearMapper([canvasHeight, 0], [windowBounds['yMin'], windowBounds['yMax']], false);
   var minValue = 9999999;
   var maxValue = -9999999;
   var maxCutoff = 100;
@@ -254,11 +253,12 @@ function truthygraphColormap(minInput, maxInput) {
 
 function getColormap(colormapName, invertColor, minInput, maxInput) {
   // Transform min and max inputs to [0, 1] so that it can be plugged into colorma
-  //console.log(`[***] minInput = ${minInput}, maxInput = ${maxInput}`);
   const valueNormalizer = makeLinearMapper([minInput, maxInput], [0, 1], false);
   var mapper = function(val) {
-    const normalizedValue = valueNormalizer(val);
-    //console.log(`val: ${val}, normalizedValue: ${normalizedValue}`);
+    var normalizedValue = valueNormalizer(val);
+    if (normalizedValue > 1) { normalizedValue = 1; }
+    else if (normalizedValue < 0) { normalizedValue = 0; }
+    else if (isNaN(normalizedValue)) { normalizedValue = 0; }  // Happens with divide by 0
     return evaluate_cmap(normalizedValue, colormapName, invertColor);
   }
 
@@ -286,12 +286,13 @@ function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, colormap
   // Determine the color scale based on the min and max values
   //var colorMapper = truthygraphColormap(valueModifier(maxValue), valueModifier(minValue));
   var colorMapper = getColormap(colormapName, invertColor, valueModifier(minValue), valueModifier(maxValue));
+  //var colorMapper = getColormap(colormapName, invertColor, minValue, maxValue);
 
   // Set the color for each pixel based on the values
   for (var x = 0; x < canvasWidth; x++) {
     for (var y = 0; y < canvasHeight; y++) {
-      var value = pixelValues[y * canvasWidth + x];
-      var color = colorMapper(valueModifier(value));
+      var value = valueModifier(pixelValues[y * canvasWidth + x]);
+      var color = colorMapper(value);
 
       // Set pixel color channels
       var pixelOffset = (canvasWidth * y + x) * 4;
@@ -310,7 +311,7 @@ function displayGraph(graphParams, canvasElem) {
   console.log(graphParams);
   const canvasWidth = canvasElem.width;
   const canvasHeight = canvasElem.height;
-  var window = calcWindowBounds(graphParams['xCenter'],
+  var windowBounds = calcWindowBounds(graphParams['xCenter'],
       graphParams['yCenter'],
       graphParams['yHeight'],
       canvasWidth,
@@ -318,7 +319,7 @@ function displayGraph(graphParams, canvasElem) {
 
   const t1 = performance.now();
   var pixelValues = calculateFuncForWindow(graphParams['equationFunction'],
-      window,
+      windowBounds,
       canvasWidth,
       canvasHeight);
   const t2 = performance.now();
