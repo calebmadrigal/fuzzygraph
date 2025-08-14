@@ -315,7 +315,6 @@
           if (parsedEquation) {
             graphConfig['equationFunction'] = parsedEquation;
 
-            // TODO: Is this needed?
             Alpine.store('app').equationFunction = graphConfig['equationFunction'];
 
             // Actually draw graph (only if equation parses)
@@ -423,6 +422,7 @@
         }
 
         const defaultConfig = {
+            version: '0.1',
             equations: ['y=x^2'],
             fuzzyLevel: 10,
             colorMap: 'viridis',
