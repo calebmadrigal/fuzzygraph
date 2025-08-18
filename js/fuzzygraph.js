@@ -89,19 +89,19 @@ function calcWindowBounds(xCenter, yCenter, yHeight, canvasWidth, canvasHeight) 
 }
 
 function calculateFuncForWindow(func, windowBounds, canvasWidth, canvasHeight) {
-  var pixel_to_x_mapper = makeLinearMapper([0, canvasWidth], [windowBounds['xMin'], windowBounds['xMax']], false);
-  var pixel_to_y_mapper = makeLinearMapper([canvasHeight, 0], [windowBounds['yMin'], windowBounds['yMax']], false);
+  var pixelToXMapper = makeLinearMapper([0, canvasWidth], [windowBounds['xMin'], windowBounds['xMax']], false);
+  var pixelToYMapper = makeLinearMapper([canvasHeight, 0], [windowBounds['yMin'], windowBounds['yMax']], false);
   var minValue = 9999999;
   var maxValue = -9999999;
-  var maxCutoff = 100;
-  console.log(`calculateFuncForWindow() - canvasWidth = ${canvasWidth}, canvasHeight = ${canvasHeight}`);
+  var maxCutoff = 100;  // TODO: Make this configurable
+  //console.log(`calculateFuncForWindow() - canvasWidth = ${canvasWidth}, canvasHeight = ${canvasHeight}`);
   var pixelValues = new Array(canvasWidth * canvasHeight);
 
   // Calculate values for each pixel, and find the min and max values
   for (var pixelX = 0; pixelX < canvasWidth; pixelX++) {
     for (var pixelY = 0; pixelY < canvasHeight; pixelY++) {
-      var x = pixel_to_x_mapper(pixelX);
-      var y = pixel_to_y_mapper(pixelY);
+      var x = pixelToXMapper(pixelX);
+      var y = pixelToYMapper(pixelY);
       var result = func(x, y);
       result = Math.min(result, maxCutoff);
       if (result > maxValue) {
@@ -111,7 +111,7 @@ function calculateFuncForWindow(func, windowBounds, canvasWidth, canvasHeight) {
         minValue = result;
       }
 
-      pixelValues[(pixelY * canvasWidth) + pixelX] = result;
+      pixelValues[(pixelY * canvasWidth) + pixelX] = Math.abs(result);
     }
   }
 
@@ -124,9 +124,20 @@ function calculateFuncForWindow(func, windowBounds, canvasWidth, canvasHeight) {
 
 //////// START AXES STUFF
 
-function drawAxes(canvas, xCenter, yCenter, xMin, xMax, yMin, yMax) {
+function drawAxes(canvas, xCenter, yCenter, xMin, xMax, yMin, yMax, options = {}) {
   // NOTE: This function written by ChatGPT 5 and modified by Caleb Madrigal.
   const ctx = canvas.getContext('2d');
+
+  // ---- options ----
+  const {
+    labelBgColor = '#ffffff',         // background behind numbers
+    labelBgAlpha = 1,                 // 1 = opaque; try 0.9 for subtle
+    labelPaddingPx = 3,               // padding around label text (CSS px)
+    fontPx = 12,                      // base CSS px (scaled by DPR)
+    gridColor = '#e3e3e3',
+    axisColor = '#e3e3e3',
+    labelColor = '#333'               // make labels a tad darker for contrast
+  } = options;
 
   // HiDPI handling (keeps result crisp if CSS size differs from width/height)
   const dpr = window.devicePixelRatio || 1;
@@ -179,7 +190,7 @@ function drawAxes(canvas, xCenter, yCenter, xMin, xMax, yMin, yMax) {
 
   // Draw grid
   ctx.lineWidth = Math.max(1, Math.floor(dpr));
-  ctx.strokeStyle = '#e3e3e3';
+  ctx.strokeStyle = gridColor;
   ctx.beginPath();
   for (let x = firstX; x <= vxMax + 1e-12; x += step) {
     const cx = toCX(x);
@@ -192,47 +203,82 @@ function drawAxes(canvas, xCenter, yCenter, xMin, xMax, yMin, yMax) {
   ctx.stroke();
 
   // Axes
-  ctx.strokeStyle = '#e3e3e3';
+  ctx.strokeStyle = axisColor;
   ctx.lineWidth = Math.max(1.5, 1.5 * dpr);
   if (vxMin <= 0 && 0 <= vxMax) { ctx.beginPath(); ctx.moveTo(toCX(0), 0); ctx.lineTo(toCX(0), H); ctx.stroke(); }
   if (vyMin <= 0 && 0 <= vyMax) { ctx.beginPath(); ctx.moveTo(0, toCY(0)); ctx.lineTo(W, toCY(0)); ctx.stroke(); }
+
+  // Label styling
+  const pad = labelPaddingPx * dpr;
+  ctx.font = `${Math.round(fontPx * dpr)}px sans-serif`;
+
+  // Helper: draw text with a background box that overwrites lines
+  function drawLabel(text, x, y, {align='left', baseline='alphabetic'} = {}) {
+    ctx.save();
+    ctx.textAlign = align;
+    ctx.textBaseline = baseline;
+
+    // Measure text
+    const m = ctx.measureText(text);
+    const w = m.width;
+    const ascent = m.actualBoundingBoxAscent ?? Math.ceil(0.8 * fontPx * dpr);
+    const descent = m.actualBoundingBoxDescent ?? Math.ceil(0.2 * fontPx * dpr);
+    const h = ascent + descent;
+
+    // Compute rect corner from align/baseline
+    let rx = x, ry = y;
+    if (align === 'center') rx -= w / 2;
+    else if (align === 'right') rx -= w;
+
+    if (baseline === 'middle') ry -= h / 2;
+    else if (baseline === 'top' || baseline === 'hanging') ; // already at top
+    else if (baseline === 'alphabetic' || baseline === 'ideographic') ry -= ascent;
+    else if (baseline === 'bottom') ry -= h;
+
+    // Background patch
+    ctx.globalAlpha = labelBgAlpha;
+    ctx.fillStyle = labelBgColor;
+    ctx.fillRect(rx - pad, ry - pad, w + 2*pad, h + 2*pad);
+
+    // Text
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = labelColor;
+    ctx.fillText(text, x, y);
+
+    ctx.restore();
+  }
 
   // Labels — SAME frequency on both axes
   const pxPerTick = step * scale;                  // pixels between ticks
   const minLabelPx = 45 * dpr;                     // desired spacing for labels
   const labelEvery = Math.max(1, Math.round(minLabelPx / pxPerTick)); // shared N
 
-  ctx.font = `${Math.round(12 * dpr)}px sans-serif`;
-  ctx.fillStyle = '#e3e3e3';
-
   // X labels
-  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
   let k = 0;
   for (let x = firstX; x <= vxMax + 1e-12; x += step, k++) {
     if (Math.abs(x) < 1e-12) continue;             // skip 0; origin gets its own
     if (k % labelEvery !== 0) continue;
     const cx = toCX(x);
     const cy = (vyMin <= 0 && 0 <= vyMax) ? toCY(0) + 4 * dpr : H - 16 * dpr;
-    ctx.fillText(fmtLabel(x, step), cx, cy);
+    drawLabel(fmtLabel(x, step), cx, cy, { align: 'center', baseline: 'top' });
   }
 
   // Y labels
-  ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
   k = 0;
   for (let y = firstY; y <= vyMax + 1e-12; y += step, k++) {
     if (Math.abs(y) < 1e-12) continue;
     if (k % labelEvery !== 0) continue;            // SAME N as X
     const cy = toCY(y);
     const cx = (vxMin <= 0 && 0 <= vxMax) ? toCX(0) - 4 * dpr : 22 * dpr;
-    ctx.fillText(fmtLabel(y, step), cx, cy);
+    drawLabel(fmtLabel(y, step), cx, cy, { align: 'right', baseline: 'middle' });
   }
 
   // Origin label
   if (vxMin <= 0 && 0 <= vxMax && vyMin <= 0 && 0 <= vyMax) {
-    ctx.textAlign = 'left'; ctx.textBaseline = 'top'; ctx.fillStyle = '#e3e3e3';
-    ctx.fillText('0', toCX(0) + 3 * dpr, toCY(0) + 3 * dpr);
+    drawLabel('0', toCX(0) + 3 * dpr, toCY(0) + 3 * dpr, { align: 'left', baseline: 'top' });
   }
 }
+
 
 //////// END AXIS STUFF
 
@@ -274,7 +320,7 @@ function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, colormap
   var imageData = context.createImageData(canvasWidth, canvasHeight);
   var pixelData = imageData.data;
 
-  console.log(`displayFuzzyGraph() - minValue = ${minValue}, maxValue = ${maxValue}, fuzzyValue = ${fuzzyValue}`);
+  //console.log(`displayFuzzyGraph() - minValue = ${minValue}, maxValue = ${maxValue}, fuzzyValue = ${fuzzyValue}`);
 
   // Function to modify the value to make the graph look more interesting
   // We do this because the value is a measure of error, but we want more error
@@ -306,9 +352,8 @@ function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, colormap
   context.putImageData(imageData, 0, 0);
 }
 
-function displayGraph(graphParams, canvasElem) {
-  console.log('~~~~ displayGraph ~~~');
-  console.log(graphParams);
+function displayGraph(graphParams, canvasElem, alpineRef) {
+  //console.log(graphParams);
   const canvasWidth = canvasElem.width;
   const canvasHeight = canvasElem.height;
   var windowBounds = calcWindowBounds(graphParams['xCenter'],
@@ -323,6 +368,9 @@ function displayGraph(graphParams, canvasElem) {
       canvasWidth,
       canvasHeight);
   const t2 = performance.now();
+
+  // TODO: Save this somewhere so it can be accessed for error mouseOver
+  //alpineRef.store('app').pixelValues = pixelValues;
 
   displayFuzzyGraph(pixelValues['pixelValues'],
       pixelValues['min'],
@@ -342,6 +390,6 @@ function displayGraph(graphParams, canvasElem) {
   const elapsed1 = t2-t1;
   const elapsed2 = t3-t2;
 
-  console.log(`displayGraph() metrics - calculateFuncForWindow_time = ${elapsed1}, displayFuzzyGraph_time = ${elapsed2}`);
+  //console.log(`displayGraph() metrics - calculateFuncForWindow_time = ${elapsed1}, displayFuzzyGraph_time = ${elapsed2}`);
 }
 

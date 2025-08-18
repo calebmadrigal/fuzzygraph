@@ -15,6 +15,17 @@
     <!-- <script src="https://unpkg.com/mathjs@14.5.3/lib/browser/math.js"></script> -->
     <script src="js/math.js"></script>
     <script src="js/js-colormaps.js"></script>
+
+    <style>
+    .coords {
+      position: absolute; right: 6px; bottom: 6px;
+      padding: 4px 8px; border-radius: 6px;
+      background: rgba(0,0,0,0.6); color: #fff;
+      font: 12px/1.2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      pointer-events: none;
+      user-select: none;
+    }
+    </style>
 </head>
 
 <body class="min-h-screen" x-data>
@@ -136,11 +147,31 @@
                 </svg>
             </button>
             <canvas id="mainCanvas"
+                    x-ref="c"
                     class="w-full h-[calc(100vh-4rem)] md:h-[calc(100vh-4rem)] bg-white"
                     @mousedown="$store.app.startDrag($event)"
                     @mouseup="$store.app.endDrag($event)"
-                    @mouseleave="$store.app.endDrag($event)">
+                    @mouseleave="$store.app.endDrag($event); $store.app.showError=false"
+                    @mouseenter="$store.app.showError=true"
+                    @mousemove="const r = $refs.c.getBoundingClientRect();
+                                const sx = $refs.c.width / r.width, sy = $refs.c.height / r.height;
+                                const windowBounds = calcWindowBounds($store.app.xCenter, $store.app.yCenter, $store.app.yHeight, $refs.c.width, $refs.c.height)
+                                var pixelToXMapper = makeLinearMapper([0, $refs.c.width], [windowBounds['xMin'], windowBounds['xMax']], false);
+                                var pixelToYMapper = makeLinearMapper([$refs.c.height, 0], [windowBounds['yMin'], windowBounds['yMax']], false);
+                                const xPixel = (event.clientX - r.left) * sx;
+                                const yPixel = (event.clientY - r.top)  * sy;
+                                const x = pixelToXMapper(xPixel);
+                                const y = pixelToYMapper(yPixel);
+                                const xStr = x.toFixed(3);
+                                const yStr = y.toFixed(3);
+                                //const pixelValOffset = yPixel * $refs.c.width + xPixel;
+                                //const errorStr = $store.app.pixelValues[pixelValOffset];
+                                //$store.app.hoverMsg = `(${xStr}, ${yStr}): error = ${errorStr}`;
+                                $store.app.hoverMsg = `(${xStr}, ${yStr})`; ">
             </canvas>
+            <div class="coords" x-show="$store.app.showError" x-transition>
+                <span x-text="$store.app.hoverMsg"></span>,
+            </div>
         </main>
 
         <!-- Sidebar - Fixed to bottom on mobile, left side on desktop -->
@@ -163,10 +194,16 @@
             <div class="p-4 flex flex-col space-y-8 max-h-[50vh] md:max-h-[calc(100vh-7rem)] overflow-y-auto">
                 <!-- Equations Section -->
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200">Equations</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200">Equation</h3>
                     <div class="space-y-2">
+                        <textarea class="w-full h-16 p-2 border border-gray-300 rounded-md resize-y"
+                                    :value="$store.app.equations[0]"
+                                    @input.debounce.1000ms="$store.app.updateEquation(0, $event.target.value)"
+                        placeholder="y=x">
+                        </textarea>
+                        <!-- For now, only allow one equation for simplicity -->
                         <!-- Dynamic Text Boxes -->
-                        <template x-for="(equation, index) in $store.app.equations" :key="index">
+                        <!-- <template x-for="(equation, index) in $store.app.equations" :key="index">
                             <div class="flex items-center space-x-2">
                                 <input type="text" @keydown.enter="$store.app.addEquation()"
                                     @input.debounce.1000ms="$store.app.updateEquation(index, $event.target.value)"
@@ -183,7 +220,7 @@
                                     </svg>
                                 </button>
                             </div>
-                        </template>
+                        </template> -->
                     </div>
                 </div>
 
@@ -331,7 +368,7 @@
             Alpine.store('app').equationFunction = graphConfig['equationFunction'];
 
             // Actually draw graph (only if equation parses)
-            displayGraph(graphConfig, canvas);
+            displayGraph(graphConfig, canvas, Alpine);
           }
 
         }
@@ -346,7 +383,9 @@
         /////////////////////////////////////////////////////////////////////////////////////// URL Handling
 
         function getAppConfig() {
-            const sessionVars = ['isDragging', 'dragStartX', 'dragStartY', 'nextId', 'xWidth'];
+            // TODO: Different scoping to simplify and not need this
+            const sessionVars = ['isDragging', 'dragStartX', 'dragStartY', 'nextId',
+                                 'xWidth', 'hoverMsg', 'showError', 'pixelValues'];
             const appStore = Alpine.store('app');
             // Filter out functions from the store, keeping only non-function properties
             const appConfig = Object.fromEntries(
@@ -436,35 +475,38 @@
         }
 
         const defaultConfig = {
-            fuzzyLevel: 100,
-            colorMap: 'viridis',
+            fuzzyLevel: 190,
+            colorMap: 'plasma',
             invertColor: true,
             // colorCycles: 1,
             // colorOffset: 0,
-            equations: ['y=x^2'],
+            equations: ['x^2+y^2=2'],
             xCenter: 0,
             yCenter: 0,
             yHeight: 6,
             sidebarOpen: true,
             showAxes: true,
-            mobileMenuOpen: true,
+            mobileMenuOpen: false,
             version: '0',
 
             // non-persistent
             isDragging: false,
             dragStartX: 0,
             dragStartY: 0,
+            hoverMsg: '',
+            showError: false,
             nextId: 1,
+            pixelValues: []
         };
 
         // Initialize Alpine store
         document.addEventListener('alpine:init', () => {
 
             Alpine.store('app', {
-                addEquation() {
-                    this.equations.push('');
-                    setTimeout(() => document.getElementById(`eq-${this.equations.length - 1}`).focus(), 0);
-                },
+                // addEquation() {
+                //     this.equations.push('');
+                //     setTimeout(() => document.getElementById(`eq-${this.equations.length - 1}`).focus(), 0);
+                // },
                 updateEquation(index, value) {
                     this.equations = [
                         ...this.equations.slice(0, index),
@@ -472,12 +514,12 @@
                         ...this.equations.slice(index + 1)
                     ];
                 },
-                removeEquation(index) {
-                    this.equations.splice(index, 1);
-                    if (this.equations.length === 0) {
-                        this.equations.push('');
-                    }
-                },
+                // removeEquation(index) {
+                //     this.equations.splice(index, 1);
+                //     if (this.equations.length === 0) {
+                //         this.equations.push('');
+                //     }
+                // },
 
                 startDrag(event) {
                     this.dragStartX = event.x;
