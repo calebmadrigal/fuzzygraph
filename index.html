@@ -49,31 +49,89 @@
             <div class="flex items-center space-x-4">
                 <!-- Desktop Navigation -->
                 <nav class="hidden md:flex space-x-4">
+                    <div x-data="{shareOpen: false}" class="relative">
+
+                        <button
+                            class="text-white hover:text-blue-200 flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700"
+                            @click="shareOpen = !shareOpen">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                            </svg>
+                            <span>Share</span>
+                        </button>
+
+                        <div
+                            x-show="shareOpen"
+                            @click.outside="shareOpen = false"
+                            x-transition.opacity
+                            class="absolute left-1/2 -translate-x-1/2 mt-3 w-96 rounded-lg shadow-lg bg-white border border-gray-200 p-4 text-sm text-gray-700 z-50">
+                    
+                            <!-- Arrow -->
+                            <div class="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 rotate-45 bg-white border-l border-t border-gray-200"></div>
+                    
+                            <p class="font-medium mb-2">Share</p>
+                            <p>Share this URL to share this graph</p>
+
+                            <div x-data="{
+                                url: window.location.search,
+                                copied: false,
+                                copyToClipboard() {
+                                    navigator.clipboard.writeText(this.url).then(() => {
+                                        this.copied = true;
+                                        setTimeout(() => this.copied = false, 2000);
+                                    });
+                                },
+                                init() {
+                                    const update = () => this.url = window.location.href;
+                                    window.addEventListener('popstate', update);
+                                    window.addEventListener('hashchange', update);
+                                }
+                            }" class="w-full max-w-md p-4">
+                                <div class="relative">
+                                    <input
+                                        type="text"
+                                        x-model="url"
+                                        readonly
+                                        class="w-full p-2 pr-20 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    >
+                                    <button
+                                        @click="copyToClipboard"
+                                        class="absolute right-1 top-1/2 -translate-y-1/2 bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600 transition duration-200"
+                                    >
+                                        <span x-show="!copied">Copy</span>
+                                        <span x-show="copied">Copied!</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <button
-                        class="text-white hover:text-blue-200 flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-                        </svg>
-                        <span>Share</span>
-                    </button>
-                    <button
-                        class="text-white hover:text-blue-200 flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700">
+                        class="text-white hover:text-blue-200 flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700"
+                        @click="$store.ephemeral.showSaveModal = !$store.ephemeral.showSaveModal"
+                        >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                         </svg>
                         <span>Save</span>
                     </button>
+
                     <button
-                        class="text-white hover:text-blue-200 flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700">
+                        class="text-white hover:text-blue-200 flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700"
+                        @click="$store.ephemeral.showHelpModal = !$store.ephemeral.showHelpModal"
+                        >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M12 21a9 9 0 110-18 9 9 0 010 18z" />
                         </svg>
                         <span>Help</span>
                     </button>
+
                 </nav>
+
+
                 <!-- Mobile menu button -->
                 <button @click="$store.app.mobileMenuOpen = !$store.app.mobileMenuOpen" class="md:hidden p-2">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -92,21 +150,24 @@
             x-transition:leave-end="opacity-0 transform -translate-y-2"
             class="absolute top-16 right-0 w-48 bg-gray-800 shadow-lg md:hidden rounded-bl-lg">
             <div class="px-2 py-3 space-y-2">
-                <button class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded">
+                <button class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded"
+                        @click="$store.ephemeral.showShareModal = !$store.ephemeral.showShareModal">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                     </svg>
                     <span>Share</span>
                 </button>
-                <button class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded">
+                <button class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded"
+                        @click="$store.ephemeral.showSaveModal = !$store.ephemeral.showSaveModal">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                     </svg>
                     <span>Save</span>
                 </button>
-                <button class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded">
+                <button class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded"
+                        @click="$store.ephemeral.showHelpModal = !$store.ephemeral.showHelpModal">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M12 21a9 9 0 110-18 9 9 0 010 18z" />
@@ -170,7 +231,7 @@
                                 $store.app.hoverMsg = `(${xStr}, ${yStr})`; ">
             </canvas>
             <div class="coords" x-show="$store.app.showError" x-transition>
-                <span x-text="$store.app.hoverMsg"></span>,
+                <span x-text="$store.app.hoverMsg"></span>
             </div>
         </main>
 
@@ -330,6 +391,119 @@
         </svg>
     </button>
     </div>
+
+    <!-- Share modal background -->
+    <div
+      x-show="$store.ephemeral.showShareModal"
+      x-transition.opacity
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      @click="open = false">
+
+      <!-- Modal content -->
+      <div
+        @click.stop
+        x-transition
+        class="relative bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+
+        <!-- X button -->
+        <button
+          @click="$store.ephemeral.showShareModal= false"
+          class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold focus:outline-none">
+          &times;
+        </button>
+
+        <h2 class="text-xl font-semibold mb-4">Share</h2>
+        <div x-data="{
+            url: window.location.search,
+            copied: false,
+            copyToClipboard() {
+                navigator.clipboard.writeText(this.url).then(() => {
+                    this.copied = true;
+                    setTimeout(() => this.copied = false, 2000);
+                });
+            },
+            init() {
+                const update = () => this.url = window.location.href;
+                window.addEventListener('popstate', update);
+                window.addEventListener('hashchange', update);
+            }
+        }" class="w-full max-w-md p-4">
+            <div class="relative">
+                <input
+                    type="text"
+                    x-model="url"
+                    readonly
+                    class="w-full p-2 pr-20 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                <button
+                    @click="copyToClipboard"
+                    class="absolute right-1 top-1/2 -translate-y-1/2 bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600 transition duration-200"
+                >
+                    <span x-show="!copied">Copy</span>
+                    <span x-show="copied">Copied!</span>
+                </button>
+            </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Save modal background -->
+    <div
+      x-show="$store.ephemeral.showSaveModal"
+      x-transition.opacity
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      @click="open = false">
+
+      <!-- Modal content -->
+      <div
+        @click.stop
+        x-transition
+        class="relative bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+
+        <!-- X button -->
+        <button
+          @click="$store.ephemeral.showSaveModal = false"
+          class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold focus:outline-none">
+          &times;
+        </button>
+
+        <h2 class="text-xl font-semibold mb-4">Save Image</h2>
+        <p class="mb-4">Image save feature coming soon</p>
+      </div>
+    </div>
+
+
+    <!-- Help modal background -->
+    <div
+      x-show="$store.ephemeral.showHelpModal"
+      x-transition.opacity
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+      @click="open = false">
+
+      <!-- Modal content -->
+      <div
+        @click.stop
+        x-transition
+        class="relative bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+
+        <!-- X button -->
+        <button
+          @click="$store.ephemeral.showHelpModal= false"
+          class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold focus:outline-none">
+          &times;
+        </button>
+
+        <h2 class="text-xl font-semibold mb-4">About FuzzyGraph</h2>
+        <p>FuzzyGraph is a non-binary graphing app. This is similar to the concept of <a class="text-blue-600 underline hover:text-blue-800 transition-colors duration-200" href="https://en.wikipedia.org/wiki/Fuzzy_logic">Fuzzy logic</a>.</p>
+        <br />
+        <p>Most conventional graphing apps show where the left and right side of the equation are EXACTLY equal. By comparison, FuzzyGraph shows the error gradient of the equation... and does not collapse into either TRUE of FALSE, but rather, shows the "shades of gray", choosing colors based on how near or far both sides are to being equal.</p>
+        <br />
+        <p>This is a project by math artist <a href="https://gods.art" class="text-blue-600 underline hover:text-blue-800 transition-colors duration-200">Caleb Madrigal</a>.</p>
+      </div>
+    </div>
+
+
 
     <script >
         var firstPass = true;
@@ -508,6 +682,10 @@
 
         // Initialize Alpine store
         document.addEventListener('alpine:init', () => {
+
+            Alpine.store('ephemeral', {
+                showSaveModal: false
+            });
 
             Alpine.store('app', {
                 // addEquation() {
