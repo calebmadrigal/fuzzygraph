@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fuzzy Graph Lib demo</title>
+    <script src="js/fuzzygraph.js"></script>
+    <script src="js/math.js"></script>
+    <script src="js/js-colormaps.js"></script>
+</head>
+
+<body>
+    <canvas id="mainCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas size to window size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        var graphConfig = {
+            equation: 'y=sin(x)/(x^2+y^2)',
+            fuzzyLevel: 101,
+            colorMap: 'magma',
+            invertColor: true,
+            xCenter: 0,
+            yCenter: 0,
+            yHeight: 6,
+            showAxes: true
+        };
+
+        graphConfig['equationFunction'] = parseEquationString(graphConfig['equation']);
+
+        displayGraph(graphConfig, canvas);
+    </script>
+</body>
+</html>
