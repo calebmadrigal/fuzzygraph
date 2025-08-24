@@ -49,15 +49,15 @@
                 <!-- Desktop Navigation -->
                 <nav class="hidden md:flex space-x-4">
 
-											<button
-													id="showShareButton"
-													class="text-white hover:text-blue-200 flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700">
-													<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-															<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-																	d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-													</svg>
-													<span>Share</span>
-											</button>
+                                            <button
+                                                    id="showShareButton"
+                                                    class="text-white hover:text-blue-200 flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+                                                    </svg>
+                                                    <span>Share</span>
+                                            </button>
 
                     <button id="showSaveButton"
                             class="text-white hover:text-blue-200 flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700" >
@@ -99,8 +99,8 @@
             class="absolute top-16 right-0 w-48 bg-gray-800 shadow-lg md:hidden rounded-bl-lg">
             <div class="px-2 py-3 space-y-2">
                 <button 
-												id="mobileShowShareButton"
-											  class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded"
+                                                id="mobileShowShareButton"
+                                              class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded"
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
@@ -108,7 +108,7 @@
                     <span>Share</span>
                 </button>
                 <button id="mobileShowSaveButton"
-												class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded"
+                                                class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded"
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
@@ -116,7 +116,7 @@
                     <span>Save</span>
                 </button>
                 <button id="mobileShowHelpButton"
-											  class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded"
+                                              class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded"
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M12 21a9 9 0 110-18 9 9 0 010 18z" />
@@ -154,10 +154,12 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
             </button>
+
             <canvas id="mainCanvas"
                     x-ref="c"
                     class="w-full h-[calc(100vh-4rem)] md:h-[calc(100vh-4rem)] bg-white">
             </canvas>
+
             <div id="hoverMsgDiv" class="coords" x-transition>
                 <span id="hoverMsg"></span>
             </div>
@@ -165,13 +167,12 @@
 
         <!-- Sidebar - Fixed to bottom on mobile, left side on desktop -->
         <aside
-						id="mobileControlPanel"
+                        id="mobileControlPanel"
             class="bg-gray-300 text-gray-800 w-full md:w-64 fixed transition-all duration-300 order-2 md:order-1 z-40">
             <!-- Top Control Bar -->
             <div class="bg-gray-400 text-white p-2 flex justify-between items-center">
                 <button id="hideControlPanelButton" class="p-1 hover:bg-gray-700 rounded">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                        :class="{ 'rotate-90 md:rotate-180': true }">
+                    <svg class="w-5 h-5 rotate-90 md:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19l7-7-7-7" />
                     </svg>
                 </button>
@@ -206,7 +207,7 @@
                             class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                             role="switch">
                             <span
-																id="axesOnSlider"
+                                                                id="axesOnSlider"
                                 class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out">
                             </span>
                         </button>
@@ -271,10 +272,7 @@
     </div>
 
     <!-- Share modal background -->
-    <div
-			id="shareModal"
-      x-transition.opacity
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div id="shareModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
 
       <!-- Modal content -->
       <div
@@ -282,7 +280,7 @@
 
         <!-- X button -->
         <button
-					id="shareModalX"
+                    id="shareModalX"
           class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold focus:outline-none">
           &times;
         </button>
@@ -290,19 +288,19 @@
         <h2 class="text-xl font-semibold mb-4">Share</h2>
         <div class="w-full max-w-md p-4">
             <div class="relative">
-                <input
+                <!--<input
                     type="text"
                     readonly
                     class="w-full p-2 pr-20 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                 <button
                     class="absolute right-1 top-1/2 -translate-y-1/2 bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600 transition duration-200">
-                </button>
+                </button>-->
+                <p>Just copy the URL in the URL bar and sent it.</p>
             </div>
         </div>
       </div>
     </div>
-
 
     <!-- Save modal background -->
     <div id="saveModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -313,7 +311,7 @@
 
         <!-- X button -->
         <button
-					id="saveModalX"
+                    id="saveModalX"
           class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold focus:outline-none">
           &times;
         </button>
@@ -323,11 +321,8 @@
       </div>
     </div>
 
-
     <!-- Help modal background -->
-    <div
-		  id="helpModal"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div id="helpModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
 
       <!-- Modal content -->
       <div
@@ -335,7 +330,7 @@
 
         <!-- X button -->
         <button
-				 	id="helpModalX"
+                     id="helpModalX"
           class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold focus:outline-none">
           &times;
         </button>
@@ -378,180 +373,189 @@
       function paintGraph() {
           const canvas = document.getElementById('mainCanvas');
 
-					// Compile equation using math.js (parseEquationString)
+                    // Compile equation using math.js (parseEquationString)
           const parsedEquation = parseEquationString(equation.get());
 
-					if (parsedEquation) {
-						var graphConfig = {
-								equationFunction: parsedEquation,
-								fuzzyLevel: fuzzyLevel.get(),
-								colorMap: colorMap.get(),
-								invertColor: invertColor.get(),
-								xCenter: xCenter.get(),
-								yCenter: yCenter.get(),
-								yHeight: yHeight.get(),
-								showAxes: showAxes.get()
-						};
+                    if (parsedEquation) {
+                        var graphConfig = {
+                                equationFunction: parsedEquation,
+                                fuzzyLevel: fuzzyLevel.get(),
+                                colorMap: colorMap.get(),
+                                invertColor: invertColor.get(),
+                                xCenter: xCenter.get(),
+                                yCenter: yCenter.get(),
+                                yHeight: yHeight.get(),
+                                showAxes: showAxes.get()
+                        };
 
             displayGraph(graphConfig, canvas);
-					}
+                    }
       }
 
       // // // // // // // Event handling
 
-			// TOP MENU EVENTS
-			showShareModal.subscribe((visible) => { document.getElementById('shareModal').classList.toggle('hidden', !visible); });
-			showSaveModal.subscribe((visible) => { document.getElementById('saveModal').classList.toggle('hidden', !visible); });
-			showHelpModal.subscribe((visible) => { document.getElementById('helpModal').classList.toggle('hidden', !visible); });
+            // TOP MENU EVENTS
+            showShareModal.subscribe((visible) => { document.getElementById('shareModal').classList.toggle('hidden', !visible); });
+            showSaveModal.subscribe((visible) => { document.getElementById('saveModal').classList.toggle('hidden', !visible); });
+            showHelpModal.subscribe((visible) => { document.getElementById('helpModal').classList.toggle('hidden', !visible); });
 
-			// Desktop menu buttons
- 		  document.getElementById('showShareButton').addEventListener('click', () => { showShareModal.set(!showShareModal.get()); });
- 		  document.getElementById('showSaveButton').addEventListener('click', () => { showSaveModal.set(!showSaveModal.get()); });
- 		  document.getElementById('showHelpButton').addEventListener('click', () => { showHelpModal.set(!showHelpModal.get()); });
+            // Desktop menu buttons
+           document.getElementById('showShareButton').addEventListener('click', () => { showShareModal.set(!showShareModal.get()); });
+           document.getElementById('showSaveButton').addEventListener('click', () => { showSaveModal.set(!showSaveModal.get()); });
+           document.getElementById('showHelpButton').addEventListener('click', () => { showHelpModal.set(!showHelpModal.get()); });
 
-			// Mobile menu buttons
- 		  document.getElementById('mobileShowShareButton').addEventListener('click', () => { showShareModal.set(!showShareModal.get()); });
- 		  document.getElementById('mobileShowSaveButton').addEventListener('click', () => { showSaveModal.set(!showSaveModal.get()); });
- 		  document.getElementById('mobileShowHelpButton').addEventListener('click', () => { showHelpModal.set(!showHelpModal.get()); });
+            // Mobile menu buttons
+           document.getElementById('mobileShowShareButton').addEventListener('click', () => { showShareModal.set(!showShareModal.get()); });
+           document.getElementById('mobileShowSaveButton').addEventListener('click', () => { showSaveModal.set(!showSaveModal.get()); });
+           document.getElementById('mobileShowHelpButton').addEventListener('click', () => { showHelpModal.set(!showHelpModal.get()); });
 
-			// Modal X buttons
- 		  document.getElementById('shareModalX').addEventListener('click', () => { showShareModal.set(false); });
- 		  document.getElementById('saveModalX').addEventListener('click', () => { showSaveModal.set(false); });
- 		  document.getElementById('helpModalX').addEventListener('click', () => { showHelpModal.set(false); });
+            // Modal X buttons
+           document.getElementById('shareModalX').addEventListener('click', () => { showShareModal.set(false); });
+           document.getElementById('saveModalX').addEventListener('click', () => { showSaveModal.set(false); });
+           document.getElementById('helpModalX').addEventListener('click', () => { showHelpModal.set(false); });
 
-			// Mobile top menu
-			mobileMenuOpen.subscribe((visible) => {
-				document.getElementById('shareModal').classList.toggle('hidden', !visible);
-			});
+            // Mobile top menu
+            mobileMenuOpen.subscribe((visible) => {
+                document.getElementById('mobileMenu').classList.toggle('hidden', visible);
+            });
 
-			document.getElementById('mobileMenuButton').addEventListener('click', () => { mobileMenuOpen.set(!mobileMenuOpen.get()); });
+            document.getElementById('mobileMenuButton').addEventListener('click', () => { mobileMenuOpen.set(!mobileMenuOpen.get()); });
 
-			// CONTROL PANEL
-			sidebarOpen.subscribe((visible) => {
-				// TODO: Make this simple visibility
-				document.getElementById('controlPanel').classList.remove('md:ml-64', 'md:ml-0');
-				document.getElementById('controlPanel').classList.add(visible ? 'md:ml-64' : 'md:ml-0');
+            // CONTROL PANEL
+            sidebarOpen.subscribe((visible) => {
+                // TODO: Make this simple visibility
+                document.getElementById('controlPanel').classList.remove('md:ml-64', 'md:ml-0');
+                document.getElementById('controlPanel').classList.add(visible ? 'md:ml-64' : 'md:ml-0');
 
-			  document.getElementById('openControlPanelButton').classList.remove('opacity-0', 'pointers-events-none', 'opacity-100');
-				if (visible) {
-					document.getElementById('openControlPanelButton').classList.add('opacity-100');
-				} else {
-					document.getElementById('openControlPanelButton').classList.add('opacity-0', 'pointer-events-none');
-				}
+              document.getElementById('openControlPanelButton').classList.remove('opacity-0', 'pointer-events-none', 'opacity-100');
+                if (visible) {
+                    document.getElementById('openControlPanelButton').classList.add('opacity-0', 'pointer-events-none');
+                } else {
+                    document.getElementById('openControlPanelButton').classList.add('opacity-100');
+                }
 
-			  document.getElementById('mobileControlPanel').classList.remove('bottom-0','md:bottom-auto', 'md:top-16',
+              document.getElementById('mobileControlPanel').classList.remove('bottom-0','md:bottom-auto', 'md:top-16',
                                                                        'md:left-0', 'bottom-[-1000px]', 'md:bottom-auto',
                                                                        'md:top-16', 'md:left-[-1000px]');
-				if (visible) {
-					document.getElementById('mobileControlPanel').classList.add('bottom-0', 'md:bottom-auto', 'md:top-16', 'md:left-0');
-				} else {
-					document.getElementById('mobileControlPanel').classList.add('bottom-[-1000px]', 'md:bottom-auto', 'md:top-16', 'md:left-[-1000px]');
-				}
+                if (visible) {
+                    document.getElementById('mobileControlPanel').classList.add('bottom-0', 'md:bottom-auto', 'md:top-16', 'md:left-0');
+                } else {
+                    document.getElementById('mobileControlPanel').classList.add('bottom-[-1000px]', 'md:bottom-auto', 'md:top-16', 'md:left-[-1000px]');
+                }
 
-				document.getElementById('mobileShowControlPanelButton').classList.remove('opacity-0', 'pointer-events-none', 'opacity-100');
+                document.getElementById('mobileShowControlPanelButton').classList.remove('opacity-0', 'pointer-events-none', 'opacity-100');
 
-				if (visible) {
-          document.getElementById('mobileShowControlPanelButton').classList.add('opacity-100');
-        } else {
-          document.getElementById('mobileShowControlPanelButton').classList.add('opacity-0', 'pointer-events-none');
-        }
-			});
+                if (visible) {
+                  document.getElementById('mobileShowControlPanelButton').classList.add('opacity-0', 'pointer-events-none');
+                } else {
+                  document.getElementById('mobileShowControlPanelButton').classList.add('opacity-100');
+                }
 
-			document.getElementById('mobileShowControlPanelButton').addEventListener('click', () => { sidebarOpen.set(true); });
-			document.getElementById('openControlPanelButton').addEventListener('click', () => { sidebarOpen.set(true); });
-			document.getElementById('hideControlPanelButton').addEventListener('click', () => { sidebarOpen.set(false); });
+                paintGraph();
 
-			// CONTROL PANEL / Equation
+            });
+
+            document.getElementById('mobileShowControlPanelButton').addEventListener('click', () => { sidebarOpen.set(true); });
+            document.getElementById('openControlPanelButton').addEventListener('click', () => { console.log('openControlPanelButton pressed'); sidebarOpen.set(true); });
+            document.getElementById('hideControlPanelButton').addEventListener('click', () => { sidebarOpen.set(false); });
+
+            // CONTROL PANEL / Equation
       equation.subscribe((eq) => {
         document.getElementById('equationInput').value = eq;
         paintGraph();
       });
 
-			document.getElementById('equationInput').addEventListener('input', (event) => {
-				// TODO: debounce
+            document.getElementById('equationInput').addEventListener('input', (event) => {
+                // TODO: debounce
         console.log(`equationInput - ${event.target.value}`);
-				equation.set(event.target.value);
-			});
+                equation.set(event.target.value);
+            });
 
-			// CONTROL PANEL / Fuzzy
+            // CONTROL PANEL / Fuzzy
       fuzzyLevel.subscribe((fuzzyVal) => {
-				document.getElementById('fuzzyLevelDisplay').textContent = parseInt((fuzzyLevel.get() / 200) * 100) + '%';
-				paintGraph();
+                document.getElementById('fuzzyLevelDisplay').textContent = parseInt((fuzzyVal / 200) * 100) + '%';
+        document.getElementById('fuzzyInput').value = fuzzyVal;
+                paintGraph();
       });
-			document.getElementById('fuzzyInput').addEventListener('input', (event) => {
-				// TODO: debounce
-				fuzzyLevel.set(event.target.value);
-			});
+            document.getElementById('fuzzyInput').addEventListener('input', (event) => {
+                // TODO: debounce
+                fuzzyLevel.set(event.target.value);
+            });
 
-			// CONTROL PANEL / Show Axes
-			showAxes.subscribe((show) => {
-				document.getElementById('axesOnSlider').classList.remove('translate-x-5', 'translate-x-0');
-				document.getElementById('axesOnSlider').classList.add(show ? 'translate-x-5' : 'translate-x-0');
+            // CONTROL PANEL / Show Axes
+            showAxes.subscribe((show) => {
+                document.getElementById('axesOnSlider').classList.remove('translate-x-5', 'translate-x-0');
+                document.getElementById('axesOnSlider').classList.add(show ? 'translate-x-5' : 'translate-x-0');
 
-				document.getElementById('axesToggle').classList.remove('bg-blue-600', 'bg-gray-200');
-				document.getElementById('axesToggle').classList.add(show ? 'bg-blue-600' : 'bg-gray-200');
+                document.getElementById('axesToggle').classList.remove('bg-blue-600', 'bg-gray-200');
+                document.getElementById('axesToggle').classList.add(show ? 'bg-blue-600' : 'bg-gray-200');
 
-				document.getElementById('axesToggle').setAttribute('aria-checked', show);
-			});
+                document.getElementById('axesToggle').setAttribute('aria-checked', show);
+            });
 
-			document.getElementById('axesToggle').addEventListener('click', () => {
-				// TODO: debounce
-				showAxes.set(!showAxes.get());
-				paintGraph();
-			});
+            document.getElementById('axesToggle').addEventListener('click', () => {
+                // TODO: debounce
+                showAxes.set(!showAxes.get());
+                paintGraph();
+            });
 
-			// CONTROL PANEL / Color map
-			const colorMapSelect = document.getElementById('colorMapSelect');
-			function renderOptions(selectedValue) {
-				const colorMaps = getColorMapList();
-				colorMapSelect.innerHTML = '';
-				colorMaps.forEach((color) => {
-					const option = document.createElement('option');
-					option.value = color;
-					option.textContent = color;
-					option.selected = color === selectedValue;
-					colorMapSelect.appendChild(option);
-				});
-			}
-			colorMap.subscribe((value) => {
-				renderOptions(value);
-			});
-			colorMapSelect.addEventListener('change', (event) => {
-				colorMap.set(event.target.value);
-			});
-			renderOptions(colorMap.get());
+            // CONTROL PANEL / Color map
+      function getColorMapList() {
+          // TODO: Rename the js-matplotlib data to be something other than "data"?
+          var colorMapList = Object.keys(data);
+          return colorMapList;
+      }
 
-			// CONTROL PANEL / Invert color
-			invertColor.subscribe((show) => {
-				document.getElementById('invertColorSlider').classList.remove('translate-x-5', 'translate-x-0');
-				document.getElementById('invertColorSlider').classList.add(show ? 'translate-x-5' : 'translate-x-0');
+            const colorMapSelect = document.getElementById('colorMapSelect');
+            function renderOptions(selectedValue) {
+                const colorMaps = getColorMapList();
+                colorMapSelect.innerHTML = '';
+                colorMaps.forEach((color) => {
+                    const option = document.createElement('option');
+                    option.value = color;
+                    option.textContent = color;
+                    option.selected = color === selectedValue;
+                    colorMapSelect.appendChild(option);
+                });
+            }
+            colorMap.subscribe((value) => {
+                renderOptions(value);
+        paintGraph();
+            });
+            colorMapSelect.addEventListener('change', (event) => {
+                colorMap.set(event.target.value);
+        paintGraph();
+            });
+            //renderOptions(colorMap.get());
 
-				document.getElementById('invertColorButton').classList.remove('bg-blue-600', 'bg-gray-200');
-				document.getElementById('invertColorButton').classList.add(show ? 'bg-blue-600' : 'bg-gray-200');
+            // CONTROL PANEL / Invert color
+            invertColor.subscribe((show) => {
+                document.getElementById('invertColorSlider').classList.remove('translate-x-5', 'translate-x-0');
+                document.getElementById('invertColorSlider').classList.add(show ? 'translate-x-5' : 'translate-x-0');
 
-				document.getElementById('invertColorButton').setAttribute('aria-checked', show);
-			});
+                document.getElementById('invertColorButton').classList.remove('bg-blue-600', 'bg-gray-200');
+                document.getElementById('invertColorButton').classList.add(show ? 'bg-blue-600' : 'bg-gray-200');
 
-			document.getElementById('invertColorButton').addEventListener('click', () => {
-				// TODO: debounce
-				invertColor.set(!invertColor.get());
-				paintGraph();
-			});
+                document.getElementById('invertColorButton').setAttribute('aria-checked', show);
+            });
 
-
-
-			// Zoom In
-			document.getElementById('zoomInButton').addEventListener('click', () => {
-				yHeight.set(yHeight.get() * (1/ZOOM_RATE));
-				paintGraph();
-			});
-			// Zoom Out
-			document.getElementById('zoomOutButton').addEventListener('click', () => {
-				yHeight.set(yHeight.get() * ZOOM_RATE);
-				paintGraph();
-			});
+            document.getElementById('invertColorButton').addEventListener('click', () => {
+                // TODO: debounce
+                invertColor.set(!invertColor.get());
+                paintGraph();
+            });
 
 
+            // Zoom In
+            document.getElementById('zoomInButton').addEventListener('click', () => {
+                yHeight.set(yHeight.get() * (1/ZOOM_RATE));
+                paintGraph();
+            });
+            // Zoom Out
+            document.getElementById('zoomOutButton').addEventListener('click', () => {
+                yHeight.set(yHeight.get() * ZOOM_RATE);
+                paintGraph();
+            });
 
 
         // Initialize canvas
@@ -569,7 +573,7 @@
             canvas.height = displayHeight * dpr;
             ctx.scale(dpr, dpr);
 
-            updateGraph();
+            paintGraph();
         }
 
         // Initial resize
@@ -577,22 +581,6 @@
 
         // Resize canvas when window is resized
         window.addEventListener('resize', resizeCanvas);
-
-        function updateGraph() {
-          const canvas = document.getElementById('mainCanvas');
-          const graphConfig = getAppConfig();
-
-          // Compile equations
-          const parsedEquation = parseEquationString(graphConfig['equation']);
-          if (parsedEquation) {
-            graphConfig['equationFunction'] = parsedEquation;
-
-            // Actually draw graph (only if equation parses)
-            displayGraph(graphConfig, canvas);
-          }
-
-        }
-
 
         /////////////////////////////////////////////////////////////////////////////////////// URL Handling
 
@@ -607,7 +595,7 @@
                 yHeight: yHeight.get(),
                 showAxes: showAxes.get()
             };
-						return graphConfig;
+                        return graphConfig;
         }
 
         function getParameterByName(name, url) {
@@ -668,15 +656,15 @@
 
             console.log("Parsed config from URL:", configFromUrl);
 
-						// Update stores
-						equation.set(configFromUrl['equation']);
-						fuzzyLevel.set(configFromUrl['fuzzyLevel']);
-						showAxes.set(configFromUrl['showAxes']);
-						colorMap.set(configFromUrl['colorMap']);
-						invertColor.set(configFromUrl['invertColor']);
-						xCenter.set(configFromUrl['xCenter']);
-						yCenter.set(configFromUrl['yCenter']);
-						yHeight.set(configFromUrl['yHeight']);
+                        // Update stores
+                        equation.set(configFromUrl['equation']);
+                        fuzzyLevel.set(configFromUrl['fuzzyLevel']);
+                        showAxes.set(configFromUrl['showAxes']);
+                        colorMap.set(configFromUrl['colorMap']);
+                        invertColor.set(configFromUrl['invertColor']);
+                        xCenter.set(configFromUrl['xCenter']);
+                        yCenter.set(configFromUrl['yCenter']);
+                        yHeight.set(configFromUrl['yHeight']);
         }
 
         function setUrlFromParams() {
@@ -688,12 +676,6 @@
             }
             const hashStr = `#?${params.toString()}`;
             window.location.hash = hashStr;
-        }
-
-        function getColorMapList() {
-						// TODO: Rename the js-matplotlib data to be something other than "data"?
-            var colorMapList = Object.keys(data);
-            return colorMapList;
         }
 
 
