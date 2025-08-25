@@ -12,6 +12,11 @@
     <script src="js/fuzzygraph.js"></script>
 
     <style>
+      #mainCanvas {
+        touch-action: none; /* Prevents default touch behaviors like scrolling to allow pan. */
+        user-select: none;
+      }
+
       .coords {
         position: absolute; right: 6px; bottom: 6px;
         padding: 4px 8px; border-radius: 6px;
@@ -356,9 +361,9 @@
       const mobileMenuOpen = atom(false);
 
       // non-persistent
-      const isDragging = atom(false);
-      const dragStartX = atom(0);
-      const dragStartY = atom(0);
+      //const isDragging = atom(false);
+      //const dragStartX = atom(0);
+      //const dragStartY = atom(0);
       const hoverMsg = atom('');
       const showError = atom(false);
 
@@ -366,10 +371,19 @@
       const showSaveModal = atom(false);
       const showHelpModal = atom(false);
 
+      function checkCanvasSize(canvas) {
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1
+        const rect = canvas.getBoundingClientRect()
+        canvas.width = Math.max(1, Math.round(rect.width * dpr))
+        canvas.height = Math.max(1, Math.round(rect.height * dpr))
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0) // user-space: CSS pixels
+      }
+
       function paintGraph() {
           const canvas = document.getElementById('mainCanvas');
 
-                    // Compile equation using math.js (parseEquationString)
+          // Compile equation using math.js (parseEquationString)
           const parsedEquation = parseEquationString(equation.get());
 
                     if (parsedEquation) {
@@ -553,10 +567,121 @@
                 paintGraph();
             });
 
+				// // // // // // // Drag and drop to pan
 
-        // Initialize canvas
         const canvas = document.getElementById('mainCanvas');
         const ctx = canvas.getContext('2d');
+				let dragState = {
+            isDragging: false,
+            startX: 0,
+            startY: 0,
+            endX: 0,
+            endY: 0
+        };
+
+				function drawArrow() {
+            ctx.beginPath();
+            ctx.moveTo(dragState.startX, dragState.startY);
+            ctx.lineTo(dragState.endX, dragState.endY);
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Draw arrowhead
+            const angle = Math.atan2(dragState.endY - dragState.startY, dragState.endX - dragState.startX);
+            const arrowSize = 10;
+            ctx.beginPath();
+            ctx.moveTo(dragState.endX, dragState.endY);
+            ctx.lineTo(
+                dragState.endX - arrowSize * Math.cos(angle - Math.PI / 6),
+                dragState.endY - arrowSize * Math.sin(angle - Math.PI / 6)
+            );
+            ctx.moveTo(dragState.endX, dragState.endY);
+            ctx.lineTo(
+                dragState.endX - arrowSize * Math.cos(angle + Math.PI / 6),
+                dragState.endY - arrowSize * Math.sin(angle + Math.PI / 6)
+            );
+            ctx.stroke();
+        }
+
+				function updatePosition(event) {
+						const canvas = event.target;
+						var xWidth = getXWidth(yHeight.get(), canvas.width, canvas.height);
+
+						var xOffsetPixels = event.x - dragState.startX;
+						var yOffsetPixels =  event.y - dragState.startY;
+
+            console.log(`[*] updatePosition - xOffsetPixels = ${xOffsetPixels}, yOffsetPixels = ${yOffsetPixels}`);
+
+						// First, we have to convert the offset in pixels into the offset in our graphing window
+						var xOffset = xOffsetPixels * (xWidth / canvas.clientWidth);
+						var yOffset = yOffsetPixels * (yHeight.get() / canvas.clientHeight);
+
+            console.log(`updatePosition - xOffset = ${xOffset}, yOffset = ${yOffset}`);
+
+						// Then we need to move the center of our graphing window accordingly
+						xCenter.set(xCenter.get() - xOffset);
+						yCenter.set(yCenter.get() + yOffset);  // Due to flipped y, negate yOffset (and -1*-1 = 1)
+
+						dragState.isDragging = false;
+
+            // TODO: No need for nanostores if we call directly
+						paintGraph()
+				}
+
+        // Get mouse position relative to canvas
+        function getMousePos(event) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: event.clientX - rect.left,
+                y: event.clientY - rect.top
+            };
+        }
+
+        // Mouse down event
+        canvas.addEventListener('mousedown', (event) => {
+            //const mousePos = getMousePos(event);
+            //dragState.startX = mousePos.x;
+            //dragState.startY = mousePos.y;
+            dragState.startX = event.x;
+            dragState.startY = event.y;
+						dragState.isDragging = true;
+        });
+
+        // Mouse move event
+        //canvas.addEventListener('mousemove', (event) => {
+        //  dragState.endX = event.x;
+        //  dragState.endY = event.y;
+        //  drawArrow();
+        //});
+
+        // Mouse up event
+        canvas.addEventListener('mouseup', (event) => {
+            dragState.isDragging = false;
+            updatePosition(event)
+        });
+
+
+        // Mouse out event to stop dragging if mouse leaves canvas
+        canvas.addEventListener('mouseout', () => {
+            dragState.isDragging = false;
+        });
+
+        canvas.addEventListener('touchstart', (e) => {
+          e.preventDefault(); // Prevent scrolling
+          const touch = e.touches[0];
+          dragState.startX = touch.clientX - currentX;
+          dragState.startY = touch.clientY - currentY;
+          dragState.isDragging = true;
+        });
+
+				document.addEventListener('touchend', (e) => {
+          dragState.isDragging = false;
+          const rect = canvas.getBoundingClientRect();
+        });
+
+				// // // // // // // Initialization
+
 
         // Set canvas size to match its display size
         function resizeCanvas() {
@@ -591,7 +716,7 @@
                 yHeight: yHeight.get(),
                 showAxes: showAxes.get()
             };
-                        return graphConfig;
+						return graphConfig;
         }
 
         function getParameterByName(name, url) {
