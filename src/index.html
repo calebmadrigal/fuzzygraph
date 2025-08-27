@@ -509,17 +509,26 @@
         document.getElementById('openControlPanelButton').addEventListener('click', () => { sidebarOpen.set(true); });
         document.getElementById('hideControlPanelButton').addEventListener('click', () => { sidebarOpen.set(false); });
 
+        // Debounce utility: returns a debounced version of a function
+        function debounce(fn, delay = 500) {
+            let timeoutId;
+            return (...args) => {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => fn.apply(null, args), delay);
+            };
+        }
+
         // CONTROL PANEL / Equation
         equation.subscribe((eq) => {
             document.getElementById('equationInput').value = eq;
             paintGraph();
         });
 
-        document.getElementById('equationInput').addEventListener('input', (event) => {
+        document.getElementById('equationInput').addEventListener('input', debounce((event) => {
             // TODO: debounce
             console.log(`equationInput - ${event.target.value}`);
             equation.set(event.target.value);
-        });
+        }));
 
         // CONTROL PANEL / Fuzzy
         fuzzyLevel.subscribe((fuzzyVal) => {
@@ -835,28 +844,28 @@
             console.log(`configFromUrl.equation: ${configFromUrl['equation']}`);
 
             // Update stores
-            if (configFromUrl['equation'] !== null) {
+            if (configFromUrl['equation'] !== null && typeof configFromUrl['equation'] !== 'undefined') {
                 equation.set(configFromUrl['equation']);
             }
-            if (configFromUrl['fuzzyLevel'] !== null) {
+            if (configFromUrl['fuzzyLevel'] !== null && typeof configFromUrl['fuzzyLevel'] !== 'undefined') {
                 fuzzyLevel.set(configFromUrl['fuzzyLevel']);
             }
-            if (configFromUrl['showAxes'] !== null) {
+            if (configFromUrl['showAxes'] !== null && typeof configFromUrl['showAxes'] !== 'undefined') {
                 showAxes.set(configFromUrl['showAxes']);
             }
-            if (configFromUrl['colorMap'] !== null) {
+            if (configFromUrl['colorMap'] !== null && typeof configFromUrl['colorMap'] !== 'undefined') {
                 colorMap.set(configFromUrl['colorMap']);
             }
-            if (configFromUrl['invertColor'] !== null) {
+            if (configFromUrl['invertColor'] !== null && typeof configFromUrl['invertColor'] !== 'undefined') {
                 invertColor.set(configFromUrl['invertColor']);
             }
-            if (configFromUrl['xCenter'] !== null) {
+            if (configFromUrl['xCenter'] !== null && typeof configFromUrl['xCenter'] !== 'undefined') {
                 xCenter.set(configFromUrl['xCenter']);
             }
-            if (configFromUrl['yCenter'] !== null) {
+            if (configFromUrl['yCenter'] !== null && typeof configFromUrl['yCenter'] !== 'undefined') {
                 yCenter.set(configFromUrl['yCenter']);
             }
-            if (configFromUrl['yHeight'] !== null) {
+            if (configFromUrl['yHeight'] !== null && typeof configFromUrl['yHeight'] !== 'undefined') {
                 yHeight.set(configFromUrl['yHeight']);
             }
         }
