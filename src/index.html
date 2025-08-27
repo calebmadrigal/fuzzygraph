@@ -285,16 +285,15 @@
             <h2 class="text-xl font-semibold mb-4">Share</h2>
             <div class="w-full max-w-md p-4">
                 <div class="relative">
-                    <!--<input
-                    type="text"
-                    readonly
+                    <input type="text" readonly id="shareUrlInput"
                     class="w-full p-2 pr-20 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                <button
-                    class="absolute right-1 top-1/2 -translate-y-1/2 bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600 transition duration-200">
-                </button>-->
-                    <p>Just copy the URL in the URL bar and sent it.</p>
+                <button id="copyUrlButton" class="absolute right-1 top-1/2 -translate-y-1/2 bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600 transition duration-200">
+                  Copy
+                </button>
+
                 </div>
+								<div id="copytooltip" style="display: none;">Copied!</div>
             </div>
         </div>
     </div>
@@ -327,7 +326,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">About FuzzyGraph</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0</h2>
             <p>FuzzyGraph is a non-binary graphing app. This is similar to the concept of <a
                     class="text-blue-600 underline hover:text-blue-800 transition-colors duration-200"
                     href="https://en.wikipedia.org/wiki/Fuzzy_logic">Fuzzy logic</a>.</p>
@@ -403,9 +402,48 @@
         // // // // // // // Event handling
 
         // TOP MENU EVENTS
-        showShareModal.subscribe((visible) => { document.getElementById('shareModal').classList.toggle('hidden', !visible); });
-        showSaveModal.subscribe((visible) => { document.getElementById('saveModal').classList.toggle('hidden', !visible); });
-        showHelpModal.subscribe((visible) => { document.getElementById('helpModal').classList.toggle('hidden', !visible); });
+        showShareModal.listen((visible) => { document.getElementById('shareModal').classList.toggle('hidden', !visible); showURL(); });
+        showSaveModal.listen((visible) => { document.getElementById('saveModal').classList.toggle('hidden', !visible); });
+        showHelpModal.listen((visible) => { document.getElementById('helpModal').classList.toggle('hidden', !visible); });
+
+        // Share logic
+        function showURL() {
+						setUrlFromParams();
+            const shareURL = window.location.href;
+            document.getElementById('shareUrlInput').value = shareURL;
+        }
+
+        function copyURL() {
+            const urlInput = document.getElementById('shareUrlInput');
+            urlInput.select();
+            try {
+                document.execCommand('copy');
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+                alert('Failed to copy URL');
+            }
+        }
+
+				document.getElementById('copyUrlButton').addEventListener('click', () => { copyURL(); });
+
+				// Small notification to show when the share url was copied
+				document.getElementById('shareUrlInput').addEventListener('copy', function(e) {
+					// Get input field position
+					const rect = document.getElementById('shareUrlInput').getBoundingClientRect();
+					const copytooltip = document.getElementById('copytooltip');
+					
+					// Position tooltip
+					copytooltip.style.top = `${rect.bottom + window.scrollY + 5}px`;
+					copytooltip.style.left = `${rect.left + window.scrollX}px`;
+					
+					// Show tooltip
+					copytooltip.style.display = 'block';
+					
+					// Hide tooltip after 2 seconds
+					setTimeout(() => {
+							copytooltip.style.display = 'none';
+					}, 2000);
+			});
 
         // Desktop menu buttons
         document.getElementById('showShareButton').addEventListener('click', () => { showShareModal.set(!showShareModal.get()); });
@@ -761,13 +799,16 @@
         function setParamsFromUrl() {
             const urlFragmentId = window.location.hash.substr(1);
             const appConfig = getAppConfig();
+						console.log(`appConfig: ${appConfig}`);
             const configFromUrl = {};
 
             // Parse each parameter from the URL
             for (const param in appConfig) {
+								console.log(`checking ${param}`);
                 if (appConfig.hasOwnProperty(param)) {
                     const paramValue = getParameterByName(param, urlFragmentId);
-                    if (paramValue !== null) {
+										console.log(`paramValue = ${paramValue}`);
+                    if (paramValue !== null && paramValue != '') {
                         configFromUrl[param] = parseUrlParam(param, paramValue);
                     }
                 }
@@ -776,14 +817,30 @@
             console.log("Parsed config from URL:", configFromUrl);
 
             // Update stores
-            equation.set(configFromUrl['equation']);
-            fuzzyLevel.set(configFromUrl['fuzzyLevel']);
-            showAxes.set(configFromUrl['showAxes']);
-            colorMap.set(configFromUrl['colorMap']);
-            invertColor.set(configFromUrl['invertColor']);
-            xCenter.set(configFromUrl['xCenter']);
-            yCenter.set(configFromUrl['yCenter']);
-            yHeight.set(configFromUrl['yHeight']);
+						if (configFromUrl['equation'] !== null && paramValue != '') {
+							equation.set(configFromUrl['equation']);
+						}
+						if (configFromUrl['fuzzyLevel'] !== null) {
+							fuzzyLevel.set(configFromUrl['fuzzyLevel']);
+						}
+						if (configFromUrl['showAxes'] !== null) {
+							showAxes.set(configFromUrl['showAxes']);
+						}
+						if (configFromUrl['colorMap'] !== null) {
+							colorMap.set(configFromUrl['colorMap']);
+						}
+						if (configFromUrl['invertColor'] !== null) {
+							invertColor.set(configFromUrl['invertColor']);
+						}
+						if (configFromUrl['xCenter'] !== null) {
+							xCenter.set(configFromUrl['xCenter']);
+						}
+						if (configFromUrl['yCenter'] !== null) {
+							yCenter.set(configFromUrl['yCenter']);
+						}
+						if (configFromUrl['yHeight'] !== null) {
+							yHeight.set(configFromUrl['yHeight']);
+						}
         }
 
         function setUrlFromParams() {
@@ -798,7 +855,10 @@
         }
 
         // Fixes the canvas aspect being off (as a result of sidebar animation changing the size)
-        setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 500);
+        // TODO: Make better solution
+        //setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 900);
+
+				setParamsFromUrl();
 
     </script>
 </body>
