@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fuzzy Graph</title>
-    <script defer src="js/alpine.min.js"></script>
+    <!-- <script defer src="js/alpine.min.js"></script> -->
     <script src="js/tailwind.js"></script>
     <script src="js/math.js"></script>
     <script src="js/js-colormaps.js"></script>
@@ -202,7 +202,7 @@
                         <label class="block text-sm font-medium text-gray-700">
                             Fuzzy Level: <span id="fuzzyLevelDisplay"></span>
                         </label>
-                        <input id="fuzzyInput" type="range" min="0" max="200"
+                        <input id="fuzzyInput" type="range" min="0" max="100"
                             class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
                     </div>
 
@@ -350,7 +350,7 @@
         import { atom } from 'https://cdn.jsdelivr.net/npm/nanostores@0.9.5/+esm';
 
         const equation = atom('x^2+y^2=2');
-        const fuzzyLevel = atom(190);
+        const fuzzyLevel = atom(50);
         const showAxes = atom(true);
         const colorMap = atom('plasma');
         const invertColor = atom(true);
@@ -408,6 +408,14 @@
         showShareModal.listen((visible) => { document.getElementById('shareModal').classList.toggle('hidden', !visible); showURL(); });
         showSaveModal.listen((visible) => { document.getElementById('saveModal').classList.toggle('hidden', !visible); });
         showHelpModal.listen((visible) => { document.getElementById('helpModal').classList.toggle('hidden', !visible); });
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                showShareModal.set(false);
+                showSaveModal.set(false);
+                showHelpModal.set(false);
+            }
+        });
 
         // Share logic
         function showURL() {
@@ -533,7 +541,7 @@
 
         // CONTROL PANEL / Fuzzy
         fuzzyLevel.subscribe((fuzzyVal) => {
-            document.getElementById('fuzzyLevelDisplay').textContent = parseInt((fuzzyVal / 200) * 100) + '%';
+            document.getElementById('fuzzyLevelDisplay').textContent = parseInt(fuzzyVal) + '%';
             document.getElementById('fuzzyInput').value = fuzzyVal;
             paintGraph();
         });
