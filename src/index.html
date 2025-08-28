@@ -7,7 +7,9 @@
     <title>Fuzzy Graph</title>
     <!-- <script defer src="js/alpine.min.js"></script> -->
     <script src="js/tailwind.js"></script>
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
     <script src="js/math.js"></script>
+    <!-- <script src="https://unpkg.com/mathjs@14.5.0/lib/browser/math.js"></script> -->
     <script src="js/js-colormaps.js"></script>
     <script src="js/fuzzygraph.js"></script>
 
@@ -347,7 +349,8 @@
     </div>
 
     <script type="module">
-        import { atom } from 'https://cdn.jsdelivr.net/npm/nanostores@0.9.5/+esm';
+        // import { atom } from 'https://cdn.jsdelivr.net/npm/nanostores@0.9.5/+esm';
+        import { atom } from 'nanostores';
 
         const equation = atom('x^2+y^2=2');
         const fuzzyLevel = atom(50);
