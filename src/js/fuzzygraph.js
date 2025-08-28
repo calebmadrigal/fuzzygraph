@@ -93,8 +93,6 @@ function calculateFuncForWindow(func, windowBounds, canvasWidth, canvasHeight) {
   var pixelToYMapper = makeLinearMapper([canvasHeight, 0], [windowBounds['yMin'], windowBounds['yMax']], false);
   var minValue = 9999999;
   var maxValue = -9999999;
-  var maxCutoff = 100;  // TODO: Make this configurable
-  //console.log(`calculateFuncForWindow() - canvasWidth = ${canvasWidth}, canvasHeight = ${canvasHeight}`);
   var pixelValues = new Array(canvasWidth * canvasHeight);
 
   // Calculate values for each pixel, and find the min and max values
@@ -103,7 +101,6 @@ function calculateFuncForWindow(func, windowBounds, canvasWidth, canvasHeight) {
       var x = pixelToXMapper(pixelX);
       var y = pixelToYMapper(pixelY);
       var result = func(x, y);
-      result = Math.min(result, maxCutoff);
       if (result > maxValue) {
         maxValue = result;
       }
@@ -306,13 +303,12 @@ function getColormap(colormapName, invertColor, minInput, maxInput) {
 // // // // // // // END Color stuff
 
 function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, colormapName, invertColor, canvasElem) {
+  var maxCutoff = 100;  // TODO: Make this configurable
   var context = canvasElem.getContext('2d');
   var canvasWidth = context.canvas.width;
   var canvasHeight = context.canvas.height;
   var imageData = context.createImageData(canvasWidth, canvasHeight);
   var pixelData = imageData.data;
-
-  //console.log(`displayFuzzyGraph() - minValue = ${minValue}, maxValue = ${maxValue}, fuzzyValue = ${fuzzyValue}`);
 
   // Function to modify the value to make the graph look more interesting
   // We do this because the value is a measure of error, but we want more error
@@ -320,6 +316,9 @@ function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, colormap
   var valueModifier = function (value) {
     return Math.pow(maxValue - value, (MAX_FUZZY+1) - fuzzyValue);  // +1 to prevent the value from ever being 0
   };
+
+  // For display purposes, allow a max and min value (TODO: Make them configurable via UI)
+  maxValue = Math.min(maxValue, maxCutoff);
 
   // Determine the color scale based on the min and max values
   //var colorMapper = truthygraphColormap(valueModifier(maxValue), valueModifier(minValue));
@@ -356,11 +355,6 @@ function ensureCanvasSize(canvas) {
 }
 
 function displayGraph(graphParams, canvasElem) {
-  console.log('displayGraph')
-  console.log(graphParams);
-
-	//ensureCanvasSize(canvasElem);
-
   const canvasWidth = canvasElem.width;
   const canvasHeight = canvasElem.height;
   var windowBounds = calcWindowBounds(graphParams['xCenter'],
@@ -394,6 +388,6 @@ function displayGraph(graphParams, canvasElem) {
   const elapsed1 = t2-t1;
   const elapsed2 = t3-t2;
 
-  console.log(`displayGraph() metrics - calculateFuncForWindow_time = ${elapsed1}, displayFuzzyGraph_time = ${elapsed2}`);
+  return pixelValues['pixelValues'];
 }
 

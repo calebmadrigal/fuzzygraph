@@ -29,6 +29,7 @@
             font: 12px/1.2 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
             pointer-events: none;
             user-select: none;
+            display: none;
         }
 
         .hidden {
@@ -165,7 +166,7 @@
             <canvas id="mainCanvas" class="w-full h-[calc(100vh-4rem)] md:h-[calc(100vh-4rem)] bg-white">
             </canvas>
 
-            <div id="hoverMsgDiv" class="coords" x-transition>
+            <div id="hoverMsgDiv" class="coords">
                 <span id="hoverMsg"></span>
             </div>
         </main>
@@ -327,14 +328,16 @@
             </button>
 
             <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0</h2>
-            <p>FuzzyGraph is a non-binary graphing app. This is similar to the concept of <a
-                    class="text-blue-600 underline hover:text-blue-800 transition-colors duration-200"
-                    href="https://en.wikipedia.org/wiki/Fuzzy_logic">Fuzzy logic</a>.</p>
+            <p>FuzzyGraph is a non-binary graphing app. </p>
             <br />
-            <p>Most conventional graphing apps show where the left and right side of the equation are EXACTLY equal. By
+            <p>Conventional graphing apps show where the left and right side of the equation are EXACTLY equal. By
                 comparison, FuzzyGraph shows the error gradient of the equation... and does not collapse into either
                 TRUE of FALSE, but rather, shows the "shades of gray", choosing colors based on how near or far both
                 sides are to being equal.</p>
+            <br />
+            <p>This is similar to the concept of <a
+                class="text-blue-600 underline hover:text-blue-800 transition-colors duration-200"
+                href="https://en.wikipedia.org/wiki/Fuzzy_logic">Fuzzy logic</a> (hence the name "FuzzyGraph").</p>
             <br />
             <p>Project by math artist <a href="https://gods.art"
                     class="text-blue-600 underline hover:text-blue-800 transition-colors duration-200">Caleb
@@ -364,6 +367,8 @@
         const showSaveModal = atom(false);
         const showHelpModal = atom(false);
 
+        var pixelValuesStore = atom([]);
+
         function checkCanvasSize(canvas) {
             const ctx = canvas.getContext('2d');
             const dpr = window.devicePixelRatio || 1
@@ -377,7 +382,6 @@
             const canvas = document.getElementById('mainCanvas');
 
             // Compile equation using math.js (parseEquationString)
-            console.log(`paintGraph: equation = ${equation.get()}`);
             const parsedEquation = parseEquationString(equation.get());
 
             if (parsedEquation) {
@@ -392,7 +396,8 @@
                     showAxes: showAxes.get()
                 };
 
-                displayGraph(graphConfig, canvas);
+                const pixelValuesNew = displayGraph(graphConfig, canvas);
+                pixelValuesStore.set(pixelValuesNew);
             }
         }
 
@@ -473,7 +478,7 @@
 
         // CONTROL PANEL
         sidebarOpen.subscribe((visible) => {
-            // TODO: Make this simple visibility
+            // TODO: Do this using simple visibility?
             document.getElementById('controlPanel').classList.remove('md:ml-64', 'md:ml-0');
             document.getElementById('controlPanel').classList.add(visible ? 'md:ml-64' : 'md:ml-0');
 
@@ -510,7 +515,7 @@
         document.getElementById('hideControlPanelButton').addEventListener('click', () => { sidebarOpen.set(false); });
 
         // Debounce utility: returns a debounced version of a function
-        function debounce(fn, delay = 500) {
+        function debounce(fn, delay = 900) {
             let timeoutId;
             return (...args) => {
                 clearTimeout(timeoutId);
@@ -525,8 +530,6 @@
         });
 
         document.getElementById('equationInput').addEventListener('input', debounce((event) => {
-            // TODO: debounce
-            console.log(`equationInput - ${event.target.value}`);
             equation.set(event.target.value);
         }));
 
@@ -537,7 +540,6 @@
             paintGraph();
         });
         document.getElementById('fuzzyInput').addEventListener('input', (event) => {
-            // TODO: debounce
             fuzzyLevel.set(event.target.value);
         });
 
@@ -553,7 +555,6 @@
         });
 
         document.getElementById('axesToggle').addEventListener('click', () => {
-            // TODO: debounce
             showAxes.set(!showAxes.get());
             paintGraph();
         });
@@ -599,7 +600,6 @@
         });
 
         document.getElementById('invertColorButton').addEventListener('click', () => {
-            // TODO: debounce
             invertColor.set(!invertColor.get());
             paintGraph();
         });
@@ -660,13 +660,9 @@
             var xOffsetPixels = event.x - dragState.startX;
             var yOffsetPixels = event.y - dragState.startY;
 
-            console.log(`[*] updatePosition - xOffsetPixels = ${xOffsetPixels}, yOffsetPixels = ${yOffsetPixels}`);
-
             // First, we have to convert the offset in pixels into the offset in our graphing window
             var xOffset = xOffsetPixels * (xWidth / canvas.clientWidth);
             var yOffset = yOffsetPixels * (yHeight.get() / canvas.clientHeight);
-
-            console.log(`updatePosition - xOffset = ${xOffset}, yOffset = ${yOffset}`);
 
             // Then we need to move the center of our graphing window accordingly
             xCenter.set(xCenter.get() - xOffset);
@@ -689,27 +685,16 @@
 
         // Mouse down event
         canvas.addEventListener('mousedown', (event) => {
-            //const mousePos = getMousePos(event);
-            //dragState.startX = mousePos.x;
-            //dragState.startY = mousePos.y;
             dragState.startX = event.x;
             dragState.startY = event.y;
             dragState.isDragging = true;
         });
-
-        // Mouse move event
-        //canvas.addEventListener('mousemove', (event) => {
-        //  dragState.endX = event.x;
-        //  dragState.endY = event.y;
-        //  drawArrow();
-        //});
 
         // Mouse up event
         canvas.addEventListener('mouseup', (event) => {
             dragState.isDragging = false;
             updatePosition(event)
         });
-
 
         // Mouse out event to stop dragging if mouse leaves canvas
         canvas.addEventListener('mouseout', () => {
@@ -724,9 +709,62 @@
             dragState.isDragging = true;
         });
 
-        document.addEventListener('touchend', (e) => {
+        canvas.addEventListener('touchend', (e) => {
             dragState.isDragging = false;
             const rect = canvas.getBoundingClientRect();
+            updatePosition(e);
+        });
+
+        function countLeadingZeros(str) {
+            const match = str.match(/^0*/);
+            return match ? match[0].length : 0;
+        }
+
+        function getDecimalPart(str) {
+            const parts = str.split('.');
+            return parts.length > 1 ? parts[1] : '';
+        }
+
+        function getPrecision() {
+            const yHeightVal = yHeight.get();
+            if (yHeightVal >= 0.01) {
+                return 3;
+            } else {
+                return countLeadingZeros(getDecimalPart(yHeightVal.toString())) + 3;
+            }
+        }
+
+        // Show (x, y) = error when the mouse moves over the canvas
+        // Mouse move event
+        hoverMsg.listen((value) => {
+            document.getElementById('hoverMsg').textContent = value;
+        });
+
+        canvas.addEventListener('mousemove', (event) => {
+            const precision = getPrecision();
+
+            const r = canvas.getBoundingClientRect();
+            const sx = canvas.width / r.width, sy = canvas.height / r.height;
+            const windowBounds = calcWindowBounds(xCenter.get(), yCenter.get(), yHeight.get(), canvas.width, canvas.height);
+            var pixelToXMapper = makeLinearMapper([0, canvas.width], [windowBounds['xMin'], windowBounds['xMax']], false);
+            var pixelToYMapper = makeLinearMapper([canvas.height, 0], [windowBounds['yMin'], windowBounds['yMax']], false);
+            const xPixel = (event.clientX - r.left) * sx;
+            const yPixel = (event.clientY - r.top)  * sy;
+            const x = pixelToXMapper(xPixel);
+            const y = pixelToYMapper(yPixel);
+            const xStr = x.toFixed(precision);
+            const yStr = y.toFixed(precision);
+            document.getElementById('hoverMsgDiv').style.display = 'block'; 
+
+            const pixelValuesTemp = pixelValuesStore.get();
+            const errorVal = pixelValuesTemp[yPixel * canvas.width + xPixel]
+            const errorValStr = errorVal.toFixed(precision);
+
+            hoverMsg.set(`(${xStr}, ${yStr}): error = ${errorValStr}`);
+        });
+
+        canvas.addEventListener('mouseleave', (event) => {
+            document.getElementById('hoverMsgDiv').style.display = 'none'; 
         });
 
         // // // // // // // Initialization
@@ -750,15 +788,6 @@
 
         // Set canvas size to match its display size
         function resizeCanvas() {
-            // const rect = canvas.getBoundingClientRect();
-
-            //const dpr = window.devicePixelRatio || 1;
-            //const displayWidth = canvas.clientWidth;
-            //const displayHeight = canvas.clientHeight;
-            //canvas.width = displayWidth * dpr;
-            //canvas.height = displayHeight * dpr;
-            //ctx.scale(dpr, dpr);
-
             fitCanvasToDisplay(canvas);
             paintGraph();
         }
@@ -840,8 +869,6 @@
                     }
                 }
             }
-
-            console.log(`configFromUrl.equation: ${configFromUrl['equation']}`);
 
             // Update stores
             if (configFromUrl['equation'] !== null && typeof configFromUrl['equation'] !== 'undefined') {
