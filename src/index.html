@@ -399,6 +399,9 @@
 
                 const pixelValuesNew = displayGraph(graphConfig, canvas);
                 pixelValuesStore.set(pixelValuesNew);
+            } else {
+                document.getElementById('hoverMsgDiv').style.display = 'block';
+                hoverMsg.set('Equation is invalid');
             }
         }
 
