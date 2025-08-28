@@ -248,12 +248,12 @@
                         </button>
                     </div>
 
-                    <div class="mt-16 text-center">
-                        ~ Built by <a href="https://gods.art"
-                            class="text-blue-600 underline hover:text-blue-800 transition-colors duration-200">
-                            Caleb Madrigal
-                        </a>
-                        ~
+                    <div class="mt-16 text-center flex flex-col justify-end">
+                            <span>~ Built by <a href="https://gods.art"
+                                class="text-fuchsia-600 underline hover:text-fuchsia-400 transition-colors duration-200">
+                                Caleb Madrigal
+                            </a>
+                            ~</span>
                     </div>
 
                 </div>
@@ -328,19 +328,20 @@
             </button>
 
             <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0</h2>
-            <p>FuzzyGraph is a non-binary graphing app. </p>
+            <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
-            <p>Conventional graphing apps show where the left and right side of the equation are EXACTLY equal. By
-                comparison, FuzzyGraph shows the error gradient of the equation... and does not collapse into either
-                TRUE of FALSE, but rather, shows the "shades of gray", choosing colors based on how near or far both
+            <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
+                comparison, FuzzyGraph shows the error gradient of the equation. Instead of collapsing the evaluation
+                into either
+                TRUE of FALSE, it instead, shows the "shades of gray", choosing colors based on how near or far both
                 sides are to being equal.</p>
             <br />
-            <p>This is similar to the concept of <a
-                class="text-blue-600 underline hover:text-blue-800 transition-colors duration-200"
-                href="https://en.wikipedia.org/wiki/Fuzzy_logic">Fuzzy logic</a> (hence the name "FuzzyGraph").</p>
+            <p>This non-binary form of evaluation is similar to the concept of <a
+                    class="text-blue-600 underline hover:text-blue-800 transition-colors duration-200"
+                    href="https://en.wikipedia.org/wiki/Fuzzy_logic">Fuzzy logic</a> (hence the name "FuzzyGraph").</p>
             <br />
             <p>Project by math artist <a href="https://gods.art"
-                    class="text-blue-600 underline hover:text-blue-800 transition-colors duration-200">Caleb
+                    class="text-fuchsia-600 underline hover:text-fuchsia-400 transition-colors duration-200">Caleb
                     Madrigal</a>.</p>
         </div>
     </div>
@@ -505,9 +506,6 @@
             } else {
                 document.getElementById('mobileShowControlPanelButton').classList.add('opacity-100');
             }
-
-            // This will cause a redraw after sidebar animation is done
-            setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 300);
         });
 
         document.getElementById('mobileShowControlPanelButton').addEventListener('click', () => { sidebarOpen.set(true); });
@@ -586,7 +584,6 @@
             colorMap.set(event.target.value);
             paintGraph();
         });
-        //renderOptions(colorMap.get());
 
         // CONTROL PANEL / Invert color
         invertColor.subscribe((show) => {
@@ -749,12 +746,12 @@
             var pixelToXMapper = makeLinearMapper([0, canvas.width], [windowBounds['xMin'], windowBounds['xMax']], false);
             var pixelToYMapper = makeLinearMapper([canvas.height, 0], [windowBounds['yMin'], windowBounds['yMax']], false);
             const xPixel = (event.clientX - r.left) * sx;
-            const yPixel = (event.clientY - r.top)  * sy;
+            const yPixel = (event.clientY - r.top) * sy;
             const x = pixelToXMapper(xPixel);
             const y = pixelToYMapper(yPixel);
             const xStr = x.toFixed(precision);
             const yStr = y.toFixed(precision);
-            document.getElementById('hoverMsgDiv').style.display = 'block'; 
+            document.getElementById('hoverMsgDiv').style.display = 'block';
 
             const pixelValuesTemp = pixelValuesStore.get();
             const errorVal = pixelValuesTemp[yPixel * canvas.width + xPixel]
@@ -764,7 +761,7 @@
         });
 
         canvas.addEventListener('mouseleave', (event) => {
-            document.getElementById('hoverMsgDiv').style.display = 'none'; 
+            document.getElementById('hoverMsgDiv').style.display = 'none';
         });
 
         // // // // // // // Initialization
@@ -791,9 +788,6 @@
             fitCanvasToDisplay(canvas);
             paintGraph();
         }
-
-        // Initial resize
-        resizeCanvas();
 
         // Resize canvas when window is resized
         window.addEventListener('resize', resizeCanvas);
