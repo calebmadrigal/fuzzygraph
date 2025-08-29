@@ -40,6 +40,10 @@
         .hidden {
             display: none;
         }
+
+        .keep {
+            display: inline;
+        }
     </style>
 </head>
 
@@ -332,7 +336,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.0</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.1</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -749,11 +753,15 @@
             dragState.startX = touch.x;
             // dragState.startY = touch.clientY - currentY;
             dragState.startY = touch.y;
+            console.log(`touchstart: x = ${touch.x}, y = ${touch.y}`);
+            console.log(`touchstart: e = ${JSON.stringify(e)}`);
             dragState.isDragging = true;
         });
 
         canvas.addEventListener('touchend', (e) => {
             dragState.isDragging = false;
+            console.log(`touchEND: x = ${touch.x}, y = ${touch.y}`);
+            console.log(`touchEND: e = ${JSON.stringify(e)}`);
             updatePosition(e);
         });
 
