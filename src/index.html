@@ -198,6 +198,8 @@
                     <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200">Equation</h3>
                     <div class="space-y-2">
                         <textarea id="equationInput" class="w-full h-16 p-2 border border-gray-300 rounded-md resize-y"
+                            oninput="this.value=this.value.toLowerCase()"
+                            autocapitalize="off" spellcheck="false"
                             placeholder="y=x">
                         </textarea>
                     </div>
@@ -336,7 +338,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.2</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.3</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -434,8 +436,9 @@
 
                 const pixelValuesNew = displayGraph(graphConfig, canvas);
                 pixelValuesStore.set(pixelValuesNew);
+                hoverMsg.set('');
+                document.getElementById('hoverMsgDiv').style.display = 'none';
             } else {
-                console.log('Equation is invalid');
                 document.getElementById('hoverMsgDiv').style.display = 'block';
                 hoverMsg.set('Equation is invalid');
             }
