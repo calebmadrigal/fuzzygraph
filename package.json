@@ -1,0 +1,24 @@
+{
+  "dependencies": {
+    "mathjs": "^14.6.0",
+    "nanostores": "^1.0.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.12",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.12",
+    "vite": "^7.1.3",
+    "vite-plugin-singlefile": "^2.3.0"
+  },
+  "targets": {
+    "browser": {
+      "context": "browser",
+      "includeNodeModules": true,
+      "distDir": "dist",
+      "outputFormat": "esmodule",
+      "isLibrary": false,
+      "optimize": true
+    }
+  }
+}

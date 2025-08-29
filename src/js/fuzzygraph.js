@@ -1,12 +1,17 @@
 // fuzzygraph.js
 // Logic to draw fuzzy graphs on a canvas
 
-ZOOM_RATE = 1.5;
-MAX_FUZZY = 200;
+import { create, all } from 'mathjs';
+const math = create(all);
+
+import { evaluate_cmap } from './js-colormaps.js';
+
+export const ZOOM_RATE = 1.5;
+export const MAX_FUZZY = 200;
 
 // // // // // // // Math stuff
 
-function makeLinearMapper(inRange, outRange, intOut) {
+export function makeLinearMapper(inRange, outRange, intOut) {
   var inDelta = inRange[1] - inRange[0];
   var outDelta = outRange[1] - outRange[0];
   // y = mx + b (m = slope, b = y-intersect)
@@ -29,7 +34,8 @@ function makeLinearMapper(inRange, outRange, intOut) {
   return linearMapper;
 }
 
-function parseEquationString(eq_str) {
+export function parseEquationString(eq_str) {
+  console.log('parseEquationString()');
   var split_result = eq_str.split("=");
   if (split_result.length != 2) {
     return null;
@@ -44,6 +50,7 @@ function parseEquationString(eq_str) {
     left_eq(0.01, 0.01);
     right_eq(0.01, 0.01);
   } catch (error) {
+    console.log(`Error parsing equation: ${error}`);
     return null;
   }
   var error_func = function (x, y) { return Math.abs(left_eq(x, y) - right_eq(x, y)); };
@@ -51,31 +58,31 @@ function parseEquationString(eq_str) {
   return error_func;
 }
 
-function getXMin(xWidth, xCenter) {
+export function getXMin(xWidth, xCenter) {
   return -1 * xWidth / 2 + xCenter;
 }
 
-function getXMax(xWidth, xCenter) {
+export function getXMax(xWidth, xCenter) {
   return xWidth / 2 + xCenter;
 }
 
-function getYMin(yHeight, yCenter) {
+export function getYMin(yHeight, yCenter) {
   return -1 * yHeight / 2 + yCenter;
 }
 
-function getYMax(yHeight, yCenter) {
+export function getYMax(yHeight, yCenter) {
   return yHeight / 2 + yCenter;
 }
 
-function getHeightToWidthMultiplier(xWidth, yHeight) {
+export function getHeightToWidthMultiplier(xWidth, yHeight) {
   return xWidth / yHeight;
 }
 
-function getXWidth(yHeight, canvasWidth, canvasHeight) {
+export function getXWidth(yHeight, canvasWidth, canvasHeight) {
   return yHeight * getHeightToWidthMultiplier(canvasWidth, canvasHeight);
 }
 
-function calcWindowBounds(xCenter, yCenter, yHeight, canvasWidth, canvasHeight) {
+export function calcWindowBounds(xCenter, yCenter, yHeight, canvasWidth, canvasHeight) {
   // Calculate xWidth based on yHeight
   var xWidth = getXWidth(yHeight, canvasWidth, canvasHeight);
 
@@ -88,7 +95,7 @@ function calcWindowBounds(xCenter, yCenter, yHeight, canvasWidth, canvasHeight) 
   };
 }
 
-function calculateFuncForWindow(func, windowBounds, canvasWidth, canvasHeight) {
+export function calculateFuncForWindow(func, windowBounds, canvasWidth, canvasHeight) {
   var pixelToXMapper = makeLinearMapper([0, canvasWidth], [windowBounds['xMin'], windowBounds['xMax']], false);
   var pixelToYMapper = makeLinearMapper([canvasHeight, 0], [windowBounds['yMin'], windowBounds['yMax']], false);
   var minValue = 9999999;
@@ -121,7 +128,7 @@ function calculateFuncForWindow(func, windowBounds, canvasWidth, canvasHeight) {
 
 //////// START AXES STUFF
 
-function drawAxes(canvas, xCenter, yCenter, xMin, xMax, yMin, yMax, options = {}) {
+export function drawAxes(canvas, xCenter, yCenter, xMin, xMax, yMin, yMax, options = {}) {
   // NOTE: This function written by ChatGPT 5 and modified by Caleb Madrigal.
   const ctx = canvas.getContext('2d');
 
@@ -274,7 +281,7 @@ function drawAxes(canvas, xCenter, yCenter, xMin, xMax, yMin, yMax, options = {}
 
 // // // // // // // START Color stuff
 
-function truthygraphColormap(minInput, maxInput) {
+export function truthygraphColormap(minInput, maxInput) {
     var colorChannelRange = [0, 255];
     var colorMapper = makeLinearMapper([minInput, maxInput], colorChannelRange, true);
 
@@ -286,7 +293,7 @@ function truthygraphColormap(minInput, maxInput) {
     return mapper;
 }
 
-function getColormap(colormapName, invertColor, minInput, maxInput) {
+export function getColormap(colormapName, invertColor, minInput, maxInput) {
   // Transform min and max inputs to [0, 1] so that it can be plugged into colorma
   const valueNormalizer = makeLinearMapper([minInput, maxInput], [0, 1], false);
   var mapper = function(val) {
@@ -294,6 +301,7 @@ function getColormap(colormapName, invertColor, minInput, maxInput) {
     if (normalizedValue > 1) { normalizedValue = 1; }
     else if (normalizedValue < 0) { normalizedValue = 0; }
     else if (isNaN(normalizedValue)) { normalizedValue = 0; }  // Happens with divide by 0
+    // return evaluate_cmap(normalizedValue, colormapName, invertColor);
     return evaluate_cmap(normalizedValue, colormapName, invertColor);
   }
 
@@ -302,7 +310,7 @@ function getColormap(colormapName, invertColor, minInput, maxInput) {
 
 // // // // // // // END Color stuff
 
-function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, colormapName, invertColor, canvasElem) {
+export function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, colormapName, invertColor, canvasElem) {
   var maxCutoff = 100;  // TODO: Make this configurable
   var context = canvasElem.getContext('2d');
   var canvasWidth = context.canvas.width;
@@ -349,7 +357,7 @@ function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, colormap
   context.putImageData(imageData, 0, 0);
 }
 
-function ensureCanvasSize(canvas) {
+export function ensureCanvasSize(canvas) {
   const dpr = window.devicePixelRatio || 1;
   const rect = canvas.getBoundingClientRect();
   const w = Math.max(1, Math.round(rect.width * dpr));
@@ -360,7 +368,8 @@ function ensureCanvasSize(canvas) {
   }
 }
 
-function displayGraph(graphParams, canvasElem) {
+export function displayGraph(graphParams, canvasElem) {
+  console.log('displayGraph()');
   const canvasWidth = canvasElem.width;
   const canvasHeight = canvasElem.height;
   var windowBounds = calcWindowBounds(graphParams['xCenter'],

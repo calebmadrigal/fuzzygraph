@@ -6,12 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fuzzy Graph</title>
     <!-- <script defer src="js/alpine.min.js"></script> -->
-    <script src="js/tailwind.js"></script>
+    <!-- <script src="js/tailwind.js"></script> -->
+    <!-- <link rel="stylesheet" href="input.css?inline"> -->
+    <!-- <link rel="stylesheet" href="/src/input.css?inline"> -->
     <!-- <script src="https://cdn.tailwindcss.com"></script> -->
-    <script src="js/math.js"></script>
+    <!-- <script src="js/math.js?inline"></script> -->
     <!-- <script src="https://unpkg.com/mathjs@14.5.0/lib/browser/math.js"></script> -->
-    <script src="js/js-colormaps.js"></script>
-    <script src="js/fuzzygraph.js"></script>
+    <!-- <script src="js/js-colormaps.js?inline"></script> -->
+    <!-- <script src="js/fuzzygraph.js?inline"></script> -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
         #mainCanvas {
@@ -348,9 +351,31 @@
         </div>
     </div>
 
+    <script>
+        window.process = { env: { NODE_ENV: "development" } };
+    </script>
+
     <script type="module">
         // import { atom } from 'https://cdn.jsdelivr.net/npm/nanostores@0.9.5/+esm';
-        import { atom } from 'nanostores';
+        // import { atom } from 'nanostores';
+        // import "nanostores";
+        import { math } from "mathjs";
+        //import "./js/math.js";
+        // import "./js/js-colormaps.js";
+        // import "./js/fuzzygraph.js"; 
+        // import "./js/tailwind.js"; 
+        import { atom } from "nanostores";
+
+        import { evaluate_cmap, data as js_colormaps_data } from "./js/js-colormaps";
+
+        import {
+            parseEquationString,
+            displayGraph,
+            calcWindowBounds,
+            getXWidth,
+            makeLinearMapper,
+            ZOOM_RATE
+        } from './js/fuzzygraph.js';
 
         const equation = atom('x^2+y^2=2');
         const fuzzyLevel = atom(50);
@@ -383,12 +408,15 @@
         }
 
         function paintGraph() {
+            console.log('paintGraph()')
             const canvas = document.getElementById('mainCanvas');
 
+            console.log(`equation = ${equation.get()}`);
             // Compile equation using math.js (parseEquationString)
             const parsedEquation = parseEquationString(equation.get());
 
             if (parsedEquation) {
+                console.log('equationParsed');
                 var graphConfig = {
                     equationFunction: parsedEquation,
                     fuzzyLevel: fuzzyLevel.get(),
@@ -403,6 +431,7 @@
                 const pixelValuesNew = displayGraph(graphConfig, canvas);
                 pixelValuesStore.set(pixelValuesNew);
             } else {
+                console.log('Equation is invalid');
                 document.getElementById('hoverMsgDiv').style.display = 'block';
                 hoverMsg.set('Equation is invalid');
             }
@@ -574,7 +603,8 @@
         // CONTROL PANEL / Color map
         function getColorMapList() {
             // TODO: Rename the js-matplotlib data to be something other than "data"?
-            var colorMapList = Object.keys(data);
+            // var colorMapList = Object.keys(data);
+            var colorMapList = Object.keys(js_colormaps_data);
             return colorMapList;
         }
 
@@ -768,10 +798,13 @@
             document.getElementById('hoverMsgDiv').style.display = 'block';
 
             const pixelValuesTemp = pixelValuesStore.get();
-            const errorVal = pixelValuesTemp[yPixel * canvas.width + xPixel]
-            const errorValStr = errorVal.toFixed(precision);
-
-            hoverMsg.set(`(${xStr}, ${yStr}): error = ${errorValStr}`);
+            if (pixelValuesTemp) {
+                const errorVal = pixelValuesTemp[yPixel * canvas.width + xPixel]
+                if (errorVal) {
+                    const errorValStr = errorVal.toFixed(precision);
+                    hoverMsg.set(`(${xStr}, ${yStr}): error = ${errorValStr}`);
+                }
+            }
         });
 
         canvas.addEventListener('mouseleave', (event) => {
