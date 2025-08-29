@@ -332,7 +332,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.0</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -746,15 +746,14 @@
             e.preventDefault(); // Prevent scrolling
             const touch = e.touches[0];
             // dragState.startX = touch.clientX - currentX;
-            dragState.startX = touch.clientX;
+            dragState.startX = touch.x;
             // dragState.startY = touch.clientY - currentY;
-            dragState.startY = touch.clientY;
+            dragState.startY = touch.y;
             dragState.isDragging = true;
         });
 
         canvas.addEventListener('touchend', (e) => {
             dragState.isDragging = false;
-            const rect = canvas.getBoundingClientRect();
             updatePosition(e);
         });
 
