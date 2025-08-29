@@ -745,8 +745,10 @@
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault(); // Prevent scrolling
             const touch = e.touches[0];
-            dragState.startX = touch.clientX - currentX;
-            dragState.startY = touch.clientY - currentY;
+            // dragState.startX = touch.clientX - currentX;
+            dragState.startX = touch.clientX;
+            // dragState.startY = touch.clientY - currentY;
+            dragState.startY = touch.clientY;
             dragState.isDragging = true;
         });
 
