@@ -71,29 +71,29 @@
 
                     <button id="showShareButton"
                         class="text-white hover:text-blue-200 flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700">
+                        <span class="inline text-gray-200 hover:text-gray-300">Share</span>
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                         </svg>
-                        <span class="keep">Share</span>
                     </button>
 
                     <button id="showSaveButton"
                         class="text-white hover:text-blue-200 flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700">
+                        <span class="inline text-gray-200">Save</span>
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                         </svg>
-                        <span class="keep">Save</span>
                     </button>
 
                     <button id="showHelpButton"
                         class="text-white hover:text-blue-200 flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700">
+                        <span class="inline text-gray-200">Help</span>
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M12 21a9 9 0 110-18 9 9 0 010 18z" />
                         </svg>
-                        <span class="keep">Help</span>
                     </button>
 
                 </nav>
@@ -114,31 +114,31 @@
             x-transition:leave="transition ease-in duration-150"
             x-transition:leave-start="opacity-100 transform translate-y-0"
             x-transition:leave-end="opacity-0 transform -translate-y-2"
-            class="absolute top-16 right-0 w-48 bg-gray-800 shadow-lg md:hidden rounded-bl-lg">
+            class="hidden absolute top-16 right-0 w-48 bg-gray-800 shadow-lg md:hidden rounded-bl-lg">
             <div class="px-2 py-3 space-y-2">
                 <button id="mobileShowShareButton"
                     class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded">
+                    <span class="inline text-gray-200">Share</span>
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                     </svg>
-                    <span>Share</span>
                 </button>
                 <button id="mobileShowSaveButton"
                     class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded">
+                    <span class="inline text-gray-200">Save</span>
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                     </svg>
-                    <span>Save</span>
                 </button>
                 <button id="mobileShowHelpButton"
                     class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded">
+                    <span class="inline text-gray-200">Help</span>
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M12 21a9 9 0 110-18 9 9 0 010 18z" />
                     </svg>
-                    <span>Help</span>
                 </button>
             </div>
         </div>
@@ -192,7 +192,7 @@
                 </button>
             </div>
             <!-- Sidebar Content -->
-            <div class="p-4 flex flex-col space-y-8 max-h-[50vh] md:max-h-[calc(100vh-7rem)] overflow-y-auto">
+            <div class="p-4 flex flex-col space-y-8 max-h-[30vh] md:max-h-[calc(100vh-7rem)] overflow-y-auto">
                 <!-- Equation Section -->
                 <div>
                     <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200">Equation</h3>
@@ -336,7 +336,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.1</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.2</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -512,7 +512,7 @@
 
         // Mobile top menu
         mobileMenuOpen.subscribe((visible) => {
-            document.getElementById('mobileMenu').classList.toggle('hidden', visible);
+            document.getElementById('mobileMenu').classList.toggle('hidden', !visible);
         });
 
         document.getElementById('mobileMenuButton').addEventListener('click', () => { mobileMenuOpen.set(!mobileMenuOpen.get()); });
@@ -749,19 +749,17 @@
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault(); // Prevent scrolling
             const touch = e.touches[0];
-            // dragState.startX = touch.clientX - currentX;
-            dragState.startX = touch.x;
-            // dragState.startY = touch.clientY - currentY;
-            dragState.startY = touch.y;
-            console.log(`touchstart: x = ${touch.x}, y = ${touch.y}`);
-            console.log(`touchstart: e = ${JSON.stringify(e)}`);
+            dragState.startX = touch.clientX;
+            dragState.startY = touch.clientY;
             dragState.isDragging = true;
         });
 
         canvas.addEventListener('touchend', (e) => {
             dragState.isDragging = false;
-            console.log(`touchEND: x = ${touch.x}, y = ${touch.y}`);
-            console.log(`touchEND: e = ${JSON.stringify(e)}`);
+            const touch = event.changedTouches[0];
+            // Make event look like destktop so updatePosition(e) works
+            e.x = touch.clientX;
+            e.y = touch.clientY;
             updatePosition(e);
         });
 
