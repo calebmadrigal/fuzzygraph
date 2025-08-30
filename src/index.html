@@ -157,7 +157,7 @@
             </div>
             <!-- Sidebar Show Button (Desktop) -->
             <button id="openControlPanelButton"
-                class="hidden md:flex items-center justify-center w-6 h-12 bg-gray-800 bg-opacity-50 hover:bg-opacity-75 text-white rounded-r fixed left-0 top-1/2 transform -translate-y-1/2 transition-opacity duration-300">
+                class="hidden md:!flex items-center justify-center w-6 h-12 bg-gray-800 bg-opacity-50 hover:bg-opacity-75 text-white rounded-r fixed left-0 top-1/2 transform -translate-y-1/2 transition-opacity duration-300">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
@@ -329,7 +329,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.3</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.4</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -942,6 +942,32 @@
         }
 
         setParamsFromUrl();
+
+        const ro = new ResizeObserver(() => resizeCanvas());
+        ro.observe(document.getElementById('controlPanel'));
+        ro.observe(document.getElementById('mainCanvas'));
+
+        function removeResizeObserver() {
+            ro.unobserve(document.getElementById('controlPanel'));
+            ro.unobserve(document.getElementById('mainCanvas'));
+            ro.disconnect();
+        }
+
+        window.addEventListener('load', () => {
+            requestAnimationFrame(() => {
+                resizeCanvas();
+                if (document.fonts && document.fonts.ready) {
+                    document.fonts.ready.then(resizeCanvas);
+                }
+            });
+        });
+
+        // Allow plenty of time for the page to fully load and for the canvas to resize
+        // appropriately. But after that, remove the resize observers so it doesn't slow
+        // down the side bar expand/collapse
+        setTimeout(() => {
+            removeResizeObserver();
+        }, 5000);
 
     </script>
 </body>
