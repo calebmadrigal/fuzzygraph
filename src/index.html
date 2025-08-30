@@ -5,16 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fuzzy Graph</title>
-    <!-- <script defer src="js/alpine.min.js"></script> -->
-    <!-- <script src="js/tailwind.js"></script> -->
-    <!-- <link rel="stylesheet" href="input.css?inline"> -->
-    <!-- <link rel="stylesheet" href="/src/input.css?inline"> -->
     <!-- <script src="https://cdn.tailwindcss.com"></script> -->
-    <!-- <script src="js/math.js?inline"></script> -->
-    <!-- <script src="https://unpkg.com/mathjs@14.5.0/lib/browser/math.js"></script> -->
-    <!-- <script src="js/js-colormaps.js?inline"></script> -->
-    <!-- <script src="js/fuzzygraph.js?inline"></script> -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <style>@import "./input.css";</style>
 
     <style>
         #mainCanvas {
@@ -67,7 +59,7 @@
             </div>
             <div class="flex items-center space-x-4">
                 <!-- Desktop Navigation -->
-                <nav class="hidden md:flex space-x-4">
+                <nav class="hidden md:!flex space-x-4">
 
                     <button id="showShareButton"
                         class="text-white hover:text-blue-200 flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700">
@@ -147,8 +139,7 @@
     <!-- Main Container -->
     <div class="flex flex-col md:flex-row pt-16 bg-gray-300">
         <!-- Main Content -->
-        <main id="controlPanel" class="flex-1 order-1 md:order-2 transition-all duration-300 relative" <!-- Zoom
-            Controls -->
+        <main id="controlPanel" class="flex-1 order-1 md:order-2 transition-all duration-300 relative">
             <div class="absolute top-4 right-4 z-10 flex flex-col gap-0.5">
                 <button id="zoomInButton"
                     class="p-1.5 bg-gray-800 bg-opacity-75 hover:bg-opacity-100 text-white rounded-t-lg shadow-lg transition-colors duration-200">
@@ -283,7 +274,7 @@
     </div>
 
     <!-- Share modal background -->
-    <div id="shareModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div id="shareModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
 
         <!-- Modal content -->
         <div class="relative bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
@@ -311,7 +302,7 @@
     </div>
 
     <!-- Save modal background -->
-    <div id="saveModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div id="saveModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
         <!-- Modal content -->
         <div x-transition class="relative bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
 
@@ -327,7 +318,7 @@
     </div>
 
     <!-- Help modal background -->
-    <div id="helpModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div id="helpModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
 
         <!-- Modal content -->
         <div class="relative bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
@@ -362,18 +353,9 @@
     </script>
 
     <script type="module">
-        // import { atom } from 'https://cdn.jsdelivr.net/npm/nanostores@0.9.5/+esm';
-        // import { atom } from 'nanostores';
-        // import "nanostores";
         import { math } from "mathjs";
-        //import "./js/math.js";
-        // import "./js/js-colormaps.js";
-        // import "./js/fuzzygraph.js"; 
-        // import "./js/tailwind.js"; 
         import { atom } from "nanostores";
-
         import { evaluate_cmap, data as js_colormaps_data } from "./js/js-colormaps";
-
         import {
             parseEquationString,
             displayGraph,
