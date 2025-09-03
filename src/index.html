@@ -99,6 +99,7 @@
                 </button>
             </div>
         </div>
+
         <!-- Mobile Navigation Menu -->
         <div id="mobileMenu" x-transition:enter="transition ease-out duration-200"
             x-transition:enter-start="opacity-0 transform -translate-y-2"
@@ -139,7 +140,7 @@
     <!-- Main Container -->
     <div class="flex flex-col md:flex-row pt-16 bg-gray-300">
         <!-- Main Content -->
-        <main id="controlPanel" class="flex-1 order-1 md:order-2 transition-all duration-300 relative">
+        <main id="overCanvasControls" class="flex-1 order-1 md:order-2 transition-all duration-300 relative">
             <div class="absolute top-4 right-4 z-10 flex flex-col gap-0.5">
                 <button id="zoomInButton"
                     class="p-1.5 bg-gray-800 bg-opacity-75 hover:bg-opacity-100 text-white rounded-t-lg shadow-lg transition-colors duration-200">
@@ -171,8 +172,8 @@
             </div>
         </main>
 
-        <!-- Sidebar - Fixed to bottom on mobile, left side on desktop -->
-        <aside id="mobileControlPanel"
+        <!-- Side Control Panel - Fixed to bottom on mobile, left side on desktop -->
+        <aside id="controlPanel"
             class="bg-gray-300 text-gray-800 w-full md:w-64 fixed order-2 md:order-1 z-40 bottom-0 md:bottom-auto md:top-16 md:left-0">
             <!-- Top Control Bar -->
             <div class="bg-gray-400 text-white p-2 flex justify-between items-center">
@@ -329,7 +330,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.8</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.9</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -400,8 +401,8 @@
 
         function startLoading() {
             //if (loadingIntervalId) return; // already running
-            hoverMsg.set("Loading...");
             document.getElementById('hoverMsgDiv').style.display = 'block';
+            hoverMsg.set("Loading...");
             //loadingIntervalId = setInterval(() => {
             //    dots = (dots + 1) % 4;
             //    hoverMsg.set("Loading" + ".".repeat(dots));
@@ -411,21 +412,18 @@
         function stopLoading() {
             //clearInterval(loadingIntervalId);
             //loadingIntervalId = null;
-            document.getElementById('hoverMsgDiv').style.display = 'none';
-            hoverMsg.set('');
+            // document.getElementById('hoverMsgDiv').style.display = 'none';
+            // hoverMsg.set('');
         }
 
         function paintGraph() {
-            startLoading();
-            console.log('paintGraph()')
+            // startLoading();
             const canvas = document.getElementById('mainCanvas');
 
-            console.log(`equation = ${equation.get()}`);
             // Compile equation using math.js (parseEquationString)
             const parsedEquation = parseEquationString(equation.get());
 
             if (parsedEquation) {
-                console.log('equationParsed');
                 var graphConfig = {
                     equationFunction: parsedEquation,
                     fuzzyLevel: fuzzyLevel.get(),
@@ -438,7 +436,7 @@
                 };
 
                 const pixelValuesNew = displayGraph(graphConfig, canvas);
-                stopLoading();
+                // stopLoading();
                 pixelValuesStore.set(pixelValuesNew);
                 hoverMsg.set('');
                 document.getElementById('hoverMsgDiv').style.display = 'none';
@@ -476,7 +474,6 @@
             try {
                 document.execCommand('copy');
             } catch (err) {
-                console.error('Failed to copy: ', err);
                 alert('Failed to copy URL');
             }
         }
@@ -524,7 +521,7 @@
 
         document.getElementById('mobileMenuButton').addEventListener('click', () => { mobileMenuOpen.set(!mobileMenuOpen.get()); });
 
-        // document.getElementById('mobileControlPanel').addEventListener('transitionend', (e) => {
+        // document.getElementById('controlPanel').addEventListener('transitionend', (e) => {
         //     if (e.propertyName === 'left' || e.propertyName === 'transform' || e.propertyName === 'width') {
         //         // Layout is final now
         //         resizeCanvas();
@@ -534,8 +531,8 @@
         // CONTROL PANEL
         sidebarOpen.subscribe((visible) => {
             // TODO: Do this using simple visibility?
-            document.getElementById('controlPanel').classList.remove('md:ml-64', 'md:ml-0');
-            document.getElementById('controlPanel').classList.add(visible ? 'md:ml-64' : 'md:ml-0');
+            document.getElementById('overCanvasControls').classList.remove('md:ml-64', 'md:ml-0');
+            document.getElementById('overCanvasControls').classList.add(visible ? 'md:ml-64' : 'md:ml-0');
 
             document.getElementById('openControlPanelButton').classList.remove('opacity-0', 'pointer-events-none', 'opacity-100');
             if (visible) {
@@ -544,13 +541,13 @@
                 document.getElementById('openControlPanelButton').classList.add('opacity-100');
             }
 
-            document.getElementById('mobileControlPanel').classList.remove('bottom-0', 'md:bottom-auto', 'md:top-16',
+            document.getElementById('controlPanel').classList.remove('bottom-0', 'md:bottom-auto', 'md:top-16',
                 'md:left-0', 'bottom-[-1000px]', 'md:bottom-auto',
                 'md:top-16', 'md:left-[-1000px]');
             if (visible) {
-                document.getElementById('mobileControlPanel').classList.add('bottom-0', 'md:bottom-auto', 'md:top-16', 'md:left-0');
+                document.getElementById('controlPanel').classList.add('bottom-0', 'md:bottom-auto', 'md:top-16', 'md:left-0');
             } else {
-                document.getElementById('mobileControlPanel').classList.add('bottom-[-1000px]', 'md:bottom-auto', 'md:top-16', 'md:left-[-1000px]');
+                document.getElementById('controlPanel').classList.add('bottom-[-1000px]', 'md:bottom-auto', 'md:top-16', 'md:left-[-1000px]');
             }
 
             document.getElementById('mobileShowControlPanelButton').classList.remove('opacity-0', 'pointer-events-none', 'opacity-100');
@@ -966,11 +963,11 @@
         setParamsFromUrl();
 
         const ro = new ResizeObserver(() => resizeCanvas());
-        ro.observe(document.getElementById('controlPanel'));
+        ro.observe(document.getElementById('overCanvasControls'));
         ro.observe(document.getElementById('mainCanvas'));
 
         function removeResizeObserver() {
-            ro.unobserve(document.getElementById('controlPanel'));
+            ro.unobserve(document.getElementById('overCanvasControls'));
             ro.unobserve(document.getElementById('mainCanvas'));
             ro.disconnect();
         }

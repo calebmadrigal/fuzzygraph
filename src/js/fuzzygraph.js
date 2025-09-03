@@ -35,7 +35,6 @@ export function makeLinearMapper(inRange, outRange, intOut) {
 }
 
 export function parseEquationString(eq_str) {
-  console.log('parseEquationString()');
   var split_result = eq_str.split("=");
   if (split_result.length != 2) {
     return null;
@@ -369,7 +368,6 @@ export function ensureCanvasSize(canvas) {
 }
 
 export function displayGraph(graphParams, canvasElem) {
-  console.log('displayGraph()');
   const canvasWidth = canvasElem.width;
   const canvasHeight = canvasElem.height;
   var windowBounds = calcWindowBounds(graphParams['xCenter'],
