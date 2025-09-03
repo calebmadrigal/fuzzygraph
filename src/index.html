@@ -329,7 +329,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.6</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.7</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -983,13 +983,6 @@
                 }
             });
         });
-
-        // Allow plenty of time for the page to fully load and for the canvas to resize
-        // appropriately. But after that, remove the resize observers so it doesn't slow
-        // down the side bar expand/collapse
-        setTimeout(() => {
-            removeResizeObserver();
-        }, 5000);
 
     </script>
 </body>
