@@ -17,8 +17,8 @@
 
         .coords {
             position: absolute;
-            right: 6px;
-            bottom: 6px;
+            left: 6px;
+            top: 6px;
             padding: 4px 8px;
             border-radius: 6px;
             background: rgba(0, 0, 0, 0.6);
@@ -173,7 +173,7 @@
 
         <!-- Sidebar - Fixed to bottom on mobile, left side on desktop -->
         <aside id="mobileControlPanel"
-            class="bg-gray-300 text-gray-800 w-full md:w-64 fixed transition-all duration-300 order-2 md:order-1 z-40">
+            class="bg-gray-300 text-gray-800 w-full md:w-64 fixed order-2 md:order-1 z-40">
             <!-- Top Control Bar -->
             <div class="bg-gray-400 text-white p-2 flex justify-between items-center">
                 <button id="hideControlPanelButton" class="p-1 hover:bg-gray-700 rounded">
@@ -329,7 +329,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.5</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.6</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -385,6 +385,9 @@
         const showHelpModal = atom(false);
 
         var pixelValuesStore = atom([]);
+        // Handle for canceling waiting indicator
+        //var loadingIntervalId = null;
+        //var dots = 0;
 
         function checkCanvasSize(canvas) {
             const ctx = canvas.getContext('2d');
@@ -395,7 +398,25 @@
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0) // user-space: CSS pixels
         }
 
+        function startLoading() {
+            //if (loadingIntervalId) return; // already running
+            hoverMsg.set("Loading...");
+            document.getElementById('hoverMsgDiv').style.display = 'block';
+            //loadingIntervalId = setInterval(() => {
+            //    dots = (dots + 1) % 4;
+            //    hoverMsg.set("Loading" + ".".repeat(dots));
+            //}, 500);
+        }
+
+        function stopLoading() {
+            //clearInterval(loadingIntervalId);
+            //loadingIntervalId = null;
+            document.getElementById('hoverMsgDiv').style.display = 'none';
+            hoverMsg.set('');
+        }
+
         function paintGraph() {
+            startLoading();
             console.log('paintGraph()')
             const canvas = document.getElementById('mainCanvas');
 
@@ -417,6 +438,7 @@
                 };
 
                 const pixelValuesNew = displayGraph(graphConfig, canvas);
+                stopLoading();
                 pixelValuesStore.set(pixelValuesNew);
                 hoverMsg.set('');
                 document.getElementById('hoverMsgDiv').style.display = 'none';
