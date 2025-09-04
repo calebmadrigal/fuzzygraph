@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fuzzy Graph</title>
-    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
     <style>
         @import "./input.css";
     </style>
@@ -30,10 +29,6 @@
             user-select: none;
             display: none;
         }
-
-        /* .hidden {
-            display: none;
-        } */
 
         .tooltip-button {
             position: relative;
@@ -369,7 +364,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.10</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.11</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -451,8 +446,23 @@
         function stopLoading() {
             //clearInterval(loadingIntervalId);
             //loadingIntervalId = null;
-            // document.getElementById('hoverMsgDiv').style.display = 'none';
-            // hoverMsg.set('');
+            document.getElementById('hoverMsgDiv').style.display = 'none';
+            hoverMsg.set('');
+        }
+
+        function debounceLatest(fn, delay) {
+            let timeoutId;
+            return function (...args) {
+                // Clear the previous scheduled call
+                if (timeoutId) {
+                    clearTimeout(timeoutId);
+                }
+
+                // Schedule the new call
+                timeoutId = setTimeout(() => {
+                    fn.apply(this, args);
+                }, delay);
+            };
         }
 
         function paintGraph() {
@@ -483,6 +493,13 @@
                 document.getElementById('hoverMsgDiv').style.display = 'block';
                 hoverMsg.set('Equation is invalid');
             }
+        }
+
+        const paintGraphDebounced = debounceLatest(paintGraph, 1000);
+
+        function scheduleRepaint() {
+            startLoading();
+            paintGraphDebounced();
         }
 
         function downloadFuzzygraph() {
@@ -618,30 +635,21 @@
         document.getElementById('openControlPanelButton').addEventListener('click', () => { sidebarOpen.set(true); });
         document.getElementById('hideControlPanelButton').addEventListener('click', () => { sidebarOpen.set(false); });
 
-        // Debounce utility: returns a debounced version of a function
-        function debounce(fn, delay = 900) {
-            let timeoutId;
-            return (...args) => {
-                clearTimeout(timeoutId);
-                timeoutId = setTimeout(() => fn.apply(null, args), delay);
-            };
-        }
-
         // CONTROL PANEL / Equation
         equation.subscribe((eq) => {
             document.getElementById('equationInput').value = eq;
-            paintGraph();
+            scheduleRepaint();
         });
 
-        document.getElementById('equationInput').addEventListener('input', debounce((event) => {
+        document.getElementById('equationInput').addEventListener('input', (event) => {
             equation.set(event.target.value);
-        }));
+        });
 
         // CONTROL PANEL / Fuzzy
         fuzzyLevel.subscribe((fuzzyVal) => {
             document.getElementById('fuzzyLevelDisplay').textContent = parseInt(fuzzyVal) + '%';
             document.getElementById('fuzzyInput').value = fuzzyVal;
-            paintGraph();
+            scheduleRepaint();
         });
         document.getElementById('fuzzyInput').addEventListener('input', (event) => {
             fuzzyLevel.set(event.target.value);
@@ -660,7 +668,7 @@
 
         document.getElementById('axesToggle').addEventListener('click', () => {
             showAxes.set(!showAxes.get());
-            paintGraph();
+            scheduleRepaint();
         });
 
         // CONTROL PANEL / Color map
@@ -685,11 +693,11 @@
         }
         colorMap.subscribe((value) => {
             renderOptions(value);
-            paintGraph();
+            scheduleRepaint();
         });
         colorMapSelect.addEventListener('change', (event) => {
             colorMap.set(event.target.value);
-            paintGraph();
+            scheduleRepaint();
         });
 
         // CONTROL PANEL / Invert color
@@ -705,19 +713,19 @@
 
         document.getElementById('invertColorButton').addEventListener('click', () => {
             invertColor.set(!invertColor.get());
-            paintGraph();
+            scheduleRepaint();
         });
 
 
         // Zoom In
         document.getElementById('zoomInButton').addEventListener('click', () => {
             yHeight.set(yHeight.get() * (1 / ZOOM_RATE));
-            paintGraph();
+            scheduleRepaint();
         });
         // Zoom Out
         document.getElementById('zoomOutButton').addEventListener('click', () => {
             yHeight.set(yHeight.get() * ZOOM_RATE);
-            paintGraph();
+            scheduleRepaint();
         });
 
         // // // // // // // Drag and drop to pan
@@ -775,7 +783,7 @@
             dragState.isDragging = false;
 
             // TODO: No need for nanostores if we call directly
-            paintGraph()
+            scheduleRepaint();
         }
 
         // Get mouse position relative to canvas
@@ -899,7 +907,7 @@
         // Set canvas size to match its display size
         function resizeCanvas() {
             fitCanvasToDisplay(canvas);
-            paintGraph();
+            scheduleRepaint();
         }
 
         // Resize canvas when window is resized
