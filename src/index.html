@@ -364,7 +364,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.12</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.13</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -414,6 +414,7 @@
 
         const hoverMsg = atom('Loading...');
         const showError = atom(false);
+        const isLoading = atom(true);
 
         const showShareModal = atom(false);
         const showSaveModal = atom(false);
@@ -431,7 +432,7 @@
         }
 
         function startLoading() {
-            //if (loadingIntervalId) return; // already running
+            isLoading.set(true);
             document.getElementById('hoverMsgDiv').style.display = 'block';
             hoverMsg.set("Loading...");
         }
@@ -439,6 +440,7 @@
         function stopLoading() {
             document.getElementById('hoverMsgDiv').style.display = 'none';
             hoverMsg.set('');
+            isLoading.set(false);
         }
 
         function debounceLatest(fn, delay) {
@@ -476,10 +478,10 @@
                 };
 
                 const pixelValuesNew = displayGraph(graphConfig, canvas);
-                // stopLoading();
+                stopLoading();
                 pixelValuesStore.set(pixelValuesNew);
-                hoverMsg.set('');
-                document.getElementById('hoverMsgDiv').style.display = 'none';
+                // hoverMsg.set('');
+                // document.getElementById('hoverMsgDiv').style.display = 'none';
             } else {
                 document.getElementById('hoverMsgDiv').style.display = 'block';
                 hoverMsg.set('Equation is invalid');
@@ -847,6 +849,9 @@
         });
 
         canvas.addEventListener('mousemove', (event) => {
+            // Don't overwrite the "Loading..." message
+            if (isLoading.get()) return;
+
             const precision = getPrecision();
 
             const r = canvas.getBoundingClientRect();
@@ -873,6 +878,7 @@
         });
 
         canvas.addEventListener('mouseleave', (event) => {
+            if (isLoading.get()) return;  // Don't overwrite "Loading..." message
             document.getElementById('hoverMsgDiv').style.display = 'none';
         });
 
