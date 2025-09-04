@@ -201,7 +201,7 @@
             </canvas>
 
             <div id="hoverMsgDiv" class="coords">
-                <span id="hoverMsg"></span>
+                <span id="hoverMsg">Loading...</span>
             </div>
         </main>
 
@@ -364,7 +364,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.11</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.12</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -412,7 +412,7 @@
         const sidebarOpen = atom(true);
         const mobileMenuOpen = atom(false);
 
-        const hoverMsg = atom('');
+        const hoverMsg = atom('Loading...');
         const showError = atom(false);
 
         const showShareModal = atom(false);
@@ -420,9 +420,6 @@
         const showHelpModal = atom(false);
 
         var pixelValuesStore = atom([]);
-        // Handle for canceling waiting indicator
-        //var loadingIntervalId = null;
-        //var dots = 0;
 
         function checkCanvasSize(canvas) {
             const ctx = canvas.getContext('2d');
@@ -437,15 +434,9 @@
             //if (loadingIntervalId) return; // already running
             document.getElementById('hoverMsgDiv').style.display = 'block';
             hoverMsg.set("Loading...");
-            //loadingIntervalId = setInterval(() => {
-            //    dots = (dots + 1) % 4;
-            //    hoverMsg.set("Loading" + ".".repeat(dots));
-            //}, 500);
         }
 
         function stopLoading() {
-            //clearInterval(loadingIntervalId);
-            //loadingIntervalId = null;
             document.getElementById('hoverMsgDiv').style.display = 'none';
             hoverMsg.set('');
         }
