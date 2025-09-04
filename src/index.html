@@ -6,7 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fuzzy Graph</title>
     <!-- <script src="https://cdn.tailwindcss.com"></script> -->
-    <style>@import "./input.css";</style>
+    <style>
+        @import "./input.css";
+    </style>
 
     <style>
         #mainCanvas {
@@ -29,12 +31,36 @@
             display: none;
         }
 
-        .hidden {
+        /* .hidden {
             display: none;
+        } */
+
+        .tooltip-button {
+            position: relative;
+            padding: 10px 20px;
+            cursor: pointer;
         }
 
-        .keep {
-            display: inline;
+        .tooltip-button::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+        }
+
+        .tooltip-button:hover::after {
+            opacity: 1;
+            visibility: visible;
         }
     </style>
 </head>
@@ -46,7 +72,8 @@
             <div class="flex items-center">
 
                 <!-- Logo -->
-                <div class="ml-1 w-52">
+                <div class="h-fit flex gap-4">
+                    <div>
                     <svg xmlns="http://www.w3.org/2000/svg" width="68.92mm" height="12.21mm" viewBox="0 0 69.92 12.21"
                         preserveAspectRatio="xMidYMid meet" class="w-full h-full">
                         <text x="0.42" y="8.78" font-family="Arial Black" font-size="10.58" stroke="white" fill="white"
@@ -54,6 +81,17 @@
                         <text x="34.83" y="8.86" font-family="Arial Black" font-size="10.58" stroke="white" fill="white"
                             stroke-width="0.26">Graph</text>
                     </svg>
+                    </div>
+
+                    <div>
+                    <button id="downloadFuzzyGraphBtn" data-tooltip="Download offline copy of FuzzyGraph"
+                    class="text-white hover:bg-gray-700 items-center px-1 py-3 rounded tooltip-button">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                        </svg>
+                    </button>
+                    </div>
                 </div>
 
             </div>
@@ -190,8 +228,7 @@
                     <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200">Equation</h3>
                     <div class="space-y-2">
                         <textarea id="equationInput" class="w-full h-16 p-2 border border-gray-300 rounded-md resize-y"
-                            oninput="this.value=this.value.toLowerCase()"
-                            autocapitalize="off" spellcheck="false"
+                            oninput="this.value=this.value.toLowerCase()" autocapitalize="off" spellcheck="false"
                             placeholder="y=x">
                         </textarea>
                     </div>
@@ -252,7 +289,7 @@
                     </div>
 
                     <div class="mt-16 text-center flex flex-col justify-end">
-                            <span>~ Built by <a href="https://gods.art"
+                        <span>~ Built by <a href="https://gods.art"
                                 class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">
                                 Caleb Madrigal
                             </a>
@@ -315,6 +352,8 @@
 
             <h2 class="text-xl font-semibold mb-4">Save Image</h2>
             <p class="mb-4">Image save feature coming soon</p>
+
+
         </div>
     </div>
 
@@ -330,7 +369,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.9</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.10</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -446,7 +485,23 @@
             }
         }
 
+        function downloadFuzzygraph() {
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'FuzzyGraph.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
         // // // // // // // Event handling
+
+        // Download offline copy of FuzzyGraph
+        document.getElementById("downloadFuzzyGraphBtn").addEventListener('click', downloadFuzzygraph);
 
         // TOP MENU EVENTS
         showShareModal.listen((visible) => { document.getElementById('shareModal').classList.toggle('hidden', !visible); showURL(); });
