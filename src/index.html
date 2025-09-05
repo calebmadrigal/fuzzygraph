@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -350,7 +349,135 @@
             </button>
 
             <h2 class="text-xl font-semibold mb-4">Save Image</h2>
-            <p class="mb-4">Image save feature coming soon</p>
+
+            <div class="bg-white w-full max-w-md">
+                <!-- Size Inputs -->
+                <div class="mb-4">
+                    <h3 class="text-lg font-semibold mb-2 text-gray-700">Size</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="width" class="block text-sm font-medium text-gray-600">Width (pixels)</label>
+                            <input 
+                                type="number" 
+                                id="saveWidthInput" 
+                                name="saveWidthInput" 
+                                min="0" 
+                                step="1" 
+                                required 
+                                class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Enter width"
+                            >
+                        </div>
+                        <div>
+                            <label for="height" class="block text-sm font-medium text-gray-600">Height (pixels)</label>
+                            <input 
+                                type="number" 
+                                id="saveHeightInput" 
+                                name="saveHeightInput" 
+                                min="0" 
+                                step="1" 
+                                required 
+                                class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Enter height"
+                            >
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Center Inputs -->
+                <div class="mb-4">
+                    <h3 class="text-lg font-semibold mb-2 text-gray-700">Center</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="x" class="block text-sm font-medium text-gray-600">X (decimal)</label>
+                            <input 
+                                type="number" 
+                                id="saveCenterXInput" 
+                                name="saveCenterXInput" 
+                                step="any" 
+                                required 
+                                class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Enter x coordinate"
+                            >
+                        </div>
+                        <div>
+                            <label for="y" class="block text-sm font-medium text-gray-600">Y (decimal)</label>
+                            <input 
+                                type="number" 
+                                id="saveCenterYInput" 
+                                name="saveCenterYInput" 
+                                step="any" 
+                                required 
+                                class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Enter y coordinate"
+                            >
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- yHeight Input -->
+                <div class="mb-4">
+                    <h3 class="text-lg font-semibold mb-2 text-gray-700">Zoom</h3>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="yHeight" class="block text-sm font-medium text-gray-600">yHeight (decimal)</label>
+                            <input 
+                                type="number" 
+                                id="saveYHeightInput" 
+                                name="saveYHeightInput" 
+                                step="any" 
+                                required 
+                                class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Enter yHeight"
+                            >
+                        </div>
+                        <div>&nbsp;</div>
+                    </div>
+
+                </div>
+
+
+                <div class="mb-4">
+                    <div class="grid grid-cols-2 gap-4 items-center">
+                        <!-- Show Axes -->
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-gray-700">Show Axes</span>
+                            <button 
+                                type="button" 
+                                id="saveAxesToggle"
+                                class="relative inline-flex h-8 w-14 flex-shrink-0 cursor-pointer rounded-full bg-gray-200 border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                role="switch">
+                                <span 
+                                    id="saveAxesOnSlider"
+                                    class="pointer-events-none inline-block h-7 w-7 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out">
+                                </span>
+                            </button>
+                        </div>
+                
+                        <!-- Save Image Button -->
+                        <div class="flex items-center justify-end">
+                            <button 
+                                type="button" 
+                                id="saveImageButton"
+                                class="px-8 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
+                            >
+                                <span class="inline text-gray-200 mr-2">Save Image</span>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+            </div>
+            <!-- <p class="mb-4">Image save feature coming soon</p> -->
 
 
         </div>
@@ -377,7 +504,7 @@
                 TRUE or FALSE, it instead, shows the "shades of gray", choosing colors based on how near or far both
                 sides are to being equal at every point in the visible area.</p>
             <br />
-            <p>Here is a short video <a href="https://www.youtube.com/watch?v=DsOyp3-8dug&t=1s" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">Intro to FuzzyGraph</a>.</p>
+            <p>Here is the <a href="https://www.youtube.com/watch?v=DsOyp3-8dug&t=1s" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">Video intro to FuzzyGraph</a>.</p>
             <br />
             <p>Project by math artist <a href="https://gods.art"
                     class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">Caleb
@@ -421,6 +548,15 @@
         const showShareModal = atom(false);
         const showSaveModal = atom(false);
         const showHelpModal = atom(false);
+
+        // Save modal variables
+        const saveWidth = atom(0);
+        const saveHeight = atom(0);
+        const saveCenterX = atom(0);
+        const saveCenterY = atom(0);
+        const saveYHeight = atom(6);
+        const saveShowAxes = atom(true);
+        const saveDefaultConfig = atom(true);
 
         var pixelValuesStore = atom([]);
 
@@ -497,6 +633,8 @@
             paintGraphDebounced();
         }
 
+        // Download FuzzyGraph
+
         function downloadFuzzygraph() {
             const htmlContent = document.documentElement.outerHTML;
             const blob = new Blob([htmlContent], { type: 'text/html' });
@@ -510,6 +648,97 @@
             URL.revokeObjectURL(url);
         }
 
+        // Save Image
+
+        async function saveImage() {
+            let saveCanvas = null;
+            if (saveDefaultConfig.get()) {
+                saveCanvas = canvas;
+            } else {
+                // Create canvas only in JS
+                saveCanvas = document.createElement('canvas');
+                saveCanvas.width = saveWidth.get();
+                saveCanvas.height = saveHeight.get();
+                // TODO: Call fuzzygraph to draw
+
+            }
+            const ctx = saveCanvas.getContext('2d');
+
+            // Helpers
+            function downloadBlob(blob, filename) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+            }
+        
+            function canvasToBlob(canvas, type = 'image/png', quality) {
+              return new Promise(resolve => canvas.toBlob(resolve, type, quality));
+            }
+        
+            const blob = await canvasToBlob(saveCanvas, 'image/png');
+            downloadBlob(blob, 'fuzzygraph_img.png');
+        }
+
+        document.getElementById('saveImageButton').addEventListener('click', async () => {
+            saveImage();
+        });
+
+        saveShowAxes.subscribe((show) => {
+            document.getElementById('saveAxesOnSlider').classList.remove('translate-x-6', 'translate-x-0');
+            document.getElementById('saveAxesOnSlider').classList.add(show ? 'translate-x-6' : 'translate-x-0');
+
+            document.getElementById('saveAxesToggle').classList.remove('bg-blue-600', 'bg-gray-200');
+            document.getElementById('saveAxesToggle').classList.add(show ? 'bg-blue-600' : 'bg-gray-200');
+
+            document.getElementById('saveAxesToggle').setAttribute('aria-checked', show);
+        });
+
+        document.getElementById('saveAxesToggle').addEventListener('click', () => {
+            saveShowAxes.set(!saveShowAxes.get());
+        });
+
+        document.getElementById('saveWidthInput').addEventListener('input', (event) => {
+            saveWidth.set(event.target.value);
+            saveDefaultConfig.set(false);
+        });
+        document.getElementById('saveHeightInput').addEventListener('input', (event) => {
+            saveHeight.set(event.target.value);
+            saveDefaultConfig.set(false);
+        });
+        document.getElementById('saveCenterXInput').addEventListener('input', (event) => {
+            saveCenterX.set(event.target.value);
+            saveDefaultConfig.set(false);
+        });
+        document.getElementById('saveCenterYInput').addEventListener('input', (event) => {
+            saveCenterY.set(event.target.value);
+            saveDefaultConfig.set(false);
+        });
+        document.getElementById('saveYHeightInput').addEventListener('input', (event) => {
+            saveYHeight.set(event.target.value);
+            saveDefaultConfig.set(false);
+        });
+
+        saveWidth.subscribe((val) => {
+            document.getElementById('saveWidthInput').value = val;
+        });
+        saveHeight.subscribe((val) => {
+            document.getElementById('saveHeightInput').value = val;
+        });
+        saveCenterX.subscribe((val) => {
+            document.getElementById('saveCenterXInput').value = val;
+        });
+        saveCenterY.subscribe((val) => {
+            document.getElementById('saveCenterYInput').value = val;
+        });
+        saveYHeight.subscribe((val) => {
+            document.getElementById('saveYHeightInput').value = val;
+        });
+
         // // // // // // // Event handling
 
         // Download offline copy of FuzzyGraph
@@ -517,8 +746,20 @@
 
         // TOP MENU EVENTS
         showShareModal.listen((visible) => { document.getElementById('shareModal').classList.toggle('hidden', !visible); showURL(); });
-        showSaveModal.listen((visible) => { document.getElementById('saveModal').classList.toggle('hidden', !visible); });
         showHelpModal.listen((visible) => { document.getElementById('helpModal').classList.toggle('hidden', !visible); });
+        showSaveModal.listen((visible) => {
+            document.getElementById('saveModal').classList.toggle('hidden', !visible);
+            // Set default values in Save Modal form
+            if (visible) {
+                saveWidth.set(canvas.width);
+                saveHeight.set(canvas.height);
+                saveCenterX.set(xCenter.get());
+                saveCenterY.set(yCenter.get());
+                saveYHeight.set(yHeight.get());
+                saveShowAxes.set(showAxes.get());
+                saveDefaultConfig.set(true);
+            }
+        });
 
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Escape') {
