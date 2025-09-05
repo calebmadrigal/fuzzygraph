@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <path style="stroke: rgb(0, 0, 0); fill: none; stroke-linecap: round; stroke-width: 20px;" d="M 71.335 351.263 C 71.335 351.263 220.824 546.123 425.655 354.919" id="object-0"/>
+  <path style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0); stroke-linecap: round; stroke-width: 20px;" d="M 244.441 337.303 L 247.495 57.542" id="object-1"/>
+  <path style="stroke: rgb(0, 0, 0); fill: none; stroke-linecap: round; stroke-width: 20px;" d="M 245.927 57.667 C 245.927 57.667 240.845 170.04 170.192 173.446" id="object-2"/>
+  <path style="stroke: rgb(0, 0, 0); fill: none; stroke-linecap: round; transform-box: fill-box; transform-origin: 50% 50%; stroke-width: 20px;" d="M 324.455 177.087 C 324.455 177.087 319.373 64.715 248.72 61.309" transform="matrix(-1, 0, 0, -1, 0.000035, -0.000015)" id="object-3"/>
+</svg>
