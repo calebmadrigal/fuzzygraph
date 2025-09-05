@@ -79,7 +79,7 @@
 
                     <div>
                     <button id="downloadFuzzyGraphBtn" data-tooltip="Download offline copy of FuzzyGraph"
-                    class="text-white hover:bg-gray-700 items-center px-1 py-3 rounded tooltip-button">
+                    class="hidden md:flex text-white hover:bg-gray-700 items-center px-1 py-3 rounded tooltip-button">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
@@ -495,7 +495,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.14</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.15</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -677,8 +677,6 @@
                     showAxes: saveShowAxes.get()
                 };
 
-                console.log(`saveImage() - xCenter = ${graphConfig['xCenter']}, yCenter=${graphConfig['yCenter']})`);
-
                 displayGraph(graphConfig, saveCanvas);
             }
 
@@ -718,10 +716,6 @@
             document.getElementById('saveAxesToggle').setAttribute('aria-checked', show);
         });
 
-        document.getElementById('saveAxesToggle').addEventListener('click', () => {
-            saveShowAxes.set(!saveShowAxes.get());
-        });
-
         document.getElementById('saveWidthInput').addEventListener('input', (event) => {
             saveWidth.set(event.target.value);
             saveDefaultConfig.set(false);
@@ -740,6 +734,10 @@
         });
         document.getElementById('saveYHeightInput').addEventListener('input', (event) => {
             saveYHeight.set(event.target.value);
+            saveDefaultConfig.set(false);
+        });
+        document.getElementById('saveAxesToggle').addEventListener('click', () => {
+            saveShowAxes.set(!saveShowAxes.get());
             saveDefaultConfig.set(false);
         });
 
