@@ -495,7 +495,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.13</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.14</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -653,15 +653,35 @@
         async function saveImage() {
             let saveCanvas = null;
             if (saveDefaultConfig.get()) {
+                // If no defaults were changed in the Save Image modal,
+                // we can just copy the image from the main canvas.
                 saveCanvas = canvas;
             } else {
-                // Create canvas only in JS
+                // But if any parameters in the Save Image modal were changed,
+                // we need to fully repaint the image in a new off-DOM canvas.
                 saveCanvas = document.createElement('canvas');
                 saveCanvas.width = saveWidth.get();
                 saveCanvas.height = saveHeight.get();
-                // TODO: Call fuzzygraph to draw
 
+                // Compile equation using math.js (parseEquationString)
+                const parsedEquation = parseEquationString(equation.get());
+
+                var graphConfig = {
+                    equationFunction: parsedEquation,
+                    fuzzyLevel: fuzzyLevel.get(),
+                    colorMap: colorMap.get(),
+                    invertColor: invertColor.get(),
+                    xCenter: parseFloat(saveCenterX.get()),
+                    yCenter: parseFloat(saveCenterY.get()),
+                    yHeight: parseFloat(saveYHeight.get()),
+                    showAxes: saveShowAxes.get()
+                };
+
+                console.log(`saveImage() - xCenter = ${graphConfig['xCenter']}, yCenter=${graphConfig['yCenter']})`);
+
+                displayGraph(graphConfig, saveCanvas);
             }
+
             const ctx = saveCanvas.getContext('2d');
 
             // Helpers
@@ -675,11 +695,11 @@
                 a.remove();
                 setTimeout(() => URL.revokeObjectURL(url), 1000);
             }
-        
+
             function canvasToBlob(canvas, type = 'image/png', quality) {
               return new Promise(resolve => canvas.toBlob(resolve, type, quality));
             }
-        
+
             const blob = await canvasToBlob(saveCanvas, 'image/png');
             downloadBlob(blob, 'fuzzygraph_img.png');
         }
