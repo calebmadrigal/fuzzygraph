@@ -34,7 +34,60 @@ export function makeLinearMapper(inRange, outRange, intOut) {
   return linearMapper;
 }
 
+export function cartesian_to_polar(x, y) {
+  const r = math.sqrt(x**2 + y**2);
+  var theta = math.atan2(y, x);
+  if (theta < 0) theta += 2 * Math.PI;
+  return {'r': r, 't': theta};
+}
+
+export function parsePolarEquationString(eq_str) {
+  var split_result = eq_str.split("=");
+  if (split_result.length != 2) {
+    return null;
+  }
+
+  try {
+    const left_polar = math.evaluate('f(r, t) = ' + split_result[0], {});
+    const right_polar = math.evaluate('f(r, t) = ' + split_result[1], {});
+    var left_eq = (x, y) => {
+      const p_coords = cartesian_to_polar(x, y);
+      return left_polar(p_coords['r'], p_coords['t']);
+    };
+    var right_eq = (x, y) => {
+      const p_coords = cartesian_to_polar(x, y);
+      return right_polar(p_coords['r'], p_coords['t']);
+    };
+
+    // Call the function for each side of the equation to see if either throws an exception.
+    // No need to render the graph (which won't happen if we return null) we can't calculate anything
+    left_eq(0.01, 0.01);
+    right_eq(0.01, 0.01);
+  } catch (error) {
+    console.log(`Failed to parse polar equation: ${error}`);
+    return null;
+  }
+  var error_func = function (x, y) { return Math.abs(left_eq(x, y) - right_eq(x, y)); };
+
+  return error_func;
+}
+
+function isPolarEquation(eq_str) {
+  // Normalize by making lowercase and removing whitespace
+  const cleanEq = eq_str.toLowerCase().replace(/\s+/g, '');
+
+  // Match standalone r or t (not part of another word like "sqrt")
+  const polarRegex = /\br\b|\bt\b/;
+
+  return polarRegex.test(cleanEq);
+}
+
 export function parseEquationString(eq_str) {
+  // If it is in polar coordinates, use the parsePolarEquationString
+  if (isPolarEquation(eq_str)) {
+    return parsePolarEquationString(eq_str);
+  }
+
   var split_result = eq_str.split("=");
   if (split_result.length != 2) {
     return null;
