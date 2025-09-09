@@ -113,6 +113,14 @@
                         </svg>
                     </button>
 
+                    <button id="showOpenButton"
+                        class="text-white hover:text-blue-200 flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700">
+                        <span class="inline text-gray-200">Open</span>
+                        <svg width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 6H12L10 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6ZM20 18H4V6H9.17L11.17 8H20V18Z" fill="#000000"/>
+                        </svg>
+                    </button>
+
                     <button id="showHelpButton"
                         class="text-white hover:text-blue-200 flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700">
                         <span class="inline text-gray-200">Help</span>
@@ -143,6 +151,7 @@
             x-transition:leave-end="opacity-0 transform -translate-y-2"
             class="hidden absolute top-16 right-0 w-48 bg-gray-800 shadow-lg md:hidden rounded-bl-lg">
             <div class="px-2 py-3 space-y-2">
+
                 <button id="mobileShowShareButton"
                     class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded">
                     <span class="inline text-gray-200">Share</span>
@@ -153,6 +162,7 @@
                         <path style="fill: none; stroke: rgb(255, 255, 255); stroke-linecap: round; transform-box: fill-box; transform-origin: 50% 50%; stroke-width: 40px;" d="M 324.455 177.087 C 324.455 177.087 314.941 85.607 244.288 82.201" transform="matrix(-1, 0, 0, -1, 4.432068, -20.892017)" id="object-3"/>
                     </svg>
                 </button>
+
                 <button id="mobileShowSaveButton"
                     class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded">
                     <span class="inline text-gray-200">Save</span>
@@ -161,6 +171,15 @@
                             d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                     </svg>
                 </button>
+
+                <button id="mobileShowOpenButton"
+                    class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded">
+                    <span class="inline text-gray-200">Open</span>
+                    <svg width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 6H12L10 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6ZM20 18H4V6H9.17L11.17 8H20V18Z" fill="#000000"/>
+                    </svg>
+                </button>
+
                 <button id="mobileShowHelpButton"
                     class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded">
                     <span class="inline text-gray-200">Help</span>
@@ -169,6 +188,7 @@
                             d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M12 21a9 9 0 110-18 9 9 0 010 18z" />
                     </svg>
                 </button>
+
             </div>
         </div>
     </header>
@@ -482,6 +502,41 @@
 
         </div>
     </div>
+    
+
+
+    <!-- Open modal background -->
+    <div id="openModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <!-- Modal content -->
+        <div x-transition class="relative bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+
+            <!-- X button -->
+            <button id="openModalX"
+                class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold focus:outline-none">
+                &times;
+            </button>
+
+            <h2 class="text-xl font-semibold mb-4">Open FuzzyGraph Image</h2>
+
+            <div class="mb-6">
+                <!-- File Upload Container -->
+                <div class="flex items-center space-x-4">
+                  <input
+                    id="pngInput"
+                    type="file"
+                    accept="image/png"
+                    class="block p-2 w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-300 dark:bg-gray-800 dark:border-gray-600 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition"
+                  />
+                </div>
+              
+                <!-- Result Display -->
+                <pre id="openResult" class="mt-4 rounded text-sm text-gray-200 dark:text-gray-700"></pre>
+            </div>
+
+
+        </div>
+    </div>
+
 
     <!-- Help modal background -->
     <div id="helpModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -495,7 +550,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.17</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.18</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -547,6 +602,7 @@
 
         const showShareModal = atom(false);
         const showSaveModal = atom(false);
+        const showOpenModal = atom(false);
         const showHelpModal = atom(false);
 
         // Save modal variables
@@ -682,6 +738,103 @@
 
             const ctx = saveCanvas.getContext('2d');
 
+
+
+
+
+            // Logic to embed graph config data into the generated png file
+            // Add a JSON object as UTF-8 iTXt metadata to a PNG Blob.
+            // Returns a new PNG Blob.
+            async function addJsonITXtToPng(blob, json, keyword = "graphconfig") {
+                // NOTE: This function generated by ChatGPT 5 (2025-09-08)
+                const buf = await blob.arrayBuffer();
+                const u8  = new Uint8Array(buf);
+
+                // --- sanity check signature ---
+                const sig = [137,80,78,71,13,10,26,10];
+                for (let i = 0; i < 8; i++) if (u8[i] !== sig[i]) throw new Error("Not a PNG");
+
+                // --- walk chunks to find IEND offset ---
+                let p = 8;
+                let iendPos = -1;
+                while (p + 8 <= u8.length) {
+                    const len = readU32(u8, p);          // chunk data length
+                    const type = readType(u8, p + 4);    // e.g., 'IHDR','IDAT','IEND'
+                    const next = p + 12 + len;           // move past [len][type][data][crc]
+                    if (type === "IEND") { iendPos = p; break; }
+                    p = next;
+                }
+                if (iendPos < 0) throw new Error("Malformed PNG (no IEND)");
+
+                // --- build iTXt chunk data (UTF-8, uncompressed) ---
+                // iTXt layout:
+                // keyword\0 compressionFlag(0|1) compressionMethod(0)
+                // languageTag\0 translatedKeyword\0 text(UTF-8 or zlib-compressed UTF-8)
+                const enc = new TextEncoder();
+                const keywordBytes = enc.encode(keyword);             // ASCII in spec, but encoder is fine
+                const langBytes = new Uint8Array(0);                  // empty language tag
+                const translatedBytes = new Uint8Array(0);            // empty translated keyword
+                const textBytes = enc.encode(JSON.stringify(json));   // your JSON as UTF-8
+
+                const parts = [
+                    keywordBytes, zero(),                               // keyword\0
+                    u8byte(0),                                          // compressionFlag = 0 (uncompressed)
+                    u8byte(0),                                          // compressionMethod = 0
+                    langBytes, zero(),                                  // languageTag\0
+                    translatedBytes, zero(),                            // translatedKeyword\0
+                    textBytes                                           // the text payload
+                ];
+                const itxtData = concat(parts);
+
+                const itxtChunk = buildChunk("iTXt", itxtData);
+
+                // --- assemble: everything before IEND + our iTXt + IEND..end ---
+                const out = new Uint8Array(u8.length + itxtChunk.length);
+                out.set(u8.subarray(0, iendPos), 0);
+                out.set(itxtChunk, iendPos);
+                out.set(u8.subarray(iendPos), iendPos + itxtChunk.length);
+
+                return new Blob([out], { type: "image/png" });
+
+                // -------- helpers --------
+                function readU32(a, i)   { return (a[i]<<24 | a[i+1]<<16 | a[i+2]<<8 | a[i+3]) >>> 0; }
+                function readType(a, i)  { return String.fromCharCode(a[i],a[i+1],a[i+2],a[i+3]); }
+                function u8byte(n)       { return new Uint8Array([n & 255]); }
+                function zero()          { return u8byte(0); }
+                function concat(arrs) {
+                    let len = 0; arrs.forEach(a => len += a.length);
+                    const o = new Uint8Array(len);
+                    let off = 0; arrs.forEach(a => { o.set(a, off); off += a.length; });
+                    return o;
+                }
+                function buildChunk(type4, data) {
+                    const enc = new TextEncoder();
+                    const typeBytes = enc.encode(type4); // 4 bytes
+                    const lenBytes  = u32BE(data.length);
+                    const crcBytes  = u32BE(crc32(join(typeBytes, data)));
+                    const out = new Uint8Array(4 + 4 + data.length + 4);
+                    out.set(lenBytes, 0);
+                    out.set(typeBytes, 4);
+                    out.set(data, 8);
+                    out.set(crcBytes, 8 + data.length);
+                    return out;
+
+                    function join(a,b){ const o=new Uint8Array(a.length+b.length); o.set(a,0); o.set(b,a.length); return o; }
+                    function u32BE(n){ const b=new Uint8Array(4); b[0]=n>>>24; b[1]=n>>>16; b[2]=n>>>8; b[3]=n; return b; }
+                    function crc32(bytes){
+                    let c = 0xFFFFFFFF >>> 0;
+                    for (let i=0;i<bytes.length;i++){
+                        c = (c ^ bytes[i]) >>> 0;
+                        for (let k=0;k<8;k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) >>> 0 : (c >>> 1) >>> 0;
+                    }
+                    return (~c) >>> 0;
+                    }
+                }
+            }
+
+
+
+
             // Helpers
             function downloadBlob(blob, filename) {
                 const url = URL.createObjectURL(blob);
@@ -698,9 +851,132 @@
               return new Promise(resolve => canvas.toBlob(resolve, type, quality));
             }
 
-            const blob = await canvasToBlob(saveCanvas, 'image/png');
-            downloadBlob(blob, 'fuzzygraph_img.png');
+            // Convert canvas into an in-memory PNG file
+            const imgBlob = await canvasToBlob(saveCanvas, 'image/png');
+
+            // Embed graph config data into the PNG file (so it can be re-opened in FuzzyGraph)
+            var graphConfig = getAppConfig();
+            graphConfig['source'] = 'FuzzyGraph';
+            graphConfig['createdDate'] = new Date().toISOString().split('T')[0];
+            const imgBlobWithData = await addJsonITXtToPng(imgBlob, graphConfig);
+
+            downloadBlob(imgBlobWithData, 'fuzzygraph_img.png');
         }
+
+
+        // // // // // // // Open Logic
+        const pngInput  = document.getElementById('pngInput');
+        const uploadResult = document.getElementById('openResult');
+
+        // var configFromImage = {};
+        function loadGraphFromImage(configFromImage) {
+            if (configFromImage) {
+                setConfigFromObj(configFromImage);
+                // Close Open Modal
+                showOpenModal.set(false);
+                uploadResult.textContent = "";
+            }
+        }
+
+        pngInput.addEventListener('change', async () => {
+            const file = pngInput.files?.[0];
+            if (!file) return;
+            try {
+                const text = await readITXtByKeyword(file, "graphconfig");
+                let parsed;
+                try { parsed = JSON.parse(text); } catch {}
+                loadGraphFromImage(parsed);
+            } catch (err) {
+                uploadResult.textContent = "No FuzzyGraph config found";
+            }
+        });
+
+        /** Read iTXt chunk with a given keyword from a PNG Blob/ArrayBuffer. Returns UTF-8 text string. */
+        async function readITXtByKeyword(blobOrArrayBuffer, targetKeyword) {
+            const ab = blobOrArrayBuffer.arrayBuffer
+                        ? await blobOrArrayBuffer.arrayBuffer()
+                        : blobOrArrayBuffer;
+            const u8 = new Uint8Array(ab);
+
+            // --- PNG signature check ---
+            const sig = [137,80,78,71,13,10,26,10];
+            for (let i = 0; i < 8; i++) if (u8[i] !== sig[i]) throw new Error("Not a PNG.");
+
+            // --- iterate chunks ---
+            let p = 8;
+            while (p + 8 <= u8.length) {
+                const len  = readU32(u8, p);
+                const type = strFrom4(u8, p + 4);
+                const dataStart = p + 8;
+                const dataEnd   = dataStart + len;
+                const next      = dataEnd + 4; // + CRC
+
+                if (dataEnd > u8.length || next > u8.length) break;
+
+                if (type === "iTXt") {
+                const maybe = await parseITXt(u8.subarray(dataStart, dataEnd), targetKeyword);
+                if (maybe != null) return maybe; // found it
+                }
+                if (type === "IEND") break;
+                p = next;
+            }
+            throw new Error(`No iTXt chunk with keyword "${targetKeyword}" found.`);
+        }
+
+        /** Parse an iTXt chunk and return the UTF-8 text if the keyword matches; else null. */
+        async function parseITXt(data, targetKeyword) {
+            // iTXt data layout:
+            // keyword\0 compressionFlag(1) compressionMethod(1)
+            // languageTag\0 translatedKeyword\0 text(UTF-8 or zlib-compressed UTF-8)
+            let off = 0;
+
+            const decLatin1 = new TextDecoder("latin1");
+            const decUTF8   = new TextDecoder("utf-8");
+
+            const key = readZ(data, off);               off = key.next;
+            const keyword = decLatin1.decode(key.bytes); // spec uses Latin-1 for keyword
+            if (keyword !== targetKeyword) return null;
+
+            const compressionFlag   = data[off++];
+            const compressionMethod = data[off++];
+            const lang = readZ(data, off);              off = lang.next; // languageTag (ignored)
+            const trkw = readZ(data, off);              off = trkw.next; // translated keyword (ignored)
+
+            let textBytes = data.subarray(off);
+
+            if (compressionFlag === 0) {
+                return decUTF8.decode(textBytes);
+            } else if (compressionFlag === 1 && compressionMethod === 0) {
+                // zlib-compressed UTF-8 text
+                const inflated = await inflateZlib(textBytes);
+                return decUTF8.decode(inflated);
+            } else {
+                throw new Error(`Unsupported iTXt compression (flag=${compressionFlag}, method=${compressionMethod}).`);
+            }
+        }
+
+        /** Inflate zlib bytes using the browser’s DecompressionStream when available (no libs). */
+        async function inflateZlib(bytes) {
+            if (typeof DecompressionStream === "function") {
+                // 'deflate' works for zlib-wrapped DEFLATE streams in modern Chromium/Firefox.
+                const ds = new DecompressionStream('deflate');
+                const stream = new Blob([bytes]).stream().pipeThrough(ds);
+                const buf = await new Response(stream).arrayBuffer();
+                return new Uint8Array(buf);
+            }
+            // Fallback: tell the caller they need a small library (e.g., pako) if their PNG uses compression.
+            throw new Error("Compressed iTXt requires DecompressionStream support or a small inflate library.");
+        }
+
+        /** Helpers */
+        function readU32(a, i) { return ((a[i]<<24) | (a[i+1]<<16) | (a[i+2]<<8) | a[i+3]) >>> 0; }
+        function strFrom4(a,i) { return String.fromCharCode(a[i],a[i+1],a[i+2],a[i+3]); }
+        function readZ(a, start) {
+            let i = start;
+            while (i < a.length && a[i] !== 0) i++;
+            return { bytes: a.subarray(start, i), next: i + 1 };
+        }
+
 
         document.getElementById('saveImageButton').addEventListener('click', async () => {
             saveImage();
@@ -765,6 +1041,7 @@
         // TOP MENU EVENTS
         showShareModal.listen((visible) => { document.getElementById('shareModal').classList.toggle('hidden', !visible); showURL(); });
         showHelpModal.listen((visible) => { document.getElementById('helpModal').classList.toggle('hidden', !visible); });
+        showOpenModal.listen((visible) => { document.getElementById('openModal').classList.toggle('hidden', !visible); });
         showSaveModal.listen((visible) => {
             document.getElementById('saveModal').classList.toggle('hidden', !visible);
             // Set default values in Save Modal form
@@ -783,6 +1060,7 @@
             if (event.key === 'Escape') {
                 showShareModal.set(false);
                 showSaveModal.set(false);
+                showOpenModal.set(false);
                 showHelpModal.set(false);
             }
         });
@@ -828,16 +1106,19 @@
         // Desktop menu buttons
         document.getElementById('showShareButton').addEventListener('click', () => { showShareModal.set(!showShareModal.get()); });
         document.getElementById('showSaveButton').addEventListener('click', () => { showSaveModal.set(!showSaveModal.get()); });
+        document.getElementById('showOpenButton').addEventListener('click', () => { showOpenModal.set(!showOpenModal.get()); });
         document.getElementById('showHelpButton').addEventListener('click', () => { showHelpModal.set(!showHelpModal.get()); });
 
         // Mobile menu buttons
         document.getElementById('mobileShowShareButton').addEventListener('click', () => { showShareModal.set(!showShareModal.get()); });
         document.getElementById('mobileShowSaveButton').addEventListener('click', () => { showSaveModal.set(!showSaveModal.get()); });
+        document.getElementById('mobileShowOpenButton').addEventListener('click', () => { showOpenModal.set(!showOpenModal.get()); });
         document.getElementById('mobileShowHelpButton').addEventListener('click', () => { showHelpModal.set(!showHelpModal.get()); });
 
         // Modal X buttons
         document.getElementById('shareModalX').addEventListener('click', () => { showShareModal.set(false); });
         document.getElementById('saveModalX').addEventListener('click', () => { showSaveModal.set(false); });
+        document.getElementById('openModalX').addEventListener('click', () => { showOpenModal.set(false); });
         document.getElementById('helpModalX').addEventListener('click', () => { showHelpModal.set(false); });
 
         // Mobile top menu
@@ -1228,6 +1509,34 @@
             return value;
         }
 
+        function setConfigFromObj(configObj) {
+            // Update stores
+            if (configObj['equation'] !== null && typeof configObj['equation'] !== 'undefined') {
+                equation.set(configObj['equation']);
+            }
+            if (configObj['fuzzyLevel'] !== null && typeof configObj['fuzzyLevel'] !== 'undefined') {
+                fuzzyLevel.set(configObj['fuzzyLevel']);
+            }
+            if (configObj['showAxes'] !== null && typeof configObj['showAxes'] !== 'undefined') {
+                showAxes.set(configObj['showAxes']);
+            }
+            if (configObj['colorMap'] !== null && typeof configObj['colorMap'] !== 'undefined') {
+                colorMap.set(configObj['colorMap']);
+            }
+            if (configObj['invertColor'] !== null && typeof configObj['invertColor'] !== 'undefined') {
+                invertColor.set(configObj['invertColor']);
+            }
+            if (configObj['xCenter'] !== null && typeof configObj['xCenter'] !== 'undefined') {
+                xCenter.set(configObj['xCenter']);
+            }
+            if (configObj['yCenter'] !== null && typeof configObj['yCenter'] !== 'undefined') {
+                yCenter.set(configObj['yCenter']);
+            }
+            if (configObj['yHeight'] !== null && typeof configObj['yHeight'] !== 'undefined') {
+                yHeight.set(configObj['yHeight']);
+            }
+        }
+
         function setParamsFromUrl() {
             const urlFragmentId = window.location.hash.substr(1);
             const appConfig = getAppConfig();
@@ -1243,31 +1552,7 @@
                 }
             }
 
-            // Update stores
-            if (configFromUrl['equation'] !== null && typeof configFromUrl['equation'] !== 'undefined') {
-                equation.set(configFromUrl['equation']);
-            }
-            if (configFromUrl['fuzzyLevel'] !== null && typeof configFromUrl['fuzzyLevel'] !== 'undefined') {
-                fuzzyLevel.set(configFromUrl['fuzzyLevel']);
-            }
-            if (configFromUrl['showAxes'] !== null && typeof configFromUrl['showAxes'] !== 'undefined') {
-                showAxes.set(configFromUrl['showAxes']);
-            }
-            if (configFromUrl['colorMap'] !== null && typeof configFromUrl['colorMap'] !== 'undefined') {
-                colorMap.set(configFromUrl['colorMap']);
-            }
-            if (configFromUrl['invertColor'] !== null && typeof configFromUrl['invertColor'] !== 'undefined') {
-                invertColor.set(configFromUrl['invertColor']);
-            }
-            if (configFromUrl['xCenter'] !== null && typeof configFromUrl['xCenter'] !== 'undefined') {
-                xCenter.set(configFromUrl['xCenter']);
-            }
-            if (configFromUrl['yCenter'] !== null && typeof configFromUrl['yCenter'] !== 'undefined') {
-                yCenter.set(configFromUrl['yCenter']);
-            }
-            if (configFromUrl['yHeight'] !== null && typeof configFromUrl['yHeight'] !== 'undefined') {
-                yHeight.set(configFromUrl['yHeight']);
-            }
+            setConfigFromObj(configFromUrl);
         }
 
         function setUrlFromParams() {
