@@ -211,6 +211,17 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 12H6" />
                     </svg>
                 </button>
+
+                <div class="mt-4">
+                    <button id="homeButton"
+                        class="p-1.5 bg-gray-800 bg-opacity-75 hover:bg-opacity-100 text-white rounded-lg shadow-lg transition-colors duration-200 flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 9.5l9-7 9 7M4 10v10a1 1 0 001 1h5V14h4v7h5a1 1 0 001-1V10" />
+                        </svg>
+                    </button>
+                </div>
+
             </div>
             <!-- Sidebar Show Button (Desktop) -->
             <button id="openControlPanelButton"
@@ -550,7 +561,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.18</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.19</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -860,7 +871,7 @@
             graphConfig['createdDate'] = new Date().toISOString().split('T')[0];
             const imgBlobWithData = await addJsonITXtToPng(imgBlob, graphConfig);
 
-            downloadBlob(imgBlobWithData, 'fuzzygraph_img.png');
+            downloadBlob(imgBlobWithData, 'fuzzygraph_image.png');
         }
 
 
@@ -1262,6 +1273,14 @@
             yHeight.set(yHeight.get() * ZOOM_RATE);
             scheduleRepaint();
         });
+        // Home
+        document.getElementById('homeButton').addEventListener('click', () => {
+            yHeight.set(6);
+            xCenter.set(0);
+            yCenter.set(0);
+            scheduleRepaint();
+        });
+
 
         // // // // // // // Drag and drop to pan
 
