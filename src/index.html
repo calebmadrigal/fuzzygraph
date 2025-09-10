@@ -561,7 +561,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.19</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.20</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -843,8 +843,17 @@
                 }
             }
 
+            function getFilenameWithTimestamp() {
+                const now = new Date();
+                const timestamp = now.getFullYear() + "-" +
+                    String(now.getMonth() + 1).padStart(2, '0') + "-" +
+                    String(now.getDate()).padStart(2, '0') + "_" +
+                    String(now.getHours()).padStart(2, '0') + "_" +
+                    String(now.getMinutes()).padStart(2, '0') + "_" +
+                    String(now.getSeconds()).padStart(2, '0');
 
-
+                return `fuzzygraph_${timestamp}.png`;
+            }
 
             // Helpers
             function downloadBlob(blob, filename) {
@@ -871,7 +880,8 @@
             graphConfig['createdDate'] = new Date().toISOString().split('T')[0];
             const imgBlobWithData = await addJsonITXtToPng(imgBlob, graphConfig);
 
-            downloadBlob(imgBlobWithData, 'fuzzygraph_image.png');
+            const filename = getFilenameWithTimestamp();
+            downloadBlob(imgBlobWithData, filename);
         }
 
 
