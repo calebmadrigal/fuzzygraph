@@ -561,7 +561,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.20</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.21</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1088,8 +1088,9 @@
 
         // Share logic
         function showURL() {
-            setUrlFromParams();
-            const shareURL = window.location.href;
+            // setUrlFromParams();
+            // const shareURL = window.location.href;
+            const shareURL = getShareUrl();
             document.getElementById('shareUrlInput').value = shareURL;
         }
 
@@ -1584,15 +1585,26 @@
             setConfigFromObj(configFromUrl);
         }
 
-        function setUrlFromParams() {
+        // function setUrlFromParams() {
+        //     const appConfig = getAppConfig();
+        //     const params = new URLSearchParams();
+        //     for (const [key, value] of Object.entries(appConfig)) {
+        //         const paramValue = Array.isArray(value) ? JSON.stringify(value) : value;
+        //         params.append(key, paramValue);
+        //     }
+        //     const hashStr = `#?${params.toString()}`;
+        //     window.location.hash = hashStr;
+        // }
+
+        function getShareUrl() {
             const appConfig = getAppConfig();
             const params = new URLSearchParams();
             for (const [key, value] of Object.entries(appConfig)) {
                 const paramValue = Array.isArray(value) ? JSON.stringify(value) : value;
                 params.append(key, paramValue);
             }
-            const hashStr = `#?${params.toString()}`;
-            window.location.hash = hashStr;
+            const paramStr = `?${params.toString()}`;
+            return `https://fuzzygraph.com/${paramStr}`;
         }
 
         setParamsFromUrl();
