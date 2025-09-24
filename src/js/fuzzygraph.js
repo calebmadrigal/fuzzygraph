@@ -82,12 +82,49 @@ function isPolarEquation(eq_str) {
   return polarRegex.test(cleanEq);
 }
 
+function isJsFunction(eq_str) {
+  if (typeof eq_str !== 'string') return false;
+
+  try {
+    // Try to create a function using the Function constructor
+    // Wrap the string in parentheses so it also works with arrow functions
+    const fn = new Function(`return (${eq_str});`)();
+    return typeof fn === 'function';
+  } catch (e) {
+    return false; // If it throws, it's not valid JS or not a function
+  }
+}
+
+// NOTE: This code brings the code from 1.05Mb to about 1.2Mb -
+// I'm guerssing because eval reduces tree shaking to some extent
+function getFunctionFromCode(jsCode) {
+  // Wrap the provided code and return the function object
+  // Get variable names and values
+  // const varNames = Object.keys(scopeVars);
+  // const varValues = Object.values(scopeVars);
+  // const wrapper = new Function(...varNames, `${jsCode}; return f;`);
+  // return wrapper();
+  return eval(`(function(){ ${jsCode}; return f; })()`);
+}
+
 export function parseEquationString(eq_str) {
   // If it is in polar coordinates, use the parsePolarEquationString
   if (isPolarEquation(eq_str)) {
     return parsePolarEquationString(eq_str);
   }
+  else if (isJsFunction(eq_str)) {
+    return getFunctionFromCode(eq_str);
+    // NOTE: a custom js function may be defined called "f", and it should take 2 params: x and y
+    // eval(eq_str);
+    // const f = new Function(eq_str);
+    // const exports = {};
+    // const wrapper = new Function('exports', `${eq_str}; for (const key in this) { 
+    //   if (typeof this[key] === 'function') return this[key]; 
+    // }`);
+    // return wrapper.call({}, exports);
+  }
 
+  // main path: parse and return function
   var split_result = eq_str.split("=");
   if (split_result.length != 2) {
     return null;
@@ -436,9 +473,19 @@ export function displayGraph(graphParams, canvasElem) {
       canvasHeight);
   const t2 = performance.now();
 
+  var minVal = pixelValues['min'];
+  var maxVal = pixelValues['max'];
+
+  if (graphParams['minOverride'] != null) {
+    minVal = graphParams['minOverride'];
+  }
+  if (graphParams['maxOverride'] != null) {
+    maxVal = graphParams['maxOverride'];
+  }
+
   displayFuzzyGraph(pixelValues['pixelValues'],
-      pixelValues['min'],
-      pixelValues['max'],
+      minVal,
+      maxVal,
       graphParams['fuzzyLevel'],
       graphParams['colorMap'],
       graphParams['invertColor'],
@@ -454,6 +501,7 @@ export function displayGraph(graphParams, canvasElem) {
   const elapsed1 = t2-t1;
   const elapsed2 = t3-t2;
 
-  return pixelValues['pixelValues'];
+  // return pixelValues['pixelValues'];
+  return pixelValues;
 }
 

@@ -249,6 +249,37 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19l7-7-7-7" />
                     </svg>
                 </button>
+
+                <div id="advancedModeToggle" class="hidden flex items-center gap-3 select-none mr-2">
+                    <!-- Dynamic Label -->
+                    <span id="modeLabel" class="text-xs">Basic</span>
+                  
+                    <!-- Switch -->
+                    <button
+                      id="modeToggle"
+                      type="button"
+                      role="switch"
+                      aria-checked="false"
+                      aria-labelledby="mode-label"
+                      class="relative inline-flex h-6 w-12 items-center bg-gray-300 transition-colors duration-200 
+                             focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 rounded-none"
+                    >
+                      <span class="sr-only">Toggle Basic/Advanced</span>
+                  
+                      <!-- Track border -->
+                      <span aria-hidden="true" class="absolute inset-0 border border-gray-500/50 pointer-events-none rounded-none"></span>
+                  
+                      <!-- Thumb -->
+                      <span
+                        id="modeThumb"
+                        class="pointer-events-none inline-block h-4 w-4 translate-x-1 bg-gray-700 transition-all duration-200 
+                               will-change-transform rounded-none shadow-md"
+                      ></span>
+                    </button>
+                </div>
+
+                
+
             </div>
             <!-- Sidebar Content -->
             <div class="p-4 flex flex-col space-y-8 max-h-[30vh] md:max-h-[calc(100vh-7rem)] overflow-y-auto">
@@ -317,15 +348,48 @@
                         </button>
                     </div>
 
-                    <div class="mt-16 text-center flex flex-col justify-end">
-                        <span>~ Built by <a href="https://gods.art"
-                                class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">
-                                Caleb Madrigal
-                            </a>
-                            ~</span>
+                </div>
+
+                <!-- Advanced Section -->
+                <div id="advancedSection" class="hidden">
+                    <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200">Advanced</h3>
+
+                    <!-- Min Override -->
+                    <div>
+                        <label for="width" class="block text-sm font-medium text-gray-600">Min Override (min: <span id="minDisplay" class="text-xs">0</span>)</label>
+                        <input 
+                            type="number" 
+                            id="minOverrideInput" 
+                            name="minOverrideInput" 
+                            min="0" 
+                            step="1" 
+                            class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                    </div>
+
+                    <!-- Max Override -->
+                    <div>
+                        <label for="width" class="block text-sm font-medium text-gray-600 mt-2">Max Override (max: <span id="maxDisplay" class="text-xs">0</span>)</label>
+                        <input 
+                            type="number" 
+                            id="maxOverrideInput" 
+                            name="maxOverrideInput" 
+                            min="0" 
+                            step="1" 
+                            class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
                     </div>
 
                 </div>
+
+                <div class="mt-16 text-center flex flex-col justify-end">
+                    <span>~ Built by <a href="https://gods.art"
+                            class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">
+                            Caleb Madrigal
+                        </a>
+                        ~</span>
+                </div>
+
 
             </div>
     </div>
@@ -561,7 +625,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.21</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.22</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -603,6 +667,14 @@
         const xCenter = atom(0);
         const yCenter = atom(0);
         const yHeight = atom(6);
+
+        // Advanced stuff
+        const advanced = atom(false);
+        const advancedMode = atom(false);
+        const minVal = atom(null);
+        const maxVal = atom(null);
+        const minOverride = atom(null);
+        const maxOverride = atom(null);
 
         const sidebarOpen = atom(true);
         const mobileMenuOpen = atom(false);
@@ -679,10 +751,18 @@
                     xCenter: xCenter.get(),
                     yCenter: yCenter.get(),
                     yHeight: yHeight.get(),
-                    showAxes: showAxes.get()
+                    showAxes: showAxes.get(),
+                    minOverride: minOverride.get(),
+                    maxOverride: maxOverride.get()
                 };
 
-                const pixelValuesNew = displayGraph(graphConfig, canvas);
+                const graphResult = displayGraph(graphConfig, canvas);
+                const pixelValuesNew = graphResult['pixelValues']
+                const minV = graphResult['min'];
+                const maxV = graphResult['max'];
+                minVal.set(minV);
+                maxVal.set(maxV);
+                
                 stopLoading();
                 pixelValuesStore.set(pixelValuesNew);
                 // hoverMsg.set('');
@@ -708,7 +788,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph.html';
+            a.download = 'FuzzyGraph_v1.0.22.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -998,10 +1078,113 @@
             return { bytes: a.subarray(start, i), next: i + 1 };
         }
 
+        function formatNumber(num) {
+            if (num == null) { return ''; }
+
+             // Handle very small numbers like 8.88e-16
+            if (Math.abs(num) < 0.0001 || Math.abs(num) >= 1000000) {
+                return num.toExponential(2); // e.g., "8.88e-16"
+            }
+
+            // Otherwise, use fixed decimal, trimmed
+            let str = num.toFixed(6);      // up to 6 decimals
+            str = str.replace(/\.?0+$/, ''); // strip trailing zeros
+            return str.length > 8 ? str.slice(0, 8) : str;
+        }
+
+        minVal.subscribe((minV) => {
+            document.getElementById('minDisplay').textContent = formatNumber(minV);
+            if (minOverride.get() == null || minOverride.get() == '') {
+                minOverride.set(minV);
+            }
+        });
+
+        maxVal.subscribe((maxV) => {
+            document.getElementById('maxDisplay').textContent = formatNumber(maxV);
+            if (maxOverride.get() == null || maxOverride.get() == '') {
+                maxOverride.set(maxV);
+            }
+        });
+
+        minOverride.subscribe((minO) => {
+            document.getElementById('minOverrideInput').value = minO;
+            scheduleRepaint();
+        });
+
+        maxOverride.subscribe((maxO) => {
+            document.getElementById('maxOverrideInput').value = maxO;
+            scheduleRepaint();
+        });
+
+        document.getElementById('minOverrideInput').addEventListener('input', (event) => {
+            minOverride.set(event.target.value);
+        });
+
+        document.getElementById('maxOverrideInput').addEventListener('input', (event) => {
+            maxOverride.set(event.target.value);
+        });
 
         document.getElementById('saveImageButton').addEventListener('click', async () => {
             saveImage();
         });
+
+        advanced.subscribe((show) => {
+            if (show) {
+                document.getElementById('advancedModeToggle').classList.remove('hidden');
+            } else {
+                document.getElementById('advancedModeToggle').classList.add('hidden');
+            }
+        });
+
+        function setMode(advancedMode) {
+            const checked = advancedMode;
+            const btn = document.getElementById('modeToggle');
+            const thumb = document.getElementById('modeThumb');
+            const advancedSection = document.getElementById('advancedSection');
+            const label = document.getElementById('modeLabel');
+
+            btn.setAttribute('aria-checked', String(checked));
+
+            // Track and thumb color
+            if (checked) {
+                btn.classList.remove('bg-gray-300');
+                btn.classList.add('bg-gray-800');
+                thumb.classList.remove('bg-gray-700');
+                thumb.classList.add('bg-gray-500'); // slightly lighter so it stands out
+                advancedSection.classList.remove('hidden');
+                label.textContent = 'Advanced';
+            } else {
+                btn.classList.remove('bg-gray-800');
+                btn.classList.add('bg-gray-300');
+                thumb.classList.remove('bg-gray-500');
+                thumb.classList.add('bg-gray-700');
+                advancedSection.classList.add('hidden');
+                label.textContent = 'Basic';
+            }
+
+            // Thumb position
+            thumb.classList.toggle('translate-x-1', !checked);
+            thumb.classList.toggle('translate-x-7', checked);
+        }
+
+        function toggleMode() {
+            const nextMode = document.getElementById('modeToggle').getAttribute('aria-checked') !== 'true';
+            setMode(nextMode);
+        }
+
+        document.getElementById('modeToggle').addEventListener('click', toggleMode);
+
+
+        advancedMode.subscribe((checked) => {
+            // document.getElementById('saveAxesOnSlider').classList.remove('translate-x-6', 'translate-x-0');
+            // document.getElementById('saveAxesOnSlider').classList.add(show ? 'translate-x-6' : 'translate-x-0');
+
+            // document.getElementById('saveAxesToggle').classList.remove('bg-blue-600', 'bg-gray-200');
+            // document.getElementById('saveAxesToggle').classList.add(show ? 'bg-blue-600' : 'bg-gray-200');
+
+            setMode(checked);
+        });
+
 
         saveShowAxes.subscribe((show) => {
             document.getElementById('saveAxesOnSlider').classList.remove('translate-x-6', 'translate-x-0');
@@ -1230,8 +1413,7 @@
 
         // CONTROL PANEL / Color map
         function getColorMapList() {
-            // TODO: Rename the js-matplotlib data to be something other than "data"?
-            // var colorMapList = Object.keys(data);
+            // TODO: CUSTOM item which opens a textarea for js code function color(value, min, max)
             var colorMapList = Object.keys(js_colormaps_data);
             return colorMapList;
         }
@@ -1493,7 +1675,11 @@
                 xCenter: xCenter.get(),
                 yCenter: yCenter.get(),
                 yHeight: yHeight.get(),
-                showAxes: showAxes.get()
+                showAxes: showAxes.get(),
+                advancedMode: advancedMode.get(),
+                advanced: advanced.get(),
+                minOverride: minOverride.get(),
+                maxOverride: maxOverride.get()
             };
             return graphConfig;
         }
@@ -1565,6 +1751,18 @@
             if (configObj['yHeight'] !== null && typeof configObj['yHeight'] !== 'undefined') {
                 yHeight.set(configObj['yHeight']);
             }
+            if (configObj['advanced'] != null && typeof configObj['advanced'] !== 'undefined') {
+                advanced.set(configObj['advanced']);
+            }
+            if (configObj['advancedMode'] != null && typeof configObj['advancedMode'] !== 'undefined') {
+                advancedMode.set(configObj['advancedMode']);
+            }
+            if (configObj['minOverride'] != null && typeof configObj['minOverride'] !== 'undefined') {
+                advancedMode.set(configObj['minOverride']);
+            }
+            if (configObj['maxOverride'] != null && typeof configObj['maxOverride'] !== 'undefined') {
+                advancedMode.set(configObj['maxOverride']);
+            }
         }
 
         function setParamsFromUrl() {
@@ -1600,6 +1798,9 @@
             const appConfig = getAppConfig();
             const params = new URLSearchParams();
             for (const [key, value] of Object.entries(appConfig)) {
+                if (['advanced', 'advancedMode'].includes(key) && value == false) {
+                    continue;
+                }
                 const paramValue = Array.isArray(value) ? JSON.stringify(value) : value;
                 params.append(key, paramValue);
             }
