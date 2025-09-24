@@ -625,7 +625,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.22</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.23</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -788,7 +788,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v1.0.22.html';
+            a.download = 'FuzzyGraph_v1.0.23.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -828,10 +828,6 @@
             }
 
             const ctx = saveCanvas.getContext('2d');
-
-
-
-
 
             // Logic to embed graph config data into the generated png file
             // Add a JSON object as UTF-8 iTXt metadata to a PNG Blob.
@@ -956,8 +952,19 @@
 
             // Embed graph config data into the PNG file (so it can be re-opened in FuzzyGraph)
             var graphConfig = getAppConfig();
+
+            // Don't add advanced stuff if not in advanced mode
+            if (!graphConfig['advancedMode']) {
+                delete graphConfig['advancedMode'];
+                delete graphConfig['advanced'];
+                delete graphConfig['minOverride'];
+                delete graphConfig['maxOverride'];
+            }
+
+            // Add some metadata
             graphConfig['source'] = 'FuzzyGraph';
             graphConfig['createdDate'] = new Date().toISOString().split('T')[0];
+
             const imgBlobWithData = await addJsonITXtToPng(imgBlob, graphConfig);
 
             const filename = getFilenameWithTimestamp();
@@ -1169,19 +1176,13 @@
 
         function toggleMode() {
             const nextMode = document.getElementById('modeToggle').getAttribute('aria-checked') !== 'true';
-            setMode(nextMode);
+            advancedMode.set(nextMode);
         }
 
         document.getElementById('modeToggle').addEventListener('click', toggleMode);
 
 
         advancedMode.subscribe((checked) => {
-            // document.getElementById('saveAxesOnSlider').classList.remove('translate-x-6', 'translate-x-0');
-            // document.getElementById('saveAxesOnSlider').classList.add(show ? 'translate-x-6' : 'translate-x-0');
-
-            // document.getElementById('saveAxesToggle').classList.remove('bg-blue-600', 'bg-gray-200');
-            // document.getElementById('saveAxesToggle').classList.add(show ? 'bg-blue-600' : 'bg-gray-200');
-
             setMode(checked);
         });
 
@@ -1681,6 +1682,7 @@
                 minOverride: minOverride.get(),
                 maxOverride: maxOverride.get()
             };
+
             return graphConfig;
         }
 
@@ -1783,24 +1785,19 @@
             setConfigFromObj(configFromUrl);
         }
 
-        // function setUrlFromParams() {
-        //     const appConfig = getAppConfig();
-        //     const params = new URLSearchParams();
-        //     for (const [key, value] of Object.entries(appConfig)) {
-        //         const paramValue = Array.isArray(value) ? JSON.stringify(value) : value;
-        //         params.append(key, paramValue);
-        //     }
-        //     const hashStr = `#?${params.toString()}`;
-        //     window.location.hash = hashStr;
-        // }
-
         function getShareUrl() {
-            const appConfig = getAppConfig();
+            var appConfig = getAppConfig();
+
+            // Don't add advanced stuff if not in advanced mode
+            if (!appConfig['advancedMode']) {
+                delete appConfig['advancedMode'];
+                delete appConfig['advanced'];
+                delete appConfig['minOverride'];
+                delete appConfig['maxOverride'];
+            }
+
             const params = new URLSearchParams();
             for (const [key, value] of Object.entries(appConfig)) {
-                if (['advanced', 'advancedMode'].includes(key) && value == false) {
-                    continue;
-                }
                 const paramValue = Array.isArray(value) ? JSON.stringify(value) : value;
                 params.append(key, paramValue);
             }
