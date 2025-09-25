@@ -286,12 +286,22 @@
                 <!-- Equation Section -->
                 <div>
                     <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200">Equation</h3>
-                    <div class="space-y-2">
+
+                    <div style="position:relative; max-width:100%;">
                         <textarea id="equationInput" class="w-full h-16 p-2 border border-gray-300 rounded-md resize-y"
                             oninput="this.value=this.value.toLowerCase()" autocapitalize="off" spellcheck="false"
                             placeholder="y=x">
                         </textarea>
+
+                        <button id="mathBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="mathPopover"
+                        title="Math functions (⌘/Ctrl+K)"
+                        class="m-1"
+                        style="position:absolute; right:6px; bottom:6px; height:20px; width:20px; border-radius:4px; 
+                                border:0px; background:#fff; cursor:pointer; font-size:18px; line-height:1; padding:0;">
+                        +
+                        </button>
                     </div>
+
                 </div>
 
                 <!-- Controls Section -->
@@ -625,7 +635,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.23</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.24</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -640,6 +650,88 @@
                     class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">Caleb Madrigal</a>.</p>
         </div>
     </div>
+
+    <!-- Math Input Popover -->
+    <div id="mathPopover" role="dialog" aria-label="Insert math"
+        style="position:absolute; top:100%; right:0; margin-top:6px; z-index:1000; max-width:min(560px, 96vw);
+                                                background:#fff; border:1px solid #ddd; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.12); padding:10px; display:none;">
+        <div style="display:flex; gap:6px; align-items:center; margin-bottom:8px;">
+            <input id="mathFilter" type="text" placeholder="Filter (e.g., sin, sqrt, log)…"
+                style="flex:1; padding:8px 10px; border:1px solid #ddd; border-radius:8px; font-size:14px;">
+            <button id="closePopover" type="button" aria-label="Close"
+                style="height:32px; width:32px; border-radius:8px; border:1px solid #ddd; background:#fff; cursor:pointer;">✕</button>
+        </div>
+
+        <!-- Action grid: now with top-row keys -->
+        <div id="fnGrid"
+            style="display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:6px; max-height:320px; overflow:auto;">
+            <!-- Top row: basic variable and operator keys -->
+            <button class="fn" data-insert="x" title="x">x</button>
+            <button class="fn" data-insert="y" title="y">y</button>
+            <button class="fn" data-insert="=" title="equals">=</button>
+            <button class="fn" data-insert="+" title="plus">+</button>
+            <button class="fn" data-insert="-" title="minus">−</button>
+            <button class="fn" data-insert="*" title="multiply">*</button>
+            <button class="fn" data-insert="/" title="divide">/</button>
+            <button class="fn" data-wrap-start="sqrt(" data-wrap-end=")" title="sqrt(x)">√(·)</button>
+            <button class="fn" data-insert="^2" title="square">^2</button>
+            <button class="fn" data-insert="^3" title="cube">^3</button>
+            <button class="fn" data-insert="^" title="power">x^y</button>
+
+            <!-- Trigonometric -->
+            <button class="fn" data-wrap-start="sin(" data-wrap-end=")" title="sin(x)">sin(·)</button>
+            <button class="fn" data-wrap-start="cos(" data-wrap-end=")" title="cos(x)">cos(·)</button>
+            <button class="fn" data-wrap-start="tan(" data-wrap-end=")" title="tan(x)">tan(·)</button>
+            <button class="fn" data-wrap-start="asin(" data-wrap-end=")" title="asin(x)">asin(·)</button>
+            <button class="fn" data-wrap-start="acos(" data-wrap-end=")" title="acos(x)">acos(·)</button>
+            <button class="fn" data-wrap-start="atan(" data-wrap-end=")" title="atan(x)">atan(·)</button>
+            <button class="fn" data-wrap-start="atan2(" data-wrap-end=", y)" title="atan2(x, y)">atan2(·,y)</button>
+
+            <!-- Hyperbolic -->
+            <button class="fn" data-wrap-start="sinh(" data-wrap-end=")" title="sinh(x)">sinh(·)</button>
+            <button class="fn" data-wrap-start="cosh(" data-wrap-end=")" title="cosh(x)">cosh(·)</button>
+            <button class="fn" data-wrap-start="tanh(" data-wrap-end=")" title="tanh(x)">tanh(·)</button>
+            <button class="fn" data-wrap-start="asinh(" data-wrap-end=")" title="asinh(x)">asinh(·)</button>
+            <button class="fn" data-wrap-start="acosh(" data-wrap-end=")" title="acosh(x)">acosh(·)</button>
+            <button class="fn" data-wrap-start="atanh(" data-wrap-end=")" title="atanh(x)">atanh(·)</button>
+
+            <!-- Advanced Roots & powers -->
+            <button class="fn" data-wrap-start="pow(" data-wrap-end=", 2)" title="pow(x, 2)">pow(·,2)</button>
+            <button class="fn" data-wrap-start="pow(" data-wrap-end=", y)" title="pow(x, y)">pow(·,y)</button>
+            <button class="fn" data-wrap-start="hypot(" data-wrap-end=", y)" title="hypot(x, y)">hypot(·,y)</button>
+
+            <!-- Exponentials & logs -->
+            <button class="fn" data-wrap-start="exp(" data-wrap-end=")" title="e^x">exp(·)</button>
+            <button class="fn" data-wrap-start="log(" data-wrap-end=")" title="natural log">ln(·)</button>
+            <button class="fn" data-wrap-start="log10(" data-wrap-end=")" title="log base 10">log10(·)</button>
+            <button class="fn" data-wrap-start="log(" data-wrap-end=", 2)" title="log base 2">log(·,2)</button>
+            <button class="fn" data-wrap-start="log(" data-wrap-end=", 10)" title="log base 10 (alt)">log(·,10)</button>
+            <button class="fn" data-wrap-start="log(" data-wrap-end=", b)" title="log base b">log(·,b)</button>
+
+            <!-- Rounding / misc numeric -->
+            <button class="fn" data-wrap-start="round(" data-wrap-end=", 2)" title="round(x, 2)">round(·,2)</button>
+            <button class="fn" data-wrap-start="floor(" data-wrap-end=")" title="floor(x)">floor(·)</button>
+            <button class="fn" data-wrap-start="ceil(" data-wrap-end=")" title="ceil(x)">ceil(·)</button>
+            <button class="fn" data-wrap-start="sign(" data-wrap-end=")" title="sign(x)">sign(·)</button>
+            <button class="fn" data-wrap-start="abs(" data-wrap-end=")" title="abs(x)">abs(·)</button>
+            <button class="fn" data-wrap-start="min(" data-wrap-end=", 1)" title="min(x, 1)">min(·,1)</button>
+            <button class="fn" data-wrap-start="max(" data-wrap-end=", 1)" title="max(x, 1)">max(·,1)</button>
+
+            <!-- Constants & punctuation -->
+            <button class="fn" data-insert="pi" title="π">pi</button>
+            <button class="fn" data-insert="e" title="Euler’s number">e</button>
+            <button class="fn" data-insert="(" title="left paren">(</button>
+            <button class="fn" data-insert=")" title="right paren">)</button>
+            <button class="fn" data-insert="," title="comma">,</button>
+            <button class="fn" data-insert=" " title="space">␠</button>
+        </div>
+
+        <div style="font-size:12px; color:#666; margin-top:8px;">
+            Tip: Select text first to wrap it, or place the cursor to insert. Open with <kbd>Ctrl/⌘</kbd>+<kbd>K</kbd>,
+            close with <kbd>Esc</kbd>.
+        </div>
+    </div>
+    <!-- END of Math Input Popover -->
 
     <script>
         window.process = { env: { NODE_ENV: "development" } };
@@ -787,7 +879,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v1.0.23.html';
+            a.download = 'FuzzyGraph_v1.0.24.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1266,6 +1358,7 @@
                 showSaveModal.set(false);
                 showOpenModal.set(false);
                 showHelpModal.set(false);
+                closePopover();
             }
         });
 
@@ -1634,6 +1727,135 @@
         canvas.addEventListener('mouseleave', (event) => {
             if (isLoading.get()) return;  // Don't overwrite "Loading..." message
             document.getElementById('hoverMsgDiv').style.display = 'none';
+        });
+
+
+        // // // // // // // Math Input logic
+        const ta = document.getElementById('equationInput');
+        const btn = document.getElementById('mathBtn');
+        const pop = document.getElementById('mathPopover');
+        const grid = document.getElementById('fnGrid');
+        const filter = document.getElementById('mathFilter');
+        const closeBtn = document.getElementById('closePopover');
+
+        // Style function buttons
+        function styleFnButtons() {
+            grid.querySelectorAll('.fn').forEach(b => {
+            Object.assign(b.style, {
+                padding: '8px 10px',
+                border: '1px solid #ddd',
+                borderRadius: '8px',
+                background: '#fafafa',
+                cursor: 'pointer',
+                fontSize: '13px',
+                textAlign: 'center'
+            });
+            b.addEventListener('keydown', (e) => {
+                if ((e.key === 'Enter' || e.key === ' ') && !e.repeat) {
+                e.preventDefault();
+                b.click();
+                }
+            });
+            });
+        }
+        styleFnButtons();
+
+          /** Utility: position popover near button */
+      function positionPopover() {
+        const rect = btn.getBoundingClientRect();
+        const popWidth = pop.offsetWidth;
+        const popHeight = pop.offsetHeight;
+
+        // Try to align bottom-right of button with popover top-left
+        let left = rect.right - popWidth;
+        let top = rect.bottom + 6; // 6px gap
+
+        // Ensure it doesn't overflow viewport
+        left = Math.max(6, Math.min(left, window.innerWidth - popWidth - 6));
+        top = Math.max(6, Math.min(top, window.innerHeight - popHeight - 6));
+
+        pop.style.left = `${left}px`;
+        pop.style.top = `${top}px`;
+    }
+
+    function isOpen() { return pop.style.display === 'block'; }
+    function openPopover() {
+        pop.style.display = 'block';
+        pop.setAttribute('aria-hidden', 'false');
+        btn.setAttribute('aria-expanded', 'true');
+        positionPopover();
+        requestAnimationFrame(() => filter.focus());
+        window.addEventListener('resize', positionPopover);
+        window.addEventListener('scroll', positionPopover, true);
+        document.addEventListener('click', onClickOutside, { capture: true });
+    }
+
+    function closePopover() {
+        pop.style.display = 'none';
+        btn.setAttribute('aria-expanded', 'false');
+        document.removeEventListener('click', onClickOutside, { capture: true });
+        window.removeEventListener('resize', positionPopover);
+        window.removeEventListener('scroll', positionPopover, true);
+    }
+
+    function onClickOutside(e) {
+        if (!pop.contains(e.target) && e.target !== btn) closePopover();
+    }
+
+    // Toggle open/close
+    btn.addEventListener('click', () => (isOpen() ? closePopover() : openPopover()));
+    closeBtn.addEventListener('click', closePopover);
+
+    // Keyboard shortcut: Ctrl/⌘+K
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        isOpen() ? closePopover() : openPopover();
+        }
+    });
+
+    // Filter search
+    filter.addEventListener('input', () => {
+        const q = filter.value.trim().toLowerCase();
+        grid.querySelectorAll('.fn').forEach(b => {
+        const t = (b.textContent + ' ' + (b.title || '')).toLowerCase();
+        b.style.display = t.includes(q) ? '' : 'none';
+        });
+    });
+
+    // Insert logic
+    function insertOrWrap({ insert, wrapStart, wrapEnd }) {
+        const start = ta.selectionStart ?? 0;
+        const end = ta.selectionEnd ?? 0;
+        const hasSelection = start !== end;
+        let before = ta.value.slice(0, start);
+        let selected = ta.value.slice(start, end);
+        let after = ta.value.slice(end);
+
+        if (wrapStart != null && wrapEnd != null) {
+        const content = hasSelection ? selected : ' ';
+        ta.value = before + wrapStart + content + wrapEnd + after;
+        const cursorPos = before.length + wrapStart.length + (hasSelection ? content.length : 1);
+        ta.focus();
+        ta.setSelectionRange(cursorPos, cursorPos);
+        } else if (insert != null) {
+        ta.value = before + insert + after;
+        const cursorPos = before.length + insert.length;
+        ta.focus();
+        ta.setSelectionRange(cursorPos, cursorPos);
+        }
+        ta.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    grid.addEventListener('click', (e) => {
+        const b = e.target.closest('.fn');
+        if (!b) return;
+        insertOrWrap({
+        insert: b.getAttribute('data-insert'),
+        wrapStart: b.getAttribute('data-wrap-start'),
+        wrapEnd: b.getAttribute('data-wrap-end')
+        });
+        ta.focus();
         });
 
         // // // // // // // Initialization
