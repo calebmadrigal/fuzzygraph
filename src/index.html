@@ -635,7 +635,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.24</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.25</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -666,9 +666,10 @@
         <div id="fnGrid"
             style="display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:6px; max-height:320px; overflow:auto;">
             <!-- Top row: basic variable and operator keys -->
-            <button class="fn" data-insert="x" title="x">x</button>
+            <button class="fn" id="clearEquationBtn" title="C">CLEAR</button>
             <button class="fn" data-insert="y" title="y">y</button>
             <button class="fn" data-insert="=" title="equals">=</button>
+            <button class="fn" data-insert="x" title="x">x</button>
             <button class="fn" data-insert="+" title="plus">+</button>
             <button class="fn" data-insert="-" title="minus">−</button>
             <button class="fn" data-insert="*" title="multiply">*</button>
@@ -879,7 +880,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v1.0.24.html';
+            a.download = 'FuzzyGraph_v1.0.25.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1729,6 +1730,9 @@
             document.getElementById('hoverMsgDiv').style.display = 'none';
         });
 
+        document.getElementById('clearEquationBtn').addEventListener('click', () => {
+            equation.set('');
+        });
 
         // // // // // // // Math Input logic
         const ta = document.getElementById('equationInput');
