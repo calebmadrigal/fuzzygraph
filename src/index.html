@@ -647,7 +647,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.26</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.27</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -865,6 +865,17 @@
             };
         }
 
+        function getEquationErrorDetails(equationStr) {
+            if (!equationStr.includes('=')) {
+                return ' - equation must have an equals sign (=)'
+            } else if (!equationStr.includes('x') && !equationStr.includes('y') && !equationStr.includes('r')) {
+                return ' - equation should include x or y (probably both)'
+            }
+            else {
+                return '';
+            }
+        }
+
         function paintGraph() {
             // startLoading();
             const canvas = document.getElementById('mainCanvas');
@@ -899,7 +910,10 @@
                 // document.getElementById('hoverMsgDiv').style.display = 'none';
             } else {
                 document.getElementById('hoverMsgDiv').style.display = 'block';
-                hoverMsg.set('Equation is invalid');
+
+                // TODO: More particular message
+                const errorDetails = getEquationErrorDetails(equation.get());
+                hoverMsg.set('Equation is invalid' + errorDetails);
             }
         }
 
@@ -918,7 +932,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v1.0.26.html';
+            a.download = 'FuzzyGraph_v1.0.27.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
