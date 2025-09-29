@@ -318,7 +318,19 @@
 
                 <!-- Controls Section -->
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200">Controls</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200 flex items-center gap-1">
+                        <span>Controls</span>
+                        <button id="controlsHelpButton"
+                            class="text-gray-500 hover:text-blue-500 flex items-center p-1 rounded-md hover:bg-gray-100">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8.228 9c.549-1.165 2.03-2 3.772-2 
+                                2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907
+                                -.542.104-.994.54-.994 1.093m0 3h.01
+                                M12 21a9 9 0 110-18 9 9 0 010 18z" />
+                            </svg>
+                      </button>
+                    </h3>
                     <!-- Fuzzy Level Slider -->
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700">
@@ -343,7 +355,20 @@
 
                 <!-- Color Section -->
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200">Color Map</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200 flex items-center gap-1">
+                        <span>Color Map</span>
+                        <button id="colorMapHelpButton"
+                            class="text-gray-500 hover:text-blue-500 flex items-center p-1 rounded-md hover:bg-gray-100">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8.228 9c.549-1.165 2.03-2 3.772-2 
+                                2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907
+                                -.542.104-.994.54-.994 1.093m0 3h.01
+                                M12 21a9 9 0 110-18 9 9 0 010 18z" />
+                            </svg>
+                      </button>
+                    </h3>
+
                     <!-- Color Map Dropdown -->
                     <div class="relative inline-block max-w-full sm:w-64 w-full">
                         <select id="colorMapSelect" name="colors"
@@ -647,7 +672,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.28</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.30</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -664,7 +689,7 @@
     </div>
 
 
-    <!-- Share modal background -->
+    <!-- Equation help modal -->
     <div id="equationHelpModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
 
         <!-- Modal content -->
@@ -687,6 +712,56 @@
             </div>
         </div>
     </div>
+
+    <!-- Controls help modal -->
+    <div id="controlsHelpModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+
+        <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+
+            <!-- X button -->
+            <button id="controlsHelpModalX"
+                class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold focus:outline-none">
+                &times;
+            </button>
+
+            <h2 class="text-xl font-semibold mb-4">Controls Help</h2>
+            <div class="w-full max-w-md p-4">
+                <div>
+                    <h3 class="font-bold">Fuzzy Level</h3>
+                    <p>The <span class="font-mono bg-gray-100 text-gray-800 px-1 py-0.5 rounded">Fuzzy Level</span> expands or squishes the equation so that the peaks and valleys are closer together, or further a part. This has an effect on how the colors manifest.</p>
+                    <br />
+                    <h3 class="font-bold">Show Axes</h3>
+                    <p>Turns the X and Y axes on or off</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Color Map help modal -->
+    <div id="colorMapHelpModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+
+        <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+
+            <!-- X button -->
+            <button id="colorMapHelpModalX"
+                class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold focus:outline-none">
+                &times;
+            </button>
+
+            <h2 class="text-xl font-semibold mb-4">Color Map Help</h2>
+            <div class="w-full max-w-md p-4">
+                <div>
+                    <p>There are two parts: the data and the representation.</p>
+                    <br />
+                    <p>The Equation defines the data.</p>
+                    <p>The Color Map defines what values get mapped to which colors.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Math Input Popover -->
     <div id="mathPopover" role="dialog" aria-label="Insert math"
@@ -788,8 +863,8 @@
             ZOOM_RATE
         } from './js/fuzzygraph.js';
 
-        const equation = atom('x^2+y^2=2');
-        const fuzzyLevel = atom(90);
+        const equation = atom('y = x^2');
+        const fuzzyLevel = atom(80);
         const showAxes = atom(true);
         const colorMap = atom('plasma');
         const invertColor = atom(true);
@@ -817,6 +892,8 @@
         const showOpenModal = atom(false);
         const showHelpModal = atom(false);
         const showEquationHelpModal = atom(false);
+        const showControlsHelpModal = atom(false);
+        const showColorMapHelpModal = atom(false);
 
         // Save modal variables
         const saveWidth = atom(0);
@@ -932,7 +1009,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v1.0.28.html';
+            a.download = 'FuzzyGraph_v1.0.30.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1404,7 +1481,6 @@
                 saveDefaultConfig.set(true);
             }
         });
-        showEquationHelpModal.listen((visible) => { document.getElementById('equationHelpModal').classList.toggle('hidden', !visible); });
 
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Escape') {
@@ -1413,6 +1489,8 @@
                 showOpenModal.set(false);
                 showHelpModal.set(false);
                 showEquationHelpModal.set(false);
+                showControlsHelpModal.set(false);
+                showColorMapHelpModal.set(false);
                 closePopover();
             }
         });
@@ -1529,10 +1607,12 @@
             scheduleRepaint();
         });
 
+        // CONTROL PANEL / Equation / Help
         document.getElementById('equationInput').addEventListener('input', (event) => {
             equation.set(event.target.value);
         });
 
+        showEquationHelpModal.listen((visible) => { document.getElementById('equationHelpModal').classList.toggle('hidden', !visible); });
         document.getElementById('equationHelpButton').addEventListener('click', () => { showEquationHelpModal.set(!showEquationHelpModal.get()); });
         document.getElementById('equationHelpModalX').addEventListener('click', () => { showEquationHelpModal.set(false); });
 
@@ -1545,6 +1625,11 @@
         document.getElementById('fuzzyInput').addEventListener('input', (event) => {
             fuzzyLevel.set(event.target.value);
         });
+
+        // CONTROL PANEL / Controls Help
+        showControlsHelpModal.listen((visible) => { document.getElementById('controlsHelpModal').classList.toggle('hidden', !visible); });
+        document.getElementById('controlsHelpButton').addEventListener('click', () => { showControlsHelpModal.set(!showControlsHelpModal.get()); });
+        document.getElementById('controlsHelpModalX').addEventListener('click', () => { showControlsHelpModal.set(false); });
 
         // CONTROL PANEL / Show Axes
         showAxes.subscribe((show) => {
@@ -1606,6 +1691,10 @@
             scheduleRepaint();
         });
 
+        // CONTROL PANEL / Color Map Help
+        showColorMapHelpModal.listen((visible) => { document.getElementById('colorMapHelpModal').classList.toggle('hidden', !visible); });
+        document.getElementById('colorMapHelpButton').addEventListener('click', () => { showColorMapHelpModal.set(!showColorMapHelpModal.get()); });
+        document.getElementById('colorMapHelpModalX').addEventListener('click', () => { showColorMapHelpModal.set(false); });
 
         // Zoom In
         document.getElementById('zoomInButton').addEventListener('click', () => {
