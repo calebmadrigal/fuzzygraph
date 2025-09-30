@@ -68,29 +68,45 @@
 <body class="min-h-screen">
     <!-- Header -->
     <header class="bg-gray-800 text-white h-16 fixed w-full top-0 left-0 z-50">
-        <div class="flex items-center justify-between h-full px-4">
+        <div class="flex items-center justify-between h-full">
             <div class="flex items-center">
 
                 <!-- Logo -->
-                <div class="h-fit flex gap-2">
-                    <div>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="68.92mm" height="12.21mm" viewBox="0 0 69.92 12.21"
-                        preserveAspectRatio="xMidYMid meet" class="w-full h-full">
-                        <text x="0.42" y="8.78" font-family="Arial Black" font-size="10.58" stroke="white" fill="white"
-                            stroke-width="0.26" style="filter: blur(0.5px);">Fuzzy</text>
-                        <text x="34.83" y="8.86" font-family="Arial Black" font-size="10.58" stroke="white" fill="white"
-                            stroke-width="0.26">Graph</text>
-                    </svg>
+                <div class="h-fit flex">
+                    <div class="ml-2">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                             width="70mm" height="15mm" viewBox="0 0 70 15"
+                             preserveAspectRatio="xMidYMid meet" class="w-full h-full">
+
+                            <defs>
+                                <filter id="fg-blur" x="-20%" y="-20%" width="140%" height="140%">
+                                <feGaussianBlur in="SourceGraphic" stdDeviation="1.0"/>
+                                </filter>
+                            </defs>
+
+                            <text x="2" y="10" font-family="Arial Black" font-size="9"
+                                    stroke="white" fill="white" stroke-width="0.26"
+                                    filter="url(#fg-blur)" opacity="1">
+                                <tspan>Fuzzy</tspan>
+                                <tspan dx="0.8">Graph</tspan>
+                            </text>
+
+                            <text x="2" y="10" font-family="Arial Black" font-size="9"
+                                    stroke="white" fill="white" stroke-width="0.26">
+                                <tspan>Fuzzy</tspan>
+                                <tspan dx="0.8">Graph</tspan>
+                            </text>
+                        </svg>
                     </div>
 
                     <div>
-                    <button id="downloadFuzzyGraphBtn" data-tooltip="Download offline copy of FuzzyGraph"
-                    class="hidden md:flex text-white hover:bg-gray-700 items-center px-1 py-3 rounded tooltip-button">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                        </svg>
-                    </button>
+                        <button id="downloadFuzzyGraphBtn" data-tooltip="Download offline copy of FuzzyGraph"
+                        class="hidden md:flex text-white hover:bg-gray-700 items-center py-3 rounded tooltip-button h-14">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                            </svg>
+                        </button>
                     </div>
                 </div>
 
@@ -139,7 +155,7 @@
                 </nav>
 
                 <!-- Mobile menu button -->
-                <button id="mobileMenuButton" class="md:hidden p-2">
+                <button id="mobileMenuButton" class="md:hidden p-2 mr-2">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M4 6h16M4 12h16M4 18h16" />
@@ -155,13 +171,13 @@
             x-transition:leave="transition ease-in duration-150"
             x-transition:leave-start="opacity-100 transform translate-y-0"
             x-transition:leave-end="opacity-0 transform -translate-y-2"
-            class="hidden absolute top-16 right-0 w-48 bg-gray-800 shadow-lg md:hidden rounded-bl-lg">
+            class="hidden absolute top-16 right-0 w-32 bg-gray-800 shadow-lg md:hidden rounded-bl-lg">
             <div class="px-2 py-3 space-y-2">
 
                 <button id="mobileShowShareButton"
                     class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded">
-                    <span class="inline text-gray-200">Share</span>
-                    <svg class="w-5 h-5" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+                    <span class="inline text-gray-200 w-12">Share</span>
+                    <svg class="w-5 h-5 block" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
                         <path style="fill: none; stroke: rgb(255, 255, 255); stroke-linecap: round; stroke-width: 40px;" d="M 71.335 351.263 C 71.335 351.263 220.824 546.123 425.655 354.919" id="object-0"/>
                         <path style="fill: none; stroke: rgb(255, 255, 255); stroke-linecap: round; stroke-width: 40px;" d="M 244.441 337.303 L 247.495 57.542" id="object-1"/>
                         <path style="fill: none; stroke: rgb(255, 255, 255); stroke-linecap: round; stroke-width: 40px;" d="M 245.927 57.667 C 245.927 57.667 233.676 153.919 163.023 157.325" id="object-2"/>
@@ -171,8 +187,8 @@
 
                 <button id="mobileShowSaveButton"
                     class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded">
-                    <span class="inline text-gray-200">Save</span>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <span class="inline text-gray-200 w-12">Save</span>
+                    <svg class="w-5 h-5 block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                     </svg>
@@ -180,16 +196,16 @@
 
                 <button id="mobileShowOpenButton"
                     class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded">
-                    <span class="inline text-gray-200">Open</span>
-                    <svg width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <span class="inline text-gray-200 w-12">Open</span>
+                    <svg class="w-5 h-5 block" width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M20 6H12L10 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6ZM20 18H4V6H9.17L11.17 8H20V18Z" fill="#000000"/>
                     </svg>
                 </button>
 
                 <button id="mobileShowHelpButton"
                     class="w-full text-white hover:bg-gray-700 flex items-center space-x-2 px-3 py-2 rounded">
-                    <span class="inline text-gray-200">Help</span>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <span class="inline text-gray-200 w-12">Help</span>
+                    <svg class="w-5 h-5 block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M12 21a9 9 0 110-18 9 9 0 010 18z" />
                     </svg>
@@ -679,7 +695,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.31</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.33</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1016,7 +1032,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v1.0.31.html';
+            a.download = 'FuzzyGraph_v1.0.33.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
