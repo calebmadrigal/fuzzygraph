@@ -9,6 +9,12 @@
     </style>
 
     <style>
+        html, body {
+              height: 100%;
+              overflow: hidden;             /* stop page scroll */
+              overscroll-behavior: none;    /* stop pull-to-refresh/bounce */
+        }
+
         #mainCanvas {
             touch-action: none;
             /* Prevents default touch behaviors like scrolling to allow pan. */
@@ -194,7 +200,8 @@
     </header>
 
     <!-- Main Container -->
-    <div class="flex flex-col md:flex-row pt-16 bg-gray-300">
+    <!-- <div class="flex flex-col md:flex-row pt-16 bg-gray-300"> -->
+    <div class="fixed inset-x-0 top-16 bottom-0 flex flex-col md:flex-row bg-gray-300">
         <!-- Main Content -->
         <main id="overCanvasControls" class="flex-1 order-1 md:order-2 transition-all duration-300 relative">
             <div class="absolute top-4 right-4 z-10 flex flex-col gap-0.5">
@@ -672,7 +679,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.30</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.31</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -756,7 +763,7 @@
                     <p>There are two parts: the data and the representation.</p>
                     <br />
                     <p>The Equation defines the data.</p>
-                    <p>The Color Map defines what values get mapped to which colors.</p>
+                    <p>The Color Map defines which colors.</p>
                 </div>
             </div>
         </div>
@@ -1009,7 +1016,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v1.0.30.html';
+            a.download = 'FuzzyGraph_v1.0.31.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
