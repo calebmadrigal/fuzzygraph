@@ -115,8 +115,8 @@
                 <!-- Desktop Navigation -->
                 <nav class="hidden md:!flex space-x-4">
 
-                    <button id="showShareButton"
-                        class="text-white hover:text-blue-200 flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700">
+                    <button id="showShareButton" data-tooltip="Generates a shareable link to this graph"
+                        class="text-white hover:text-blue-200 flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700 tooltip-button">
                         <span class="inline text-gray-200 hover:text-gray-300">Share</span>
                         <svg class="w-5 h-5" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
                             <path style="fill: none; stroke: rgb(255, 255, 255); stroke-linecap: round; stroke-width: 40px;" d="M 71.335 351.263 C 71.335 351.263 220.824 546.123 425.655 354.919" id="object-0"/>
@@ -126,8 +126,8 @@
                         </svg>
                     </button>
 
-                    <button id="showSaveButton"
-                        class="text-white hover:text-blue-200 flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700">
+                    <button id="showSaveButton" data-tooltip="Saves this graph as an image file with the graph data built in"
+                        class="text-white hover:text-blue-200 flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700 tooltip-button">
                         <span class="inline text-gray-200">Save</span>
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -135,8 +135,8 @@
                         </svg>
                     </button>
 
-                    <button id="showOpenButton"
-                        class="text-white hover:text-blue-200 flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700">
+                    <button id="showOpenButton" data-tooltip="Only opens FuzzyGraph-created image files"
+                        class="text-white hover:text-blue-200 flex items-center space-x-2 px-3 py-2 rounded-md hover:bg-gray-700 tooltip-button">
                         <span class="inline text-gray-200">Open</span>
                         <svg width="24" height="24" viewBox="0 0 24 24" stroke="currentColor" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M20 6H12L10 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V8C22 6.9 21.1 6 20 6ZM20 18H4V6H9.17L11.17 8H20V18Z" fill="#000000"/>
@@ -695,7 +695,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.34</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.35</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1032,7 +1032,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v1.0.34.html';
+            a.download = 'FuzzyGraph_v1.0.35.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
