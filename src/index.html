@@ -695,7 +695,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.33</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.34</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -886,7 +886,7 @@
             ZOOM_RATE
         } from './js/fuzzygraph.js';
 
-        const equation = atom('y = x^2');
+        const equation = atom('y = x^2 - 1');
         const fuzzyLevel = atom(80);
         const showAxes = atom(true);
         const colorMap = atom('plasma');
@@ -1032,7 +1032,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v1.0.33.html';
+            a.download = 'FuzzyGraph_v1.0.34.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
