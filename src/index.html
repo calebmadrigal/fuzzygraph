@@ -695,7 +695,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.35</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.36</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1032,7 +1032,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v1.0.35.html';
+            a.download = 'FuzzyGraph_v1.0.36.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1065,6 +1065,8 @@
                     xCenter: parseFloat(saveCenterX.get()),
                     yCenter: parseFloat(saveCenterY.get()),
                     yHeight: parseFloat(saveYHeight.get()),
+                    minOverride: minVal.get(),
+                    maxOverride: maxVal.get(),
                     showAxes: saveShowAxes.get()
                 };
 
@@ -1367,6 +1369,11 @@
             scheduleRepaint();
         });
 
+        function clearMinAndMaxOverrides() {
+            minOverride.set(null);
+            maxOverride.set(null);
+        }
+
         document.getElementById('minOverrideInput').addEventListener('input', (event) => {
             minOverride.set(event.target.value);
         });
@@ -1627,6 +1634,12 @@
         // CONTROL PANEL / Equation
         equation.subscribe((eq) => {
             document.getElementById('equationInput').value = eq;
+
+            // If not in advancd mode, clear the min and max overrides when the equation changes
+            if (!advancedMode.get()) {
+                clearMinAndMaxOverrides();
+            }
+
             scheduleRepaint();
         });
 
@@ -1722,11 +1735,25 @@
         // Zoom In
         document.getElementById('zoomInButton').addEventListener('click', () => {
             yHeight.set(yHeight.get() * (1 / ZOOM_RATE));
+
+            // If not in advancedMode, clear min and max overrides on zoom. The reason is because
+            // the window changes, so the min and max values can change drastically.
+            if (!advancedMode.get()) {
+                clearMinAndMaxOverrides();
+            }
+
             scheduleRepaint();
         });
         // Zoom Out
         document.getElementById('zoomOutButton').addEventListener('click', () => {
             yHeight.set(yHeight.get() * ZOOM_RATE);
+
+            // If not in advancedMode, clear min and max overrides on zoom. The reason is because
+            // the window changes, so the min and max values can change drastically.
+            if (!advancedMode.get()) {
+                clearMinAndMaxOverrides();
+            }
+
             scheduleRepaint();
         });
         // Home
@@ -2154,10 +2181,10 @@
                 advancedMode.set(configObj['advancedMode']);
             }
             if (configObj['minOverride'] != null && typeof configObj['minOverride'] !== 'undefined') {
-                advancedMode.set(configObj['minOverride']);
+                minOverride.set(configObj['minOverride']);
             }
             if (configObj['maxOverride'] != null && typeof configObj['maxOverride'] !== 'undefined') {
-                advancedMode.set(configObj['maxOverride']);
+                maxOverride.set(configObj['maxOverride']);
             }
         }
 
@@ -2189,6 +2216,9 @@
                 delete appConfig['minOverride'];
                 delete appConfig['maxOverride'];
             }
+
+            appConfig['minOverride'] = minVal.get();
+            appConfig['maxOverride'] = maxVal.get();
 
             const params = new URLSearchParams();
             for (const [key, value] of Object.entries(appConfig)) {
