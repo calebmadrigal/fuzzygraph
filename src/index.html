@@ -695,7 +695,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.37</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.38</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -779,7 +779,7 @@
                     <p>There are two parts: the <span class="font-bold">data</span> and the <span class="font-bold">representation</span>.</p>
                     <br />
                     <p><span class="font-bold">The Equation</span> defines the data.</p>
-                    <p><span class="font-bold">The Color Map</span> defines which colors map to which values. For example, in the <span class="font-mono bg-gray-100 text-gray-800 px-1 py-0.5 rounded">rainbow</span> color map, the lowest value would map to <span class="italic">purple</span>, and the highest value would map to <span class="italic">red</span>.</p>
+                    <p><span class="font-bold">The Color Map</span> defines which values map to which colors. For example, in the <span class="font-mono bg-gray-100 text-gray-800 px-1 py-0.5 rounded">rainbow</span> color map, the lowest value would map to <span class="text-purple-500">purple</span>, and the highest value would map to <span class="text-red-500">red</span>. If <span class="font-bold">Invert Color</span> is on, then the lowest value would map to <span class="text-red-500">red</span> and the highest value would map to <span class="text-purple-500">purple</span>.</p>
                     <br />
                     <p>The same equation/data can be rendered in many different ways.</p>
                 </div>
@@ -1034,7 +1034,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v1.0.37.html';
+            a.download = 'FuzzyGraph_v1.0.38.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
