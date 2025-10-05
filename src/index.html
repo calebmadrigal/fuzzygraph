@@ -695,7 +695,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.36</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.37</h2>
             <p>FuzzyGraph is the world's first non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -752,10 +752,10 @@
             <div class="w-full max-w-md p-4">
                 <div>
                     <h3 class="font-bold">Fuzzy Level</h3>
-                    <p>The <span class="font-mono bg-gray-100 text-gray-800 px-1 py-0.5 rounded">Fuzzy Level</span> expands or squishes the equation so that the peaks and valleys are closer together, or further a part. This has an effect on how the colors manifest.</p>
+                    <p>The <span class="font-mono bg-gray-100 text-gray-800 px-1 py-0.5 rounded">Fuzzy Level</span> expands or squishes the equation so that the peaks and valleys are closer together, or further apart. This has an effect on how the colors manifest.</p>
                     <br />
                     <h3 class="font-bold">Show Axes</h3>
-                    <p>Turns the X and Y axes on or off</p>
+                    <p>Turns the X and Y Axes on or off</p>
                 </div>
             </div>
         </div>
@@ -776,10 +776,12 @@
             <h2 class="text-xl font-semibold mb-4">Color Map Help</h2>
             <div class="w-full max-w-md p-4">
                 <div>
-                    <p>There are two parts: the data and the representation.</p>
+                    <p>There are two parts: the <span class="font-bold">data</span> and the <span class="font-bold">representation</span>.</p>
                     <br />
-                    <p>The Equation defines the data.</p>
-                    <p>The Color Map defines which colors.</p>
+                    <p><span class="font-bold">The Equation</span> defines the data.</p>
+                    <p><span class="font-bold">The Color Map</span> defines which colors map to which values. For example, in the <span class="font-mono bg-gray-100 text-gray-800 px-1 py-0.5 rounded">rainbow</span> color map, the lowest value would map to <span class="italic">purple</span>, and the highest value would map to <span class="italic">red</span>.</p>
+                    <br />
+                    <p>The same equation/data can be rendered in many different ways.</p>
                 </div>
             </div>
         </div>
@@ -1032,7 +1034,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v1.0.36.html';
+            a.download = 'FuzzyGraph_v1.0.37.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
