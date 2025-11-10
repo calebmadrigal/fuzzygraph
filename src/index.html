@@ -695,7 +695,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.41</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.42</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a>/non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -968,7 +968,7 @@
         }
 
         function getEquationErrorDetails(equationStr) {
-            if (!equationStr.includes('=')) {
+            if (!equationStr.includes('=') && !equationStr.includes('≈')) {
                 return ' - equation must have an equals sign (=)'
             } else if (!equationStr.includes('x') && !equationStr.includes('y') && !equationStr.includes('r')) {
                 return ' - equation should include x or y (probably both)'
@@ -1034,7 +1034,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v1.0.41.html';
+            a.download = 'FuzzyGraph_v1.0.42.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
