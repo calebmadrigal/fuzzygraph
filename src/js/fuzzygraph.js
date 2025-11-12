@@ -42,7 +42,7 @@ export function cartesian_to_polar(x, y) {
 }
 
 export function parsePolarEquationString(eq_str) {
-  if (str.includes("≈")) {
+  if (eq_str.includes("≈")) {
     var split_result = eq_str.split("≈");
   }
   else {
