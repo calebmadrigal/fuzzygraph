@@ -15,7 +15,7 @@
 - [ ] Backward compatibility for images and share links
 - [ ] New rendering algorithm (v2.0.0)
 - [ ] Advanced mode
-- [ ] Shader-based rendering
+- [ ] Shader-based rendering (SPEED)
 
 # Author
 
