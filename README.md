@@ -19,4 +19,4 @@ Graphs where equations are not only exactly true, but close to true. Instead of 
 
 # Author
 
-Written by Caleb Madrigal (https://gods.art).
+Caleb Madrigal (https://gods.art).
