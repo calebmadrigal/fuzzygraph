@@ -301,7 +301,6 @@
                     </button>
                 </div>
 
-                
 
             </div>
             <!-- Sidebar Content -->
@@ -424,18 +423,79 @@
                 <div id="advancedSection" class="hidden">
                     <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200">Advanced</h3>
 
-                    <!-- Min Override -->
                     <div>
-                        <label for="width" class="block text-sm font-medium text-gray-600">Min Override (min: <span id="minDisplay" class="text-xs">0</span>)</label>
-                        <input 
+                        <label for="minOverrideInput" class="block text-sm font-medium text-gray-600">
+                          Min Override (min: <span id="minDisplay" class="text-xs">0</span>)
+                        </label>
+                      
+                        <div class="mt-1 relative">
+                          <!-- Input -->
+                          <input 
                             type="number" 
                             id="minOverrideInput" 
                             name="minOverrideInput" 
-                            min="0" 
-                            step="1" 
-                            class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        >
-                    </div>
+                            class="no-spinner w-full px-3 py-2 pr-12 border border-gray-300 rounded-md shadow-sm 
+                                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          >
+                      
+                          <!-- Toggle inside input -->
+                          <button
+                            type="button"
+                            id="minOverrideToggle"
+                            class="absolute inset-y-0 right-2 my-auto h-5 w-9 flex items-center px-1
+                                   rounded-full bg-blue-500 transition-colors"
+                            aria-pressed="true"
+                            tabindex="-1"
+                          >
+                            <span
+                              class="knob inline-block h-4 w-4 rounded-full bg-white shadow transform 
+                                     transition-transform translate-x-4"
+                            ></span>
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <style>
+                        /* Remove number input arrows (Chrome, Safari, Edge, Opera) */
+                        .no-spinner::-webkit-outer-spin-button,
+                        .no-spinner::-webkit-inner-spin-button {
+                          -webkit-appearance: none;
+                          margin: 0;
+                        }
+                      
+                        /* Remove number input arrows (Firefox) */
+                        .no-spinner[type="number"] {
+                          -moz-appearance: textfield;
+                        }
+                      </style>
+                      
+                      <script>
+                        const toggle = document.getElementById("minOverrideToggle");
+                        const knob = toggle.querySelector(".knob");
+                        const input = document.getElementById("minOverrideInput");
+                      
+                        toggle.addEventListener("click", () => {
+                          const isOn = toggle.getAttribute("aria-pressed") === "true";
+                          const next = !isOn;
+                      
+                          toggle.setAttribute("aria-pressed", next);
+                          input.disabled = !next;
+                      
+                          if (next) {
+                            // Turn ON
+                            toggle.classList.replace("bg-gray-300", "bg-blue-500");
+                            knob.classList.replace("translate-x-0", "translate-x-4");
+                            input.classList.remove("bg-gray-100", "text-gray-500");
+                          } else {
+                            // Turn OFF
+                            toggle.classList.replace("bg-blue-500", "bg-gray-300");
+                            knob.classList.replace("translate-x-4", "translate-x-0");
+                            input.classList.add("bg-gray-100", "text-gray-500");
+                          }
+                        });
+                      </script>
+                      
+
 
                     <!-- Max Override -->
                     <div>
@@ -695,7 +755,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v1.0.43</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v2.0.0</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a>/non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -888,8 +948,10 @@
             ZOOM_RATE
         } from './js/fuzzygraph.js';
 
+        const version = '2';
+
         const equation = atom('y = x^2 - 1');
-        const fuzzyLevel = atom(80);
+        const fuzzyLevel = atom(30);
         const showAxes = atom(true);
         const colorMap = atom('plasma');
         const invertColor = atom(true);
@@ -1034,7 +1096,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v1.0.43.html';
+            a.download = 'FuzzyGraph_v2.0.0.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1069,7 +1131,8 @@
                     yHeight: parseFloat(saveYHeight.get()),
                     minOverride: minOverride.get(),
                     maxOverride: maxOverride.get(),
-                    showAxes: saveShowAxes.get()
+                    showAxes: saveShowAxes.get(),
+                    version: version
                 };
 
                 displayGraph(graphConfig, saveCanvas);
@@ -1407,16 +1470,16 @@
 
             // Track and thumb color
             if (checked) {
-                btn.classList.remove('bg-gray-300');
+                btn.classList.remove('bg-gray-500');
                 btn.classList.add('bg-gray-800');
                 thumb.classList.remove('bg-gray-700');
-                thumb.classList.add('bg-gray-500'); // slightly lighter so it stands out
+                thumb.classList.add('bg-gray-50');
                 advancedSection.classList.remove('hidden');
                 label.textContent = 'Advanced';
             } else {
                 btn.classList.remove('bg-gray-800');
-                btn.classList.add('bg-gray-300');
-                thumb.classList.remove('bg-gray-500');
+                btn.classList.add('bg-gray-500');
+                thumb.classList.remove('bg-gray-50');
                 thumb.classList.add('bg-gray-700');
                 advancedSection.classList.add('hidden');
                 label.textContent = 'Basic';
