@@ -1459,46 +1459,19 @@
             // }
         });
 
-        minOverride.subscribe((minO) => {
-            document.getElementById('minOverrideInput').value = minO;
-            scheduleRepaint();
-        });
-
-        maxOverride.subscribe((maxO) => {
-            document.getElementById('maxOverrideInput').value = maxO;
-            scheduleRepaint();
-        });
-
-        function clearMinAndMaxOverrides() {
-            minOverride.set(null);
-            maxOverride.set(null);
-        }
-
-        document.getElementById('minOverrideInput').addEventListener('input', (event) => {
-            minOverride.set(event.target.value);
-        });
-
-        document.getElementById('maxOverrideInput').addEventListener('input', (event) => {
-            maxOverride.set(event.target.value);
-        });
-
-
         const minToggle = document.getElementById("minOverrideToggle");
         const minKnob = minToggle.querySelector(".knob");
         const minInput = document.getElementById("minOverrideInput");
-    
+
         const maxToggle = document.getElementById("maxOverrideToggle");
         const maxKnob = maxToggle.querySelector(".knob");
         const maxInput = document.getElementById("maxOverrideInput");
 
-        function toggleMinOverride() {
-            const isOn = minToggle.getAttribute("aria-pressed") === "true";
-            const next = !isOn;
-        
-            minToggle.setAttribute("aria-pressed", String(next));
-            minInput.disabled = !next;
-        
-            if (next) {
+        function setMinOverrideEnabled(enabled) {
+            minToggle.setAttribute("aria-pressed", String(enabled));
+            minInput.disabled = !enabled;
+
+            if (enabled) {
                 // ON: dark track, light knob, knob right (advanced-style)
                 minToggle.classList.remove("bg-gray-500");
                 minToggle.classList.add("bg-gray-800");
@@ -1516,15 +1489,12 @@
                 minOverride.set(null);
             }
         }
-    
-        function toggleMaxOverride() {
-            const isOn = maxToggle.getAttribute("aria-pressed") === "true";
-            const next = !isOn;
-        
-            maxToggle.setAttribute("aria-pressed", String(next));
-            maxInput.disabled = !next;
-        
-            if (next) {
+
+        function setMaxOverrideEnabled(enabled) {
+            maxToggle.setAttribute("aria-pressed", String(enabled));
+            maxInput.disabled = !enabled;
+
+            if (enabled) {
                 // ON: dark track, light knob, knob right (advanced-style)
                 maxToggle.classList.remove("bg-gray-500");
                 maxToggle.classList.add("bg-gray-800");
@@ -1542,15 +1512,58 @@
                 maxOverride.set(null);
             }
         }
-    
+
+        function toggleMinOverride() {
+            const isOn = minToggle.getAttribute("aria-pressed") === "true";
+            setMinOverrideEnabled(!isOn);
+        }
+
+        function toggleMaxOverride() {
+            const isOn = maxToggle.getAttribute("aria-pressed") === "true";
+            setMaxOverrideEnabled(!isOn);
+        }
+
         minToggle.addEventListener("click", toggleMinOverride);
         maxToggle.addEventListener("click", toggleMaxOverride);
 
+        minOverride.subscribe((minO) => {
+            document.getElementById('minOverrideInput').value = minO;
+            if (minO == null || minO == '') {
+                setMinOverrideEnabled(false);
+            }
+            else {
+                setMinOverrideEnabled(true);
+            }
+            scheduleRepaint();
+        });
+
+        maxOverride.subscribe((maxO) => {
+            document.getElementById('maxOverrideInput').value = maxO;
+            if (maxO == null || maxO == '') {
+                setMaxOverrideEnabled(false);
+            }
+            else {
+                setMaxOverrideEnabled(true);
+            }
+            scheduleRepaint();
+        });
+
+        function clearMinAndMaxOverrides() {
+            minOverride.set(null);
+            maxOverride.set(null);
+        }
+
+        document.getElementById('minOverrideInput').addEventListener('input', (event) => {
+            minOverride.set(event.target.value);
+        });
+
+        document.getElementById('maxOverrideInput').addEventListener('input', (event) => {
+            maxOverride.set(event.target.value);
+        });
 
         document.getElementById('saveImageButton').addEventListener('click', async () => {
             saveImage();
         });
-
 
         function setMode(advancedMode) {
             const checked = advancedMode;
@@ -2380,8 +2393,12 @@
                 delete appConfig['maxOverride'];
             }
 
-            appConfig['minOverride'] = minVal.get();
-            appConfig['maxOverride'] = maxVal.get();
+            if (appConfig['minOverride'] == null || appConfig['minOverride'] == '') {
+                appConfig['minOverride'] = minVal.get();
+            }
+            if (appConfig['maxOverride'] == null || appConfig['maxOverride'] == '') {
+                appConfig['maxOverride'] = maxVal.get();
+            }
 
             const params = new URLSearchParams();
             for (const [key, value] of Object.entries(appConfig)) {
