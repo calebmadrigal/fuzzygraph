@@ -472,7 +472,19 @@
 
                 <!-- Advanced Section -->
                 <div id="advancedSection" class="hidden">
-                    <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200">Advanced</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200 flex items-center gap-1">
+                        <span>Advanced</span>
+                        <button id="advancedHelpButton"
+                            class="text-gray-500 hover:text-blue-500 flex items-center p-1 rounded-md hover:bg-gray-100">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8.228 9c.549-1.165 2.03-2 3.772-2 
+                                2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907
+                                -.542.104-.994.54-.994 1.093m0 3h.01
+                                M12 21a9 9 0 110-18 9 9 0 010 18z" />
+                            </svg>
+                      </button>
+                    </h3>
 
                     <div>
                         <label for="minOverrideInput" class="block text-sm font-medium text-gray-600">
@@ -881,6 +893,30 @@
         </div>
     </div>
 
+    <!-- Advanced help modal -->
+    <div id="advancedHelpModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+
+        <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+
+            <!-- X button -->
+            <button id="advancedHelpModalX"
+                class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold focus:outline-none">
+                &times;
+            </button>
+
+            <h2 class="text-xl font-semibold mb-4">Advanced Help</h2>
+            <div class="w-full max-w-md p-4">
+                <div>
+                    <h3 class="font-bold">Min Override</h3>
+                    <p>Since FuzzyGraph takes the absolute value of the error, the minimum value is typically 0, and usually does not need to be changed.</p>
+                    <br />
+                    <h3 class="font-bold">Max Override</h3>
+                    <p>Just as a bright light (like the sun) can "wash out" everything else in a photo, so also a section of really high error can wash out the rest of the mathematical topography (which hides many of the details). So it is often valuable to clamp down on the max value by setting a "Max Override".</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Math Input Popover -->
     <div id="mathPopover" role="dialog" aria-label="Insert math"
@@ -1014,6 +1050,7 @@
         const showEquationHelpModal = atom(false);
         const showControlsHelpModal = atom(false);
         const showColorMapHelpModal = atom(false);
+        const showAdvancedHelpModal = atom(false);
 
         // Save modal variables
         const saveWidth = atom(0);
@@ -1697,6 +1734,7 @@
                 showEquationHelpModal.set(false);
                 showControlsHelpModal.set(false);
                 showColorMapHelpModal.set(false);
+                showAdvancedHelpModal.set(false);
                 closePopover();
             }
         });
@@ -1913,6 +1951,11 @@
         showColorMapHelpModal.listen((visible) => { document.getElementById('colorMapHelpModal').classList.toggle('hidden', !visible); });
         document.getElementById('colorMapHelpButton').addEventListener('click', () => { showColorMapHelpModal.set(!showColorMapHelpModal.get()); });
         document.getElementById('colorMapHelpModalX').addEventListener('click', () => { showColorMapHelpModal.set(false); });
+
+        // CONTROL PANEL / Advanced Help
+        showAdvancedHelpModal.listen((visible) => { document.getElementById('advancedHelpModal').classList.toggle('hidden', !visible); });
+        document.getElementById('advancedHelpButton').addEventListener('click', () => { showAdvancedHelpModal.set(!showAdvancedHelpModal.get()); });
+        document.getElementById('advancedHelpModalX').addEventListener('click', () => { showAdvancedHelpModal.set(false); });
 
         // Zoom In
         document.getElementById('zoomInButton').addEventListener('click', () => {
