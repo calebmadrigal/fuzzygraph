@@ -12,9 +12,9 @@
 
 # Roadmap
 
-- [ ] Backward compatibility for images and share links
-- [ ] New rendering algorithm (v2.0.0)
-- [ ] Advanced mode
+- [x] Backward compatibility for images and share links
+- [x] New rendering algorithm (v2.0.0)
+- [x] Advanced mode
 - [ ] Shader-based rendering (SPEED)
 
 # Author
