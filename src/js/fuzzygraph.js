@@ -409,39 +409,50 @@ export function getColormap(colormapName, invertColor, minInput, maxInput) {
 
 // // // // // // // END Color stuff
 
+function calculateFuzzyFactor(fuzzyValue) {
+  // Maps from [1, 100] to [0.01, 1]
+  //return 1.01 - 0.01 * fuzzyValue;
+  return 0.01 * fuzzyValue;
+}
+
 export function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, colormapName, invertColor, canvasElem) {
-  var maxCutoff = 100;  // TODO: Make this configurable
   var context = canvasElem.getContext('2d');
   var canvasWidth = context.canvas.width;
   var canvasHeight = context.canvas.height;
   var imageData = context.createImageData(canvasWidth, canvasHeight);
   var pixelData = imageData.data;
+  const epsilon = 1e-6;  // Used to prevent divide-by-zero errors
+  var alpha = 1; // between 0.1 and 10
 
   // Function to modify the value to make the graph look more interesting
   // We do this because the value is a measure of error, but we want more error
   // to look like a more intense value on the graph
   if (fuzzyValue >= 1) {
-    var valueModifier = function (value) {
-      return Math.pow(maxValue - value, (MAX_FUZZY+1) - (fuzzyValue*2));  // +1 to prevent the value from ever being 0
+    var fuzzyFactor = calculateFuzzyFactor(fuzzyValue);
+    var fuzzyModifier = function (value) {
+      // Old transfer function - preserving for posterity
+      // var modifiedFuzzyValue = 1/(MAX_FUZZY - (fuzzyValue*2));
+      // return Math.pow(maxValue - value, (MAX_FUZZY+1) - (fuzzyValue*2));  // +1 to prevent the value from ever being 0
+
+      return Math.pow((alpha * value) + epsilon, fuzzyFactor);
     };
   } else {
-    var valueModifier = function (value) {
+    // Conventional/binary mode (when fuzzyValue == 0)
+    var fuzzyModifier = function (value) {
       return value < 0.02 ? maxValue : minValue;
     };
   }
 
-  // For display purposes, allow a max and min value (TODO: Make them configurable via UI)
-  maxValue = Math.min(maxValue, maxCutoff);
-
   // Determine the color scale based on the min and max values
   //var colorMapper = truthygraphColormap(valueModifier(maxValue), valueModifier(minValue));
-  var colorMapper = getColormap(colormapName, invertColor, valueModifier(minValue), valueModifier(maxValue));
+
+  var colorMapper = getColormap(colormapName, invertColor, fuzzyModifier(minValue), fuzzyModifier(maxValue));
   //var colorMapper = getColormap(colormapName, invertColor, minValue, maxValue);
 
   // Set the color for each pixel based on the values
   for (var x = 0; x < canvasWidth; x++) {
     for (var y = 0; y < canvasHeight; y++) {
-      var value = valueModifier(pixelValues[y * canvasWidth + x]);
+      var value = fuzzyModifier(pixelValues[y * canvasWidth + x]);
       var color = colorMapper(value);
 
       // Set pixel color channels
@@ -486,10 +497,10 @@ export function displayGraph(graphParams, canvasElem) {
   var minVal = pixelValues['min'];
   var maxVal = pixelValues['max'];
 
-  if (graphParams['minOverride'] != null) {
+  if (graphParams['minOverride'] != null && graphParams['minOverride'] != '') {
     minVal = graphParams['minOverride'];
   }
-  if (graphParams['maxOverride'] != null) {
+  if (graphParams['maxOverride'] != null && graphParams['maxOverride'] != '') {
     maxVal = graphParams['maxOverride'];
   }
 
