@@ -497,10 +497,10 @@ export function displayGraph(graphParams, canvasElem) {
   var minVal = pixelValues['min'];
   var maxVal = pixelValues['max'];
 
-  if (graphParams['minOverride'] != null) {
+  if (graphParams['minOverride'] != null && graphParams['minOverride'] != '') {
     minVal = graphParams['minOverride'];
   }
-  if (graphParams['maxOverride'] != null) {
+  if (graphParams['maxOverride'] != null && graphParams['maxOverride'] != '') {
     maxVal = graphParams['maxOverride'];
   }
 

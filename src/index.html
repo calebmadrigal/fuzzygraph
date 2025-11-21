@@ -62,6 +62,19 @@
             opacity: 1;
             visibility: visible;
         }
+
+        /* Remove number input arrows (Chrome, Safari, Edge, Opera) */
+        .no-spinner::-webkit-outer-spin-button,
+        .no-spinner::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        /* Remove number input arrows (Firefox) */
+        .no-spinner[type="number"] {
+            -moz-appearance: textfield;
+        }
+                    
     </style>
 </head>
 
@@ -358,8 +371,29 @@
                         <label class="block text-sm font-medium text-gray-700">
                             Fuzzy Level: <span id="fuzzyLevelDisplay"></span>
                         </label>
-                        <input id="fuzzyInput" type="range" min="0" max="100"
-                            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        <!-- <input id="fuzzyInput" type="range" min="0" max="100"
+                            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"> -->
+
+                            <input
+                            id="fuzzyInput"
+                            type="range"
+                            min="0"
+                            max="100"
+                            class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer
+                              [&::-webkit-slider-thumb]:appearance-none
+                              [&::-webkit-slider-thumb]:w-4
+                              [&::-webkit-slider-thumb]:h-4
+                              [&::-webkit-slider-thumb]:bg-gray-800
+                              [&::-webkit-slider-thumb]:rounded-none
+                              [&::-webkit-slider-thumb]:cursor-pointer
+                          
+                              [&::-moz-range-thumb]:w-4
+                              [&::-moz-range-thumb]:h-4
+                              [&::-moz-range-thumb]:bg-gray-800
+                              [&::-moz-range-thumb]:border-0
+                              [&::-moz-range-thumb]:rounded-none
+                            "
+                          />
                     </div>
 
                     <!-- Axes Toggle Switch -->
@@ -459,9 +493,9 @@
                           <button
                             type="button"
                             id="minOverrideToggle"
-                            class="absolute inset-y-0 right-2 my-auto h-5 w-9 flex items-center px-1
+                            class="absolute inset-y-0 right-2 my-auto h-5 w-9 flex items-center px-0
                                    bg-gray-800 transition-colors duration-200 rounded-none"
-                            aria-pressed="true"
+                            aria-pressed="false"
                             tabindex="-1"
                           >
                             <span
@@ -471,20 +505,6 @@
                           </button>
                         </div>
                       </div>
-                      
-                      <style>
-                        /* Remove number input arrows (Chrome, Safari, Edge, Opera) */
-                        .no-spinner::-webkit-outer-spin-button,
-                        .no-spinner::-webkit-inner-spin-button {
-                          -webkit-appearance: none;
-                          margin: 0;
-                        }
-                      
-                        /* Remove number input arrows (Firefox) */
-                        .no-spinner[type="number"] {
-                          -moz-appearance: textfield;
-                        }
-                      </style>
                       
 
                     <!-- Max Override -->
@@ -498,8 +518,6 @@
                             type="number" 
                             id="maxOverrideInput" 
                             name="maxOverrideInput" 
-                            min="0" 
-                            step="1" 
                             class="no-spinner w-full px-3 py-2 pr-12 border border-gray-300 rounded-md shadow-sm 
                                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         >
@@ -508,9 +526,9 @@
                         <button
                             type="button"
                             id="maxOverrideToggle"
-                            class="absolute inset-y-0 right-2 my-auto h-5 w-9 flex items-center px-1
+                            class="absolute inset-y-0 right-2 my-auto h-5 w-9 flex items-center px-0
                                 bg-gray-800 transition-colors duration-200 rounded-none"
-                            aria-pressed="true"
+                            aria-pressed="false"
                             tabindex="-1"
                         >
                             <span
@@ -520,47 +538,6 @@
                         </button>
                         </div>
                     </div>
-
-                    <script>
-                        const minToggle = document.getElementById("minOverrideToggle");
-                        const minKnob = minToggle.querySelector(".knob");
-                        const minInput = document.getElementById("minOverrideInput");
-                      
-                        const maxToggle = document.getElementById("maxOverrideToggle");
-                        const maxKnob = maxToggle.querySelector(".knob");
-                        const maxInput = document.getElementById("maxOverrideInput");
-                      
-                        function setupOverrideToggle(toggleEl, knobEl, inputEl) {
-                          toggleEl.addEventListener("click", () => {
-                            const isOn = toggleEl.getAttribute("aria-pressed") === "true";
-                            const next = !isOn;
-                      
-                            toggleEl.setAttribute("aria-pressed", String(next));
-                            inputEl.disabled = !next;
-                      
-                            if (next) {
-                              // ON: dark track, light knob, knob right (advanced-style)
-                              toggleEl.classList.remove("bg-gray-500");
-                              toggleEl.classList.add("bg-gray-800");
-                              knobEl.classList.remove("translate-x-1", "bg-gray-700");
-                              knobEl.classList.add("translate-x-5", "bg-gray-50");
-                              inputEl.classList.remove("bg-gray-100", "text-gray-500");
-                            } else {
-                              // OFF: medium track, dark knob, knob left
-                              toggleEl.classList.remove("bg-gray-800");
-                              toggleEl.classList.add("bg-gray-500");
-                              knobEl.classList.remove("translate-x-5", "bg-gray-50");
-                              knobEl.classList.add("translate-x-1", "bg-gray-700");
-                              inputEl.classList.add("bg-gray-100", "text-gray-500");
-                            }
-                          });
-                        }
-                      
-                        setupOverrideToggle(minToggle, minKnob, minInput);
-                        setupOverrideToggle(maxToggle, maxKnob, maxInput);
-                      </script>
-                      
-
 
                 </div>
 
@@ -1023,6 +1000,8 @@
         const maxVal = atom(null);
         const minOverride = atom(null);
         const maxOverride = atom(null);
+        const minOverrideEnabled = atom(false);
+        const maxOverrideEnabled = atom(false);
 
         const sidebarOpen = atom(true);
         const mobileMenuOpen = atom(false);
@@ -1457,8 +1436,11 @@
             if (num == null) { return ''; }
 
              // Handle very small numbers like 8.88e-16
-            if (Math.abs(num) < 0.0001 || Math.abs(num) >= 1000000) {
-                return num.toExponential(2); // e.g., "8.88e-16"
+            if (Math.abs(num) < 0.0001) {
+                return '0';
+            }
+            else if (Math.abs(num) >= 1000000) {
+                return num.toExponential(4); // e.g., "8.8888e-16"
             }
 
             // Otherwise, use fixed decimal, trimmed
@@ -1469,16 +1451,16 @@
 
         minVal.subscribe((minV) => {
             document.getElementById('minDisplay').textContent = formatNumber(minV);
-            if (minOverride.get() == null || minOverride.get() == '') {
-                minOverride.set(minV);
-            }
+            // if (minOverride.get() == null || minOverride.get() == '') {
+            //     minOverride.set(minV);
+            // }
         });
 
         maxVal.subscribe((maxV) => {
             document.getElementById('maxDisplay').textContent = formatNumber(maxV);
-            if (maxOverride.get() == null || maxOverride.get() == '') {
-                maxOverride.set(maxV);
-            }
+            // if (maxOverride.get() == null || maxOverride.get() == '') {
+            //     maxOverride.set(maxV);
+            // }
         });
 
         minOverride.subscribe((minO) => {
@@ -1503,6 +1485,71 @@
         document.getElementById('maxOverrideInput').addEventListener('input', (event) => {
             maxOverride.set(event.target.value);
         });
+
+
+        const minToggle = document.getElementById("minOverrideToggle");
+        const minKnob = minToggle.querySelector(".knob");
+        const minInput = document.getElementById("minOverrideInput");
+    
+        const maxToggle = document.getElementById("maxOverrideToggle");
+        const maxKnob = maxToggle.querySelector(".knob");
+        const maxInput = document.getElementById("maxOverrideInput");
+
+        function toggleMinOverride() {
+            const isOn = minToggle.getAttribute("aria-pressed") === "true";
+            const next = !isOn;
+        
+            minToggle.setAttribute("aria-pressed", String(next));
+            minInput.disabled = !next;
+        
+            if (next) {
+                // ON: dark track, light knob, knob right (advanced-style)
+                minToggle.classList.remove("bg-gray-500");
+                minToggle.classList.add("bg-gray-800");
+                minKnob.classList.remove("translate-x-1", "bg-gray-700");
+                minKnob.classList.add("translate-x-5", "bg-gray-50");
+                minInput.classList.remove("bg-gray-100", "text-gray-500");
+            } else {
+                // OFF: medium track, dark knob, knob left
+                minToggle.classList.remove("bg-gray-800");
+                minToggle.classList.add("bg-gray-500");
+                minKnob.classList.remove("translate-x-5", "bg-gray-50");
+                minKnob.classList.add("translate-x-1", "bg-gray-700");
+                minInput.classList.add("bg-gray-100", "text-gray-500");
+
+                minOverride.set(null);
+            }
+        }
+    
+        function toggleMaxOverride() {
+            const isOn = maxToggle.getAttribute("aria-pressed") === "true";
+            const next = !isOn;
+        
+            maxToggle.setAttribute("aria-pressed", String(next));
+            maxInput.disabled = !next;
+        
+            if (next) {
+                // ON: dark track, light knob, knob right (advanced-style)
+                maxToggle.classList.remove("bg-gray-500");
+                maxToggle.classList.add("bg-gray-800");
+                maxKnob.classList.remove("translate-x-1", "bg-gray-700");
+                maxKnob.classList.add("translate-x-5", "bg-gray-50");
+                maxInput.classList.remove("bg-gray-100", "text-gray-500");
+            } else {
+                // OFF: medium track, dark knob, knob left
+                maxToggle.classList.remove("bg-gray-800");
+                maxToggle.classList.add("bg-gray-500");
+                maxKnob.classList.remove("translate-x-5", "bg-gray-50");
+                maxKnob.classList.add("translate-x-1", "bg-gray-700");
+                maxInput.classList.add("bg-gray-100", "text-gray-500");
+
+                maxOverride.set(null);
+            }
+        }
+    
+        minToggle.addEventListener("click", toggleMinOverride);
+        maxToggle.addEventListener("click", toggleMaxOverride);
+
 
         document.getElementById('saveImageButton').addEventListener('click', async () => {
             saveImage();
