@@ -295,7 +295,7 @@
                       <!-- Thumb -->
                       <span
                         id="modeThumb"
-                        class="pointer-events-none inline-block h-4 w-4 translate-x-1 bg-gray-700 transition-all duration-200 
+                        class="pointer-events-none inline-block h-4 w-4 translate-x-1 bg-gray-50 transition-all duration-200 
                                will-change-transform rounded-none shadow-md"
                       ></span>
                     </button>
@@ -455,18 +455,18 @@
                                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           >
                       
-                          <!-- Toggle inside input -->
+                          <!-- Toggle inside input (small advanced-style) -->
                           <button
                             type="button"
                             id="minOverrideToggle"
                             class="absolute inset-y-0 right-2 my-auto h-5 w-9 flex items-center px-1
-                                   rounded-full bg-blue-500 transition-colors"
+                                   bg-gray-800 transition-colors duration-200 rounded-none"
                             aria-pressed="true"
                             tabindex="-1"
                           >
                             <span
-                              class="knob inline-block h-4 w-4 rounded-full bg-white shadow transform 
-                                     transition-transform translate-x-4"
+                              class="knob inline-block h-3 w-3 translate-x-5 bg-gray-50 shadow transform 
+                                     transition-transform duration-200 will-change-transform rounded-none"
                             ></span>
                           </button>
                         </div>
@@ -486,46 +486,81 @@
                         }
                       </style>
                       
-                      <script>
-                        const toggle = document.getElementById("minOverrideToggle");
-                        const knob = toggle.querySelector(".knob");
-                        const input = document.getElementById("minOverrideInput");
-                      
-                        toggle.addEventListener("click", () => {
-                          const isOn = toggle.getAttribute("aria-pressed") === "true";
-                          const next = !isOn;
-                      
-                          toggle.setAttribute("aria-pressed", next);
-                          input.disabled = !next;
-                      
-                          if (next) {
-                            // Turn ON
-                            toggle.classList.replace("bg-gray-300", "bg-blue-500");
-                            knob.classList.replace("translate-x-0", "translate-x-4");
-                            input.classList.remove("bg-gray-100", "text-gray-500");
-                          } else {
-                            // Turn OFF
-                            toggle.classList.replace("bg-blue-500", "bg-gray-300");
-                            knob.classList.replace("translate-x-4", "translate-x-0");
-                            input.classList.add("bg-gray-100", "text-gray-500");
-                          }
-                        });
-                      </script>
-                      
-
 
                     <!-- Max Override -->
                     <div>
-                        <label for="width" class="block text-sm font-medium text-gray-600 mt-2">Max Override (max: <span id="maxDisplay" class="text-xs">0</span>)</label>
+                        <label for="maxOverrideInput" class="block text-sm font-medium text-gray-600 mt-2">
+                        Max Override (max: <span id="maxDisplay" class="text-xs">0</span>)
+                        </label>
+                    
+                        <div class="mt-1 relative">
                         <input 
                             type="number" 
                             id="maxOverrideInput" 
                             name="maxOverrideInput" 
                             min="0" 
                             step="1" 
-                            class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            class="no-spinner w-full px-3 py-2 pr-12 border border-gray-300 rounded-md shadow-sm 
+                                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         >
+                    
+                        <!-- Toggle inside input (small advanced-style) -->
+                        <button
+                            type="button"
+                            id="maxOverrideToggle"
+                            class="absolute inset-y-0 right-2 my-auto h-5 w-9 flex items-center px-1
+                                bg-gray-800 transition-colors duration-200 rounded-none"
+                            aria-pressed="true"
+                            tabindex="-1"
+                        >
+                            <span
+                            class="knob inline-block h-3 w-3 translate-x-5 bg-gray-50 shadow transform 
+                                    transition-transform duration-200 will-change-transform rounded-none"
+                            ></span>
+                        </button>
+                        </div>
                     </div>
+
+                    <script>
+                        const minToggle = document.getElementById("minOverrideToggle");
+                        const minKnob = minToggle.querySelector(".knob");
+                        const minInput = document.getElementById("minOverrideInput");
+                      
+                        const maxToggle = document.getElementById("maxOverrideToggle");
+                        const maxKnob = maxToggle.querySelector(".knob");
+                        const maxInput = document.getElementById("maxOverrideInput");
+                      
+                        function setupOverrideToggle(toggleEl, knobEl, inputEl) {
+                          toggleEl.addEventListener("click", () => {
+                            const isOn = toggleEl.getAttribute("aria-pressed") === "true";
+                            const next = !isOn;
+                      
+                            toggleEl.setAttribute("aria-pressed", String(next));
+                            inputEl.disabled = !next;
+                      
+                            if (next) {
+                              // ON: dark track, light knob, knob right (advanced-style)
+                              toggleEl.classList.remove("bg-gray-500");
+                              toggleEl.classList.add("bg-gray-800");
+                              knobEl.classList.remove("translate-x-1", "bg-gray-700");
+                              knobEl.classList.add("translate-x-5", "bg-gray-50");
+                              inputEl.classList.remove("bg-gray-100", "text-gray-500");
+                            } else {
+                              // OFF: medium track, dark knob, knob left
+                              toggleEl.classList.remove("bg-gray-800");
+                              toggleEl.classList.add("bg-gray-500");
+                              knobEl.classList.remove("translate-x-5", "bg-gray-50");
+                              knobEl.classList.add("translate-x-1", "bg-gray-700");
+                              inputEl.classList.add("bg-gray-100", "text-gray-500");
+                            }
+                          });
+                        }
+                      
+                        setupOverrideToggle(minToggle, minKnob, minInput);
+                        setupOverrideToggle(maxToggle, maxKnob, maxInput);
+                      </script>
+                      
+
 
                 </div>
 
@@ -569,7 +604,7 @@
                     <input type="text" readonly id="shareUrlInput"
                         class="w-full p-2 pr-20 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <button id="copyUrlButton"
-                        class="absolute right-1 top-1/2 -translate-y-1/2 bg-blue-500 text-white px-3 py-1 rounded-lg hover:bg-blue-600 transition duration-200">
+                        class="absolute right-1 top-1/2 -translate-y-1/2 bg-gray-800 text-white px-3 py-1 rounded-lg hover:bg-gray-700 transition duration-200">
                         Copy
                     </button>
 
@@ -685,24 +720,29 @@
                         <!-- Show Axes -->
                         <div class="flex items-center justify-between">
                             <span class="text-sm font-medium text-gray-700">Show Axes</span>
-                            <button 
-                                type="button" 
+                            <button
+                                type="button"
                                 id="saveAxesToggle"
-                                class="relative inline-flex h-8 w-14 flex-shrink-0 cursor-pointer rounded-full bg-gray-200 border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                                role="switch">
-                                <span 
+                                role="switch"
+                                aria-checked="true"
+                                class="relative inline-flex h-6 w-12 items-center bg-gray-800 transition-colors duration-200 
+                                       focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 rounded-none"
+                            >
+                                <span class="sr-only">Toggle axes in saved image</span>
+                                <span
                                     id="saveAxesOnSlider"
-                                    class="pointer-events-none inline-block h-7 w-7 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out">
-                                </span>
+                                    class="pointer-events-none inline-block h-4 w-4 translate-x-7 bg-gray-50 transition-all duration-200 
+                                           will-change-transform rounded-none shadow-md"
+                                ></span>
                             </button>
                         </div>
-                
+
                         <!-- Save Image Button -->
                         <div class="flex items-center justify-end">
                             <button 
                                 type="button" 
                                 id="saveImageButton"
-                                class="px-8 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
+                                class="px-8 py-2 bg-gray-800 text-white font-semibold rounded-md shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
                             >
                                 <span class="inline text-gray-200 mr-2">Save Image</span>
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -747,7 +787,7 @@
                     id="pngInput"
                     type="file"
                     accept="image/png"
-                    class="block p-2 w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-300 dark:bg-gray-800 dark:border-gray-600 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition"
+                    class="block p-2 w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-300 dark:bg-gray-800 dark:border-gray-600 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-gray-800 file:text-white hover:file:bg-gray-700 transition"
                   />
                 </div>
               
@@ -1489,15 +1529,15 @@
             if (checked) {
                 btn.classList.remove('bg-gray-500');
                 btn.classList.add('bg-gray-800');
-                thumb.classList.remove('bg-gray-700');
-                thumb.classList.add('bg-gray-50');
+                // thumb.classList.remove('bg-gray-700');
+                // thumb.classList.add('bg-gray-50');
                 advancedSection.classList.remove('hidden');
                 label.textContent = 'Advanced';
             } else {
                 btn.classList.remove('bg-gray-800');
                 btn.classList.add('bg-gray-500');
-                thumb.classList.remove('bg-gray-50');
-                thumb.classList.add('bg-gray-700');
+                // thumb.classList.remove('bg-gray-50');
+                // thumb.classList.add('bg-gray-700');
                 advancedSection.classList.add('hidden');
                 label.textContent = 'Basic';
             }
@@ -1519,9 +1559,9 @@
             setMode(checked);
         });
 
-        showAxes.subscribe((show) => {
-            const slider = document.getElementById('axesOnSlider');
-            const toggleEl = document.getElementById('axesToggle');
+        saveShowAxes.subscribe((show) => {
+            const slider = document.getElementById('saveAxesOnSlider');
+            const toggleEl = document.getElementById('saveAxesToggle');
 
             slider.classList.remove('translate-x-1', 'translate-x-7');
             slider.classList.add(show ? 'translate-x-7' : 'translate-x-1');
@@ -1753,13 +1793,16 @@
 
         // CONTROL PANEL / Show Axes
         showAxes.subscribe((show) => {
-            document.getElementById('axesOnSlider').classList.remove('translate-x-5', 'translate-x-0');
-            document.getElementById('axesOnSlider').classList.add(show ? 'translate-x-5' : 'translate-x-0');
+            const slider = document.getElementById('axesOnSlider');
+            const toggleEl = document.getElementById('axesToggle');
 
-            document.getElementById('axesToggle').classList.remove('bg-blue-600', 'bg-gray-200');
-            document.getElementById('axesToggle').classList.add(show ? 'bg-blue-600' : 'bg-gray-200');
+            slider.classList.remove('translate-x-1', 'translate-x-7');
+            slider.classList.add(show ? 'translate-x-7' : 'translate-x-1');
 
-            document.getElementById('axesToggle').setAttribute('aria-checked', show);
+            toggleEl.classList.remove('bg-gray-500', 'bg-gray-800', 'bg-blue-600', 'bg-gray-200');
+            toggleEl.classList.add(show ? 'bg-gray-800' : 'bg-gray-500');
+
+            toggleEl.setAttribute('aria-checked', show);
         });
 
         document.getElementById('axesToggle').addEventListener('click', () => {
