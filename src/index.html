@@ -2403,7 +2403,7 @@
                 params.append(key, paramValue);
             }
             const paramStr = `?${params.toString()}`;
-            return `https://fuzzygraph.com/${paramStr}`;
+            return `https://fuzzygraph.com/v${version}.html${paramStr}`;
         }
 
         setParamsFromUrl();
