@@ -286,7 +286,7 @@
                     </svg>
                 </button>
 
-                <div id="advancedModeToggle" class="hidden flex items-center gap-3 select-none mr-2">
+                <div id="advancedModeToggle" class="flex items-center gap-3 select-none mr-2">
                     <!-- Dynamic Label -->
                     <span id="modeLabel" class="text-xs">Basic</span>
                   
@@ -994,14 +994,11 @@
         const yHeight = atom(6);
 
         // Advanced stuff
-        const advanced = atom(false);
         const advancedMode = atom(false);
         const minVal = atom(null);
         const maxVal = atom(null);
         const minOverride = atom(null);
         const maxOverride = atom(null);
-        const minOverrideEnabled = atom(false);
-        const maxOverrideEnabled = atom(false);
 
         const sidebarOpen = atom(true);
         const mobileMenuOpen = atom(false);
@@ -1303,7 +1300,6 @@
             // Don't add advanced stuff if not in advanced mode
             if (!graphConfig['advancedMode']) {
                 delete graphConfig['advancedMode'];
-                delete graphConfig['advanced'];
                 delete graphConfig['minOverride'];
                 delete graphConfig['maxOverride'];
             }
@@ -1555,13 +1551,6 @@
             saveImage();
         });
 
-        advanced.subscribe((show) => {
-            if (show) {
-                document.getElementById('advancedModeToggle').classList.remove('hidden');
-            } else {
-                document.getElementById('advancedModeToggle').classList.add('hidden');
-            }
-        });
 
         function setMode(advancedMode) {
             const checked = advancedMode;
@@ -1587,6 +1576,9 @@
                 // thumb.classList.add('bg-gray-700');
                 advancedSection.classList.add('hidden');
                 label.textContent = 'Basic';
+
+                // Clear min and max overrides since they are no longer visible
+                clearMinAndMaxOverrides();
             }
 
             // Thumb position
@@ -2276,7 +2268,6 @@
                 yHeight: yHeight.get(),
                 showAxes: showAxes.get(),
                 advancedMode: advancedMode.get(),
-                advanced: advanced.get(),
                 minOverride: minOverride.get(),
                 maxOverride: maxOverride.get()
             };
@@ -2351,9 +2342,6 @@
             if (configObj['yHeight'] !== null && typeof configObj['yHeight'] !== 'undefined') {
                 yHeight.set(configObj['yHeight']);
             }
-            if (configObj['advanced'] != null && typeof configObj['advanced'] !== 'undefined') {
-                advanced.set(configObj['advanced']);
-            }
             if (configObj['advancedMode'] != null && typeof configObj['advancedMode'] !== 'undefined') {
                 advancedMode.set(configObj['advancedMode']);
             }
@@ -2388,8 +2376,6 @@
 
             // Don't add advanced stuff if not in advanced mode
             if (!appConfig['advancedMode']) {
-                delete appConfig['advancedMode'];
-                delete appConfig['advanced'];
                 delete appConfig['minOverride'];
                 delete appConfig['maxOverride'];
             }
