@@ -801,7 +801,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v2.0.0</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v2.1.0</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a>/non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1019,6 +1019,7 @@
         } from './js/fuzzygraph.js';
 
         const version = '2';
+        const defaultMaxOverride = 5;
 
         const equation = atom('y = x^2 - 1');
         const fuzzyLevel = atom(30);
@@ -1034,7 +1035,7 @@
         const minVal = atom(null);
         const maxVal = atom(null);
         const minOverride = atom(null);
-        const maxOverride = atom(null);
+        const maxOverride = atom(defaultMaxOverride);
 
         const sidebarOpen = atom(true);
         const mobileMenuOpen = atom(false);
@@ -1159,14 +1160,13 @@
         }
 
         // Download FuzzyGraph
-
         function downloadFuzzygraph() {
             const htmlContent = document.documentElement.outerHTML;
             const blob = new Blob([htmlContent], { type: 'text/html' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v2.0.0.html';
+            a.download = 'FuzzyGraph_v2.1.0.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1174,7 +1174,6 @@
         }
 
         // Save Image
-
         async function saveImage() {
             let saveCanvas = null;
             if (saveDefaultConfig.get()) {
@@ -1484,16 +1483,10 @@
 
         minVal.subscribe((minV) => {
             document.getElementById('minDisplay').textContent = formatNumber(minV);
-            // if (minOverride.get() == null || minOverride.get() == '') {
-            //     minOverride.set(minV);
-            // }
         });
 
         maxVal.subscribe((maxV) => {
             document.getElementById('maxDisplay').textContent = formatNumber(maxV);
-            // if (maxOverride.get() == null || maxOverride.get() == '') {
-            //     maxOverride.set(maxV);
-            // }
         });
 
         const minToggle = document.getElementById("minOverrideToggle");
@@ -1587,7 +1580,7 @@
 
         function clearMinAndMaxOverrides() {
             minOverride.set(null);
-            maxOverride.set(null);
+            maxOverride.set(defaultMaxOverride);
         }
 
         document.getElementById('minOverrideInput').addEventListener('input', (event) => {
@@ -2429,12 +2422,6 @@
 
         function getShareUrl() {
             var appConfig = getAppConfig();
-
-            // Don't add advanced stuff if not in advanced mode
-            if (!appConfig['advancedMode']) {
-                delete appConfig['minOverride'];
-                delete appConfig['maxOverride'];
-            }
 
             if (appConfig['minOverride'] == null || appConfig['minOverride'] == '') {
                 appConfig['minOverride'] = minVal.get();
