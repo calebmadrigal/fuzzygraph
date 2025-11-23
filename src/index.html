@@ -801,7 +801,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v2.1.0</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v2.1.1</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a>/non-binary graphing calculator.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1166,7 +1166,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v2.1.0.html';
+            a.download = 'FuzzyGraph_v2.1.1.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1468,15 +1468,15 @@
             if (num == null) { return ''; }
 
              // Handle very small numbers like 8.88e-16
-            if (Math.abs(num) < 0.0001) {
+            if (Math.abs(num) < 0.000001) {
                 return '0';
             }
             else if (Math.abs(num) >= 1000000) {
-                return num.toExponential(4); // e.g., "8.8888e-16"
+                return num.toExponential(8); // e.g., "8.8888e-16"
             }
 
             // Otherwise, use fixed decimal, trimmed
-            let str = num.toFixed(6);      // up to 6 decimals
+            let str = num.toFixed(8);      // up to 8 decimals
             str = str.replace(/\.?0+$/, ''); // strip trailing zeros
             return str.length > 8 ? str.slice(0, 8) : str;
         }
@@ -1852,7 +1852,9 @@
 
         // CONTROL PANEL / Equation / Help
         document.getElementById('equationInput').addEventListener('input', (event) => {
-            equation.set(event.target.value);
+            // Remove new lines, spaces, etc to prevent errors
+            const cleanEquationStr= event.target.value.replace(/\s+/g, "");
+            equation.set(cleanEquationStr);
         });
 
         showEquationHelpModal.listen((visible) => { document.getElementById('equationHelpModal').classList.toggle('hidden', !visible); });
@@ -2096,11 +2098,14 @@
         }
 
         function getPrecision() {
+            const errorRange = maxVal.get() - minVal.get();
+            const errorRangeLeadingZeros = countLeadingZeros(getDecimalPart(errorRange.toString()));
             const yHeightVal = yHeight.get();
+            const heightLeadingZeros = countLeadingZeros(getDecimalPart(yHeightVal.toString()));
             if (yHeightVal >= 0.01) {
-                return 3;
+                return 7;
             } else {
-                return countLeadingZeros(getDecimalPart(yHeightVal.toString())) + 3;
+                return max(errorRangeLeadingZeros, heightLeadingZeros) + 3;
             }
         }
 
