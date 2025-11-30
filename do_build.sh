@@ -11,7 +11,10 @@ cp src/examples.html dist
 cp -r images dist
 
 # Copy previous versions to dist
-curl -L -o dist/v1.html https://github.com/calebmadrigal/fuzzygraph/releases/download/v1.0.43/FuzzyGraph_v1.0.43.html
+if [ ! -f "dist/v1.html" ]; then
+    echo "Downloading v1.html"
+    curl -L -o dist/v1.html https://github.com/calebmadrigal/fuzzygraph/releases/download/v1.0.43/FuzzyGraph_v1.0.43.html
+fi
 
 # Copy current version to a versioned link
 cp dist/index.html dist/v2.html  # NOTE: Make sure to change this from v2.html to v3.html (and add v2.html curl copy as above)

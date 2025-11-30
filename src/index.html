@@ -801,7 +801,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v2.2.1</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v2.3.0</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a>/non-binary graphing calculator. FuzzyGraph is also free and <a href="https://github.com/calebmadrigal/fuzzygraph" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">open-source</a>.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1275,6 +1275,7 @@
             combineOperator: '+',
             rotateRadians: 0,
         });
+        const unmodifiedCymaticsEquation = atom(false);
 
         // Save modal variables
         const saveWidth = atom(0);
@@ -1393,7 +1394,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v2.2.1.html';
+            a.download = 'FuzzyGraph_v2.3.0.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1401,8 +1402,19 @@
         }
 
         // Save Image
-        async function saveImage() {
+        async function saveImage(w=null, h=null, cX=null, cY=null, yH=null) {
+            const sW = w ?? saveWidth.get();
+            const sH = h ?? saveHeight.get();
+            const sCX = cX ?? saveCenterX.get();
+            const sCY = cY ?? saveCenterY.get();
+            const sYH = yH ?? saveYHeight.get();
+            if (w | h | cX | cY | yH) {
+                // If we received any of these, then this is not from the UI, and we need to render
+                saveDefaultConfig.set(false);
+            }
+
             let saveCanvas = null;
+
             if (saveDefaultConfig.get()) {
                 // If no defaults were changed in the Save Image modal,
                 // we can just copy the image from the main canvas.
@@ -1411,8 +1423,8 @@
                 // But if any parameters in the Save Image modal were changed,
                 // we need to fully repaint the image in a new off-DOM canvas.
                 saveCanvas = document.createElement('canvas');
-                saveCanvas.width = saveWidth.get();
-                saveCanvas.height = saveHeight.get();
+                saveCanvas.width = sW;
+                saveCanvas.height = sH;
 
                 // Compile equation using math.js (parseEquationString)
                 const parsedEquation = parseEquationString(getStrippedEquation());
@@ -1422,13 +1434,12 @@
                     fuzzyLevel: fuzzyLevel.get(),
                     colorMap: colorMap.get(),
                     invertColor: invertColor.get(),
-                    xCenter: parseFloat(saveCenterX.get()),
-                    yCenter: parseFloat(saveCenterY.get()),
-                    yHeight: parseFloat(saveYHeight.get()),
+                    xCenter: parseFloat(sCX),
+                    yCenter: parseFloat(sCY),
+                    yHeight: parseFloat(sYH),
                     minOverride: minOverride.get(),
                     maxOverride: maxOverride.get(),
-                    showAxes: saveShowAxes.get(),
-                    version: version
+                    showAxes: saveShowAxes.get()
                 };
 
                 displayGraph(graphConfig, saveCanvas);
@@ -2081,6 +2092,7 @@
         // CONTROL PANEL / Equation / Help
         document.getElementById('equationInput').addEventListener('input', (event) => {
             equation.set(event.target.value);
+            unmodifiedCymaticsEquation.set(false);
         });
 
         showEquationHelpModal.listen((visible) => { document.getElementById('equationHelpModal').classList.toggle('hidden', !visible); });
@@ -2549,8 +2561,15 @@
                 showAxes: showAxes.get(),
                 advancedMode: advancedMode.get(),
                 minOverride: minOverride.get(),
-                maxOverride: maxOverride.get()
+                maxOverride: maxOverride.get(),
+                version: version
             };
+
+            if (unmodifiedCymaticsEquation.get()) {
+                graphConfig['cymaticsConfig'] = cymaticsConfig.get();
+                // NOTE: No need to include a long equation if we can just load it from the cymaticsConfig
+                delete graphConfig.equation;
+            }
 
             return graphConfig;
         }
@@ -2631,6 +2650,13 @@
             if (configObj['maxOverride'] != null && typeof configObj['maxOverride'] !== 'undefined') {
                 maxOverride.set(configObj['maxOverride']);
             }
+            if (configObj['cymaticsConfig'] != null && typeof configObj['cymaticsConfig'] !== 'undefined') {
+                cymaticsConfig.set(configObj['cymaticsConfig']);
+                // If this was a cymatics equation, load the equation from the cymatics config
+                const cymaticsEqStr = get_cymatics_equation_generator(cymaticsConfig.get());
+                equation.set(cymaticsEqStr);
+            }
+
         }
 
         function setParamsFromUrl() {
@@ -2648,11 +2674,37 @@
                 }
             }
 
+            const raw = getParameterByName("cymaticsConfig", urlFragmentId);
+            let cymaticsConfigObj = null;
+            if (raw) {
+                try {
+                    cymaticsConfigObj = JSON.parse(decodeURIComponent(raw));
+                } catch (e) {
+                    console.warn("Invalid cymaticsConfig JSON");
+                }
+            }
+
+            configFromUrl.cymaticsConfig = cymaticsConfigObj;
+
             setConfigFromObj(configFromUrl);
+
+            if (getParameterByName('download', urlFragmentId) != null) {
+                const w = getParameterByName('w');
+                const h = getParameterByName('h');
+                const cX = getParameterByName('cx');
+                const cY = getParameterByName('cy');
+                const yH = getParameterByName('yh');
+                saveImage(w, h, cX, cY, yH);
+            }
         }
 
         function getShareUrl() {
             var appConfig = getAppConfig();
+
+            if (appConfig.cymaticsConfig) {
+                const cymaticsConfStr = encodeURIComponent(JSON.stringify(appConfig.cymaticsConfig));
+                appConfig.cymaticsConfig = cymaticsConfStr;
+            }
 
             if (appConfig['minOverride'] == null || appConfig['minOverride'] == '') {
                 appConfig['minOverride'] = minVal.get();
@@ -2748,11 +2800,7 @@
         });
     }
 
-    // ---------- PUBLIC FUNCTION using NANOSTORES CONFIG ----------
-
-    function get_cymatics_equation_generator() {
-        const cfg = cymaticsConfig.get();
-
+    function get_cymatics_equation_generator(cfg) {
         const eqStr = cymatics_equation_generator(
             cfg.numResonators,
             cfg.distance,
@@ -2850,8 +2898,10 @@
         // Insert equation button: use store-backed function, then close modal
         if (insertBtn) {
             insertBtn.addEventListener('click', () => {
-                const cymaticsEqStr = get_cymatics_equation_generator();
+                const cfg = cymaticsConfig.get();
+                const cymaticsEqStr = get_cymatics_equation_generator(cfg);
                 equation.set(cymaticsEqStr);
+                unmodifiedCymaticsEquation.set(true);
                 showCymaticsModal.set(false);
             });
         }

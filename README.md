@@ -15,6 +15,8 @@
 - [x] Backward compatibility for images and share links
 - [x] New rendering algorithm (v2.0.0)
 - [x] Advanced mode
+- [x] Digital Cymatics Equation Generator
+- [x] Basic API
 - [ ] More precise pan and zoom controls
 - [ ] More transfer function controls
 - [ ] Shader-based rendering (for speed)
