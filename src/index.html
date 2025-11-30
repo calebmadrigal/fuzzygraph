@@ -801,7 +801,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v2.1.2</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v2.2.0</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a>/non-binary graphing calculator. FuzzyGraph is also free and <a href="https://github.com/calebmadrigal/fuzzygraph" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">open-source</a>.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -992,6 +992,9 @@
             <button class="fn" data-insert=")" title="right paren">)</button>
             <button class="fn" data-insert="," title="comma">,</button>
             <button class="fn" data-insert=" " title="space">␠</button>
+
+            <!-- Equation generators -->
+            <button class="fn" id="openCymaticsModal" title="Digital Cymatics Equation Generator">ψ</button>
         </div>
 
         <div style="font-size:12px; color:#666; margin-top:8px;">
@@ -1001,13 +1004,219 @@
     </div>
     <!-- END of Math Input Popover -->
 
+    <!-- Cymatics Modal -->
+    <div
+        id="cymaticsModal"
+        class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+    >
+        <!-- Modal content -->
+        <div
+            x-transition
+            class="relative bg-white rounded-lg shadow-lg p-6 max-w-lg w-full"
+        >
+            <!-- X button -->
+            <button
+                id="cymaticsModalClose"
+                class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold focus:outline-none"
+                type="button"
+            >
+                &times;
+            </button>
+
+            <h2 class="text-xl font-semibold mb-4">Digital Cymatics Equation Generator</h2>
+
+            <div class="bg-white w-full">
+                <!-- Resonator Settings -->
+                <div class="mb-4">
+                    <h3 class="text-lg font-semibold mb-2 text-gray-700">
+                        Resonator Settings
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label
+                                for="numResonatorsInput"
+                                class="block text-sm font-medium text-gray-600"
+                                >Number of Resonators</label
+                            >
+                            <input
+                                type="number"
+                                id="numResonatorsInput"
+                                name="numResonatorsInput"
+                                min="1"
+                                step="1"
+                                required
+                                class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label
+                                for="distanceInput"
+                                class="block text-sm font-medium text-gray-600"
+                                >Distance from Center</label
+                            >
+                            <input
+                                type="number"
+                                id="distanceInput"
+                                name="distanceInput"
+                                step="any"
+                                required
+                                class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Wave Parameters -->
+                <div class="mb-4">
+                    <h3 class="text-lg font-semibold mb-2 text-gray-700">
+                        Wave Parameters
+                    </h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label
+                                for="amplitudeInput"
+                                class="block text-sm font-medium text-gray-600"
+                                >Amplitude</label
+                            >
+                            <input
+                                type="number"
+                                id="amplitudeInput"
+                                name="amplitudeInput"
+                                step="any"
+                                required
+                                class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label
+                                for="frequencyInput"
+                                class="block text-sm font-medium text-gray-600"
+                                >Frequency</label
+                            >
+                            <input
+                                type="number"
+                                id="frequencyInput"
+                                name="frequencyInput"
+                                step="any"
+                                required
+                                class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <label
+                                for="phaseInput"
+                                class="block text-sm font-medium text-gray-600"
+                                >Phase</label
+                            >
+                            <input
+                                type="number"
+                                id="phaseInput"
+                                name="phaseInput"
+                                step="any"
+                                required
+                                class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                        </div>
+                        <div>
+                            <label
+                                for="combineOperatorInput"
+                                class="block text-sm font-medium text-gray-600"
+                                >Combine Operator</label
+                            >
+                            <select
+                                id="combineOperatorInput"
+                                name="combineOperatorInput"
+                                class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+                            >
+                                <option value="+">+</option>
+                                <option value="-">-</option>
+                                <option value="*">*</option>
+                                <option value="/">/</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rotation & Visualization -->
+                <div class="mb-4">
+                    <div class="grid grid-cols-2 gap-4 items-start">
+                        <div>
+                            <h3 class="text-lg font-semibold mb-2 text-gray-700">
+                                Rotation
+                            </h3>
+                            <label
+                                for="rotateRadiansInput"
+                                class="block text-sm font-medium text-gray-600"
+                                >Rotate (radians)</label
+                            >
+                            <input
+                                type="number"
+                                id="rotateRadiansInput"
+                                name="rotateRadiansInput"
+                                step="any"
+                                required
+                                class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            />
+                            <p class="mt-1 text-xs text-gray-500">
+                                π/2 (~1.571) = 90° rotation
+                            </p>
+                        </div>
+
+                        <!-- Canvas visualization -->
+                        <div class="flex flex-col items-center">
+                            <h3 class="text-lg font-semibold mb-2 text-gray-700">
+                                Layout Preview
+                            </h3>
+                            <canvas
+                                id="resonatorCanvas"
+                                width="200"
+                                height="200"
+                                class="border border-gray-300 shadow-sm"
+                            ></canvas>
+                            <p class="mt-1 text-xs text-gray-500">
+                                Points represent resonators (centered at 0,0).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bottom buttons -->
+                <div class="mt-6 flex items-center justify-between">
+                    <button
+                        type="button"
+                        id="insertCymaticsEquationButton"
+                        class="px-6 py-2 bg-gray-800 text-white font-semibold rounded-md shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
+                    >
+                        <span class="inline text-gray-200 mr-2">Insert Equation</span>
+                        <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 4v16m8-8H4"
+                            />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         window.process = { env: { NODE_ENV: "development" } };
     </script>
 
     <script type="module">
         import { math } from "mathjs";
-        import { atom } from "nanostores";
+        import { atom, map } from "nanostores";
         import { evaluate_cmap, data as js_colormaps_data } from "./js/js-colormaps";
         import {
             parseEquationString,
@@ -1017,6 +1226,10 @@
             makeLinearMapper,
             ZOOM_RATE
         } from './js/fuzzygraph.js';
+        import {
+            uniformly_distributed_points,
+            cymatics_equation_generator
+        } from './js/cymatics.js';
 
         const version = '2';
         const defaultMaxOverride = 5;
@@ -1052,6 +1265,16 @@
         const showControlsHelpModal = atom(false);
         const showColorMapHelpModal = atom(false);
         const showAdvancedHelpModal = atom(false);
+        const showCymaticsModal = atom(false);
+        const cymaticsConfig = map({
+            numResonators: 2,
+            distance: 2,
+            amplitude: 1.0,
+            frequency: 1.0,
+            phase: 0.0,
+            combineOperator: '+',
+            rotateRadians: 0,
+        });
 
         // Save modal variables
         const saveWidth = atom(0);
@@ -1166,7 +1389,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v2.1.2.html';
+            a.download = 'FuzzyGraph_v2.2.0.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1728,6 +1951,7 @@
                 showControlsHelpModal.set(false);
                 showColorMapHelpModal.set(false);
                 showAdvancedHelpModal.set(false);
+                showCymaticsModal.set(false);
                 closePopover();
             }
         });
@@ -2464,6 +2688,172 @@
                 }
             });
         });
+
+
+        // Cymatics
+        function drawResonatorPointsOnCanvas(canvasId, cfg) {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+
+        // Clear canvas
+        ctx.clearRect(0, 0, width, height);
+
+        // Background
+        ctx.fillStyle = '#f9fafb'; // gray-50-ish
+        ctx.fillRect(0, 0, width, height);
+
+        const centerX = width / 2;
+        const centerY = height / 2;
+
+        const points = uniformly_distributed_points(
+            cfg.numResonators,
+            cfg.distance,
+            cfg.rotateRadians
+        );
+
+        let maxRadius = Math.abs(cfg.distance);
+        if (maxRadius === 0) maxRadius = 1;
+        const scale = (Math.min(width, height) * 0.4) / maxRadius;
+
+        // Axes
+        ctx.strokeStyle = '#e5e7eb'; // gray-200
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(centerX, 0);
+        ctx.lineTo(centerX, height);
+        ctx.moveTo(0, centerY);
+        ctx.lineTo(width, centerY);
+        ctx.stroke();
+
+        // Origin
+        ctx.fillStyle = '#9ca3af'; // gray-400
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 3, 0, 2 * Math.PI);
+        ctx.fill();
+
+        // Points
+        ctx.fillStyle = '#111827'; // gray-900
+        points.forEach((p) => {
+            const cx = centerX + p.x * scale;
+            const cy = centerY - p.y * scale;
+            ctx.beginPath();
+            ctx.arc(cx, cy, 4, 0, 2 * Math.PI);
+            ctx.fill();
+        });
+    }
+
+    // ---------- PUBLIC FUNCTION using NANOSTORES CONFIG ----------
+
+    function get_cymatics_equation_generator() {
+        const cfg = cymaticsConfig.get();
+
+        const eqStr = cymatics_equation_generator(
+            cfg.numResonators,
+            cfg.distance,
+            cfg.amplitude,
+            cfg.frequency,
+            cfg.phase,
+            cfg.combineOperator,
+            cfg.rotateRadians
+        );
+
+        return eqStr;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const modal = document.getElementById('cymaticsModal');
+        const openBtn = document.getElementById('openCymaticsModal');
+        const closeBtn = document.getElementById('cymaticsModalClose');
+        const insertBtn = document.getElementById('insertCymaticsEquationButton');
+
+        const numInput = document.getElementById('numResonatorsInput');
+        const distanceInput = document.getElementById('distanceInput');
+        const amplitudeInput = document.getElementById('amplitudeInput');
+        const frequencyInput = document.getElementById('frequencyInput');
+        const phaseInput = document.getElementById('phaseInput');
+        const combineInput = document.getElementById('combineOperatorInput');
+        const rotateInput = document.getElementById('rotateRadiansInput');
+
+        // Initialize inputs from store
+        const initial = cymaticsConfig.get();
+        numInput.value = initial.numResonators;
+        distanceInput.value = initial.distance;
+        amplitudeInput.value = initial.amplitude;
+        frequencyInput.value = initial.frequency;
+        phaseInput.value = initial.phase;
+        combineInput.value = initial.combineOperator;
+        rotateInput.value = initial.rotateRadians;
+
+        // Sync modal visibility with store
+        showCymaticsModal.subscribe((isOpen) => {
+            if (!modal) return;
+            if (isOpen) {
+                modal.classList.remove('hidden');
+                drawResonatorPointsOnCanvas('resonatorCanvas', cymaticsConfig.get());
+            } else {
+                modal.classList.add('hidden');
+            }
+        });
+
+        // Open / close via buttons
+        if (openBtn) {
+            openBtn.addEventListener('click', () => {
+                closePopover();
+                showCymaticsModal.set(true);
+            });
+        }
+        if (closeBtn) closeBtn.addEventListener('click', () => showCymaticsModal.set(false));
+
+        // Click on overlay closes modal
+        if (modal) {
+            modal.addEventListener('mousedown', (e) => {
+                if (e.target === modal) {
+                    showCymaticsModal.set(false);
+                }
+            });
+        }
+
+        // On each input change, update store
+        numInput.addEventListener('input', (e) => {
+            cymaticsConfig.setKey('numResonators', Number(e.target.value || 0));
+        });
+        distanceInput.addEventListener('input', (e) => {
+            cymaticsConfig.setKey('distance', Number(e.target.value || 0));
+        });
+        amplitudeInput.addEventListener('input', (e) => {
+            cymaticsConfig.setKey('amplitude', Number(e.target.value || 0));
+        });
+        frequencyInput.addEventListener('input', (e) => {
+            cymaticsConfig.setKey('frequency', Number(e.target.value || 0));
+        });
+        phaseInput.addEventListener('input', (e) => {
+            cymaticsConfig.setKey('phase', Number(e.target.value || 0));
+        });
+        combineInput.addEventListener('change', (e) => {
+            cymaticsConfig.setKey('combineOperator', e.target.value);
+        });
+        rotateInput.addEventListener('input', (e) => {
+            cymaticsConfig.setKey('rotateRadians', Number(e.target.value || 0));
+        });
+
+        // Whenever layout-related config changes, redraw canvas
+        cymaticsConfig.subscribe((cfg) => {
+            drawResonatorPointsOnCanvas('resonatorCanvas', cfg);
+        });
+
+        // Insert equation button: use store-backed function, then close modal
+        if (insertBtn) {
+            insertBtn.addEventListener('click', () => {
+                const cymaticsEqStr = get_cymatics_equation_generator();
+                equation.set(cymaticsEqStr);
+                showCymaticsModal.set(false);
+            });
+        }
+    });
 
     </script>
 </body>
