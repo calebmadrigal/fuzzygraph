@@ -801,7 +801,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v2.2.0</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v2.2.1</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a>/non-binary graphing calculator. FuzzyGraph is also free and <a href="https://github.com/calebmadrigal/fuzzygraph" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">open-source</a>.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1287,6 +1287,10 @@
 
         var pixelValuesStore = atom([]);
 
+        function getStrippedEquation() {
+            return equation.get().replace(/\s+/g, "");
+        }
+
         function checkCanvasSize(canvas) {
             const ctx = canvas.getContext('2d');
             const dpr = window.devicePixelRatio || 1
@@ -1339,7 +1343,7 @@
             const canvas = document.getElementById('mainCanvas');
 
             // Compile equation using math.js (parseEquationString)
-            const parsedEquation = parseEquationString(equation.get());
+            const parsedEquation = parseEquationString(getStrippedEquation());
 
             if (parsedEquation) {
                 var graphConfig = {
@@ -1370,7 +1374,7 @@
                 document.getElementById('hoverMsgDiv').style.display = 'block';
 
                 // TODO: More particular message
-                const errorDetails = getEquationErrorDetails(equation.get());
+                const errorDetails = getEquationErrorDetails(getStrippedEquation());
                 hoverMsg.set('Equation is invalid' + errorDetails);
             }
         }
@@ -1389,7 +1393,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v2.2.0.html';
+            a.download = 'FuzzyGraph_v2.2.1.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1411,7 +1415,7 @@
                 saveCanvas.height = saveHeight.get();
 
                 // Compile equation using math.js (parseEquationString)
-                const parsedEquation = parseEquationString(equation.get());
+                const parsedEquation = parseEquationString(getStrippedEquation());
 
                 var graphConfig = {
                     equationFunction: parsedEquation,
@@ -2076,9 +2080,7 @@
 
         // CONTROL PANEL / Equation / Help
         document.getElementById('equationInput').addEventListener('input', (event) => {
-            // Remove new lines, spaces, etc to prevent errors
-            const cleanEquationStr= event.target.value.replace(/\s+/g, "");
-            equation.set(cleanEquationStr);
+            equation.set(event.target.value);
         });
 
         showEquationHelpModal.listen((visible) => { document.getElementById('equationHelpModal').classList.toggle('hidden', !visible); });
@@ -2537,7 +2539,7 @@
 
         function getAppConfig() {
             var graphConfig = {
-                equation: equation.get(),
+                equation: getStrippedEquation(),
                 fuzzyLevel: fuzzyLevel.get(),
                 colorMap: colorMap.get(),
                 invertColor: invertColor.get(),
