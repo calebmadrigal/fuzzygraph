@@ -801,7 +801,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v2.3.0</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v2.3.1</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a>/non-binary graphing calculator. FuzzyGraph is also free and <a href="https://github.com/calebmadrigal/fuzzygraph" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">open-source</a>.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1007,12 +1007,11 @@
     <!-- Cymatics Modal -->
     <div
         id="cymaticsModal"
-        class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-    >
+        class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 ">
         <!-- Modal content -->
         <div
             x-transition
-            class="relative bg-white rounded-lg shadow-lg p-6 max-w-lg w-full"
+            class="relative bg-white rounded-lg shadow-lg p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto mx-4"
         >
             <!-- X button -->
             <button
@@ -1023,7 +1022,9 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">Digital Cymatics Equation Generator</h2>
+            <h2 class="text-xl font-semibold mb-4">
+                Digital Cymatics Equation Generator
+            </h2>
 
             <div class="bg-white w-full">
                 <!-- Resonator Settings -->
@@ -1031,7 +1032,7 @@
                     <h3 class="text-lg font-semibold mb-2 text-gray-700">
                         Resonator Settings
                     </h3>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label
                                 for="numResonatorsInput"
@@ -1071,7 +1072,7 @@
                     <h3 class="text-lg font-semibold mb-2 text-gray-700">
                         Wave Parameters
                     </h3>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label
                                 for="amplitudeInput"
@@ -1104,7 +1105,7 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4 mt-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                         <div>
                             <label
                                 for="phaseInput"
@@ -1142,7 +1143,7 @@
 
                 <!-- Rotation & Visualization -->
                 <div class="mb-4">
-                    <div class="grid grid-cols-2 gap-4 items-start">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
                         <div>
                             <h3 class="text-lg font-semibold mb-2 text-gray-700">
                                 Rotation
@@ -1174,7 +1175,7 @@
                                 id="resonatorCanvas"
                                 width="200"
                                 height="200"
-                                class="border border-gray-300 shadow-sm"
+                                class="border border-gray-300 shadow-sm w-32 h-32 sm:w-48 sm:h-48"
                             ></canvas>
                             <p class="mt-1 text-xs text-gray-500">
                                 Points represent resonators (centered at 0,0).
@@ -1184,7 +1185,7 @@
                 </div>
 
                 <!-- Bottom buttons -->
-                <div class="mt-6 flex items-center justify-between">
+                <div class="mt-6 flex items-center justify-center pb-20 sm:pb-6">
                     <button
                         type="button"
                         id="insertCymaticsEquationButton"
@@ -1206,9 +1207,12 @@
                         </svg>
                     </button>
                 </div>
+
+
             </div>
         </div>
     </div>
+
 
     <script>
         window.process = { env: { NODE_ENV: "development" } };
@@ -1394,7 +1398,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v2.3.0.html';
+            a.download = 'FuzzyGraph_v2.3.1.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
