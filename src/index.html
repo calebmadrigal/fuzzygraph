@@ -248,15 +248,22 @@
                     </svg>
                 </button>
 
-                <div class="mt-4">
-                    <button id="homeButton"
-                        class="p-1.5 bg-gray-800 bg-opacity-75 hover:bg-opacity-100 text-white rounded-lg shadow-lg transition-colors duration-200 flex items-center justify-center">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 9.5l9-7 9 7M4 10v10a1 1 0 001 1h5V14h4v7h5a1 1 0 001-1V10" />
-                        </svg>
-                    </button>
-                </div>
+                <button id="gotoButton"
+                    class="p-1.5 bg-gray-800 bg-opacity-75 hover:bg-opacity-100 text-white rounded-lg shadow-lg transition-colors duration-200 flex items-center justify-center mt-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="9" stroke-width="2" />
+                        <circle cx="12" cy="12" r="4" stroke-width="2" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2m0 14v2m9-9h-2M5 12H3" />
+                    </svg>
+                </button>
+
+                <button id="homeButton"
+                    class="p-1.5 bg-gray-800 bg-opacity-75 hover:bg-opacity-100 text-white rounded-lg shadow-lg transition-colors duration-200 flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 9.5l9-7 9 7M4 10v10a1 1 0 001 1h5V14h4v7h5a1 1 0 001-1V10" />
+                    </svg>
+                </button>
 
             </div>
             <!-- Sidebar Show Button (Desktop) -->
@@ -762,6 +769,92 @@
     </div>
     
 
+    <!-- Goto modal background -->
+    <div id="gotoModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <!-- Modal content -->
+        <div x-transition class="relative bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+
+            <!-- X button -->
+            <button id="gotoModalX"
+                class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold focus:outline-none">
+                &times;
+            </button>
+
+            <h2 class="text-xl font-semibold mb-4">Goto</h2>
+
+            <div class="bg-white w-full max-w-md space-y-6">
+                <!-- Center Inputs -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-2 text-gray-700">Center</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="gotoCenterXInput" class="block text-sm font-medium text-gray-600">X (decimal)</label>
+                            <input
+                                type="number"
+                                id="gotoCenterXInput"
+                                name="gotoCenterXInput"
+                                step="any"
+                                required
+                                class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Enter x coordinate"
+                            >
+                        </div>
+                        <div>
+                            <label for="gotoCenterYInput" class="block text-sm font-medium text-gray-600">Y (decimal)</label>
+                            <input
+                                type="number"
+                                id="gotoCenterYInput"
+                                name="gotoCenterYInput"
+                                step="any"
+                                required
+                                class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Enter y coordinate"
+                            >
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Zoom Input -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-2 text-gray-700">Zoom</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="gotoZoomInput" class="block text-sm font-medium text-gray-600">Zoom (decimal)</label>
+                            <input
+                                type="number"
+                                id="gotoZoomInput"
+                                name="gotoZoomInput"
+                                step="any"
+                                required
+                                class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Enter zoom"
+                            >
+                        </div>
+                        <div>&nbsp;</div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-3">
+                    <button
+                        type="button"
+                        id="gotoCancelButton"
+                        class="px-6 py-2 bg-gray-200 text-gray-800 font-semibold rounded-md shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="button"
+                        id="gotoSubmitButton"
+                        class="px-6 py-2 bg-gray-800 text-white font-semibold rounded-md shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
+                    >
+                        Goto
+                    </button>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
 
     <!-- Open modal background -->
     <div id="openModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -808,7 +901,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v2.3.3</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v2.4.0</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a>/non-binary graphing calculator. FuzzyGraph is also free and <a href="https://github.com/calebmadrigal/fuzzygraph" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">open-source</a>.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1289,6 +1382,7 @@
         } from './js/cymatics.js';
 
         const version = '2';
+        const yHeightAtZoom1 = 6;
         const defaultMaxOverride = 5;
 
         const equation = atom('y = x^2 - 1');
@@ -1298,7 +1392,7 @@
         const invertColor = atom(true);
         const xCenter = atom(0);
         const yCenter = atom(0);
-        const yHeight = atom(6);
+        const yHeight = atom(yHeightAtZoom1);
 
         // Advanced stuff
         const advancedMode = atom(false);
@@ -1316,6 +1410,7 @@
 
         const showShareModal = atom(false);
         const showSaveModal = atom(false);
+        const showGotoModal = atom(false);
         const showOpenModal = atom(false);
         const showHelpModal = atom(false);
         const showEquationHelpModal = atom(false);
@@ -1340,7 +1435,7 @@
         const saveHeight = atom(0);
         const saveCenterX = atom(0);
         const saveCenterY = atom(0);
-        const saveYHeight = atom(6);
+        const saveYHeight = atom(yHeightAtZoom1);
         const saveShowAxes = atom(true);
         const saveDefaultConfig = atom(true);
 
@@ -1452,7 +1547,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v2.3.3.html';
+            a.download = 'FuzzyGraph_v2.4.0.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1991,6 +2086,13 @@
             document.getElementById('saveYHeightInput').value = val;
         });
 
+        function populateGotoModalFields() {
+            document.getElementById('gotoCenterXInput').value = xCenter.get();
+            document.getElementById('gotoCenterYInput').value = yCenter.get();
+            document.getElementById('gotoZoomInput').value = yHeightAtZoom1 / yHeight.get();
+        }
+
+
         // // // // // // // Event handling
 
         // Download offline copy of FuzzyGraph
@@ -2013,6 +2115,12 @@
                 saveDefaultConfig.set(true);
             }
         });
+        showGotoModal.listen((visible) => {
+            document.getElementById('gotoModal').classList.toggle('hidden', !visible);
+            if (visible) {
+                populateGotoModalFields();
+            }
+        });
 
         document.addEventListener('keydown', (event) => {
             if (event.key === 'Escape') {
@@ -2026,6 +2134,7 @@
                 showAdvancedHelpModal.set(false);
                 showEquationModal.set(false);
                 showCymaticsModal.set(false);
+                showGotoModal.set(false);
                 closePopover();
             }
         });
@@ -2086,6 +2195,23 @@
         document.getElementById('saveModalX').addEventListener('click', () => { showSaveModal.set(false); });
         document.getElementById('openModalX').addEventListener('click', () => { showOpenModal.set(false); });
         document.getElementById('helpModalX').addEventListener('click', () => { showHelpModal.set(false); });
+        document.getElementById('gotoModalX').addEventListener('click', () => { showGotoModal.set(false); });
+        document.getElementById('gotoCancelButton').addEventListener('click', () => { showGotoModal.set(false); });
+        document.getElementById('gotoSubmitButton').addEventListener('click', () => {
+            const newX = parseFloat(document.getElementById('gotoCenterXInput').value);
+            const newY = parseFloat(document.getElementById('gotoCenterYInput').value);
+            const zoom = parseFloat(document.getElementById('gotoZoomInput').value);
+
+            if (!Number.isFinite(newX) || !Number.isFinite(newY) || !Number.isFinite(zoom) || zoom === 0) {
+                return;
+            }
+
+            xCenter.set(newX);
+            yCenter.set(newY);
+            yHeight.set(yHeightAtZoom1 / zoom);
+            scheduleRepaint();
+            showGotoModal.set(false);
+        });
 
         // Mobile top menu
         mobileMenuOpen.subscribe((visible) => {
@@ -2312,12 +2438,16 @@
         });
         // Home
         document.getElementById('homeButton').addEventListener('click', () => {
-            yHeight.set(6);
+            yHeight.set(yHeightAtZoom1);
             xCenter.set(0);
             yCenter.set(0);
             scheduleRepaint();
         });
 
+        // Goto
+        document.getElementById('gotoButton').addEventListener('click', () => {
+            showGotoModal.set(true);
+        });
 
         // // // // // // // Drag and drop to pan
 
