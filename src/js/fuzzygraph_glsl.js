@@ -538,8 +538,12 @@ function createColormapLUT(colormapName, invertColor) {
 function ensureCanvasSize(canvas) {
   const dpr = window.devicePixelRatio || 1;
   const rect = canvas.getBoundingClientRect();
-  const w = Math.max(1, Math.round(rect.width * dpr));
-  const h = Math.max(1, Math.round(rect.height * dpr));
+  // If the canvas isn't attached to the DOM (e.g. offscreen render for downloads),
+  // getBoundingClientRect will return 0 for width/height. In that case, respect the
+  // current intrinsic size that was already set by the caller.
+  const hasSizeFromDOM = rect.width > 0 && rect.height > 0;
+  const w = hasSizeFromDOM ? Math.max(1, Math.round(rect.width * dpr)) : canvas.width;
+  const h = hasSizeFromDOM ? Math.max(1, Math.round(rect.height * dpr)) : canvas.height;
   if (canvas.width !== w || canvas.height !== h) {
     canvas.width = w;
     canvas.height = h;

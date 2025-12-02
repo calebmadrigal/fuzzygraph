@@ -901,7 +901,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v3.0.3</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v3.0.4</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a> (non-binary) graphing calculator. FuzzyGraph is also free and <a href="https://github.com/calebmadrigal/fuzzygraph" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">open-source</a>.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1549,7 +1549,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v3.0.3.html';
+            a.download = 'FuzzyGraph_v3.0.4.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1558,11 +1558,25 @@
 
         // Save Image
         async function saveImage(w=null, h=null, cX=null, cY=null, yH=null) {
-            const sW = w ?? saveWidth.get();
-            const sH = h ?? saveHeight.get();
-            const sCX = cX ?? saveCenterX.get();
-            const sCY = cY ?? saveCenterY.get();
-            const sYH = yH ?? saveYHeight.get();
+            // const sW = w ?? saveWidth.get();
+            // const sH = h ?? saveHeight.get();
+            // const sCX = cX ?? saveCenterX.get();
+            // const sCY = cY ?? saveCenterY.get();
+            // const sYH = yH ?? saveYHeight.get();
+            const fallbackW = canvas.width;
+            const fallbackH = canvas.height;
+
+            const toNumberOr = (val, fallback) => {
+                const num = Number(val);
+                return Number.isFinite(num) ? num : fallback;
+            };
+
+            const sW = toNumberOr(w ?? saveWidth.get(), fallbackW);
+            const sH = toNumberOr(h ?? saveHeight.get(), fallbackH);
+            const sCX = toNumberOr(cX ?? saveCenterX.get(), xCenter.get());
+            const sCY = toNumberOr(cY ?? saveCenterY.get(), yCenter.get());
+            const sYH = toNumberOr(yH ?? saveYHeight.get(), yHeight.get());
+
             if (w | h | cX | cY | yH) {
                 // If we received any of these, then this is not from the UI, and we need to render
                 saveDefaultConfig.set(false);
@@ -2350,6 +2364,8 @@
             toggleEl.classList.add(show ? 'bg-gray-800' : 'bg-gray-500');
 
             toggleEl.setAttribute('aria-checked', show);
+
+            saveShowAxes.set(show);
         });
 
         document.getElementById('axesToggle').addEventListener('click', () => {
