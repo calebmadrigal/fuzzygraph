@@ -340,10 +340,17 @@
                             placeholder="y=x">
                         </textarea>
 
+                        <button id="openEquationModalButton" type="button" title="Open equation editor"
+                        class="m-1"
+                        style="position:absolute; right:6px; bottom:30px; height:20px; width:20px; border-radius:4px;
+                                border:0px; background:#fff; cursor:pointer; font-size:18px; line-height:1; padding:0;">
+                        ✎
+                        </button>
+
                         <button id="mathBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="mathPopover"
                         title="Math functions (⌘/Ctrl+K)"
                         class="m-1"
-                        style="position:absolute; right:6px; bottom:6px; height:20px; width:20px; border-radius:4px; 
+                        style="position:absolute; right:6px; bottom:6px; height:20px; width:20px; border-radius:4px;
                                 border:0px; background:#fff; cursor:pointer; font-size:18px; line-height:1; padding:0;">
                         +
                         </button>
@@ -801,7 +808,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v2.3.2</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v2.3.3</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a>/non-binary graphing calculator. FuzzyGraph is also free and <a href="https://github.com/calebmadrigal/fuzzygraph" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">open-source</a>.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1003,6 +1010,52 @@
         </div>
     </div>
     <!-- END of Math Input Popover -->
+
+    <!-- Equation Modal -->
+    <div
+        id="equationModal"
+        class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+    >
+        <div
+            class="relative bg-white rounded-lg shadow-lg p-8 max-w-4xl w-full max-h-[90vh] h-[70vh] overflow-hidden mx-4 flex flex-col"
+        >
+            <button
+                id="equationModalClose"
+                class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold focus:outline-none"
+                type="button"
+            >
+                &times;
+            </button>
+
+            <h2 class="text-xl font-semibold mb-4">Equation</h2>
+
+            <div class="flex-1 mb-4">
+                <textarea
+                    id="equationModalTextarea"
+                    class="w-full h-full min-h-[320px] border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                    spellcheck="false"
+                    autocapitalize="off"
+                ></textarea>
+            </div>
+
+            <div class="flex justify-end space-x-3 pt-2 border-t border-gray-200">
+                <button
+                    id="equationModalCancel"
+                    class="px-4 py-2 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    type="button"
+                >
+                    Cancel
+                </button>
+                <button
+                    id="equationModalUpdate"
+                    class="px-4 py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    type="button"
+                >
+                    Update
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Cymatics Modal -->
     <div
@@ -1269,6 +1322,7 @@
         const showControlsHelpModal = atom(false);
         const showColorMapHelpModal = atom(false);
         const showAdvancedHelpModal = atom(false);
+        const showEquationModal = atom(false);
         const showCymaticsModal = atom(false);
         const cymaticsConfig = map({
             numResonators: 2,
@@ -1398,7 +1452,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v2.3.2.html';
+            a.download = 'FuzzyGraph_v2.3.3.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1970,6 +2024,7 @@
                 showControlsHelpModal.set(false);
                 showColorMapHelpModal.set(false);
                 showAdvancedHelpModal.set(false);
+                showEquationModal.set(false);
                 showCymaticsModal.set(false);
                 closePopover();
             }
@@ -2082,8 +2137,14 @@
         document.getElementById('hideControlPanelButton').addEventListener('click', () => { sidebarOpen.set(false); });
 
         // CONTROL PANEL / Equation
+        const equationModalTextarea = document.getElementById('equationModalTextarea');
+
         equation.subscribe((eq) => {
             document.getElementById('equationInput').value = eq;
+
+            if (!document.getElementById('equationModal').classList.contains('hidden') && equationModalTextarea) {
+                equationModalTextarea.value = eq;
+            }
 
             // If not in advancd mode, clear the min and max overrides when the equation changes
             if (!advancedMode.get()) {
@@ -2097,6 +2158,37 @@
         document.getElementById('equationInput').addEventListener('input', (event) => {
             equation.set(event.target.value);
             unmodifiedCymaticsEquation.set(false);
+        });
+
+        showEquationModal.listen((visible) => {
+            const modal = document.getElementById('equationModal');
+            modal.classList.toggle('hidden', !visible);
+
+            if (visible && equationModalTextarea) {
+                const currentEquation = equation.get();
+                equationModalTextarea.value = currentEquation;
+                equationModalTextarea.focus();
+                equationModalTextarea.setSelectionRange(currentEquation.length, currentEquation.length);
+            }
+        });
+
+        document.getElementById('openEquationModalButton').addEventListener('click', () => {
+            showEquationModal.set(true);
+        });
+
+        document.getElementById('equationModalClose').addEventListener('click', () => {
+            showEquationModal.set(false);
+        });
+
+        document.getElementById('equationModalCancel').addEventListener('click', () => {
+            showEquationModal.set(false);
+        });
+
+        document.getElementById('equationModalUpdate').addEventListener('click', () => {
+            if (!equationModalTextarea) return;
+            equation.set(equationModalTextarea.value);
+            unmodifiedCymaticsEquation.set(false);
+            showEquationModal.set(false);
         });
 
         showEquationHelpModal.listen((visible) => { document.getElementById('equationHelpModal').classList.toggle('hidden', !visible); });
