@@ -15,9 +15,13 @@ if [ ! -f "dist/v1.html" ]; then
     echo "Downloading v1.html"
     curl -L -o dist/v1.html https://github.com/calebmadrigal/fuzzygraph/releases/download/v1.0.43/FuzzyGraph_v1.0.43.html
 fi
+if [ ! -f "dist/v2.html" ]; then
+    echo "Downloading v2.html"
+    curl -L -o dist/v2.html https://github.com/calebmadrigal/fuzzygraph/releases/download/v2.4.0/FuzzyGraph_v2.4.0.html
+fi
 
 # Copy current version to a versioned link
-cp dist/index.html dist/v2.html  # NOTE: Make sure to change this from v2.html to v3.html (and add v2.html curl copy as above)
+cp dist/index.html dist/v3.html
 
 # Copy favicon
 cp images/android-chrome-192x192.png dist
