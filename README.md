@@ -13,11 +13,11 @@
 # Roadmap
 
 - [x] Backward compatibility for images and share links
-- [x] New rendering algorithm (v2.0.0)
+- [x] New rendering math (v2.0.0)
 - [x] Advanced mode
 - [x] Digital Cymatics Equation Generator
 - [x] Basic API
-- [x] Shader-based rendering (for speed)
+- [x] Shader-based rendering for speed (v3.0.0)
 - [x] More precise pan and zoom controls
 - [ ] More transfer function controls
 - [ ] More control over color
