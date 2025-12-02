@@ -592,7 +592,6 @@ uniform float uMin;
 uniform float uMax;
 uniform float uFuzzy;
 uniform float uAlpha;
-uniform bool uInvert;
 
 float transfer(float value) {
   if (uFuzzy >= 1.0) {
@@ -604,13 +603,10 @@ float transfer(float value) {
 }
 
 void main() {
-  vec2 uv = vec2(gl_FragCoord.x / uResolution.x, gl_FragCoord.y / uResolution.y);
+  vec2 uv = vec2(gl_FragCoord.x / uResolution.x, 1.0 - (gl_FragCoord.y / uResolution.y));
   float value = texture(uValues, uv).r;
   float modified = transfer(value);
   float t = clamp((modified - uMin) / max(1e-6, uMax - uMin), 0.0, 1.0);
-  if (uInvert) {
-    t = 1.0 - t;
-  }
   vec4 cmap = texture(uColormap, vec2(t, 0.5));
   outColor = vec4(cmap.rgb, 1.0);
 }`;
@@ -729,12 +725,12 @@ function renderToCanvas(canvasElem, pixelValues, minVal, maxVal, fuzzyValue, col
   gl.uniform1f(gl.getUniformLocation(glState.program, 'uMax'), maxVal);
   gl.uniform1f(gl.getUniformLocation(glState.program, 'uFuzzy'), fuzzyValue);
   gl.uniform1f(gl.getUniformLocation(glState.program, 'uAlpha'), 1.0);
-  gl.uniform1i(gl.getUniformLocation(glState.program, 'uInvert'), invertColor ? 1 : 0);
 
   gl.viewport(0, 0, width, height);
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
   const ctx2d = canvasElem.getContext('2d');
+  ctx2d.setTransform(1, 0, 0, 1, 0, 0);
   ctx2d.clearRect(0, 0, width, height);
   ctx2d.drawImage(glState.canvas, 0, 0, width, height);
 }
