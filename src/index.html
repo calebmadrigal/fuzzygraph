@@ -901,7 +901,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v2.4.0</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v3.0.0</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a> (non-binary) graphing calculator. FuzzyGraph is also free and <a href="https://github.com/calebmadrigal/fuzzygraph" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">open-source</a>.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -909,6 +909,8 @@
                 into either
                 TRUE or FALSE, it instead, shows the "shades of gray", choosing colors based on how near or far both
                 sides are to being equal at every point in the visible area.</p>
+            <br />
+            <p>Another way to think about it is this: fuzzy graphs are graphs of approximate equations (≈).</p>
             <br />
             <p>Here is a <a href="https://www.youtube.com/watch?v=DsOyp3-8dug&t=1s" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">video intro to FuzzyGraph</a>.</p>
             <br />
@@ -1385,7 +1387,7 @@
         const yHeightAtZoom1 = 6;
         const defaultMaxOverride = 5;
 
-        const equation = atom('y = x^2 - 1');
+        const equation = atom('y ≈ x^2 - 1');
         const fuzzyLevel = atom(30);
         const showAxes = atom(true);
         const colorMap = atom('plasma');
@@ -1547,7 +1549,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v2.4.0.html';
+            a.download = 'FuzzyGraph_v3.0.0.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
