@@ -333,24 +333,17 @@ function evaluateEquationToTexture(func, windowBounds, canvasWidth, canvasHeight
 
   const values = new Float32Array(canvasWidth * canvasHeight);
   gl.readPixels(0, 0, canvasWidth, canvasHeight, gl.RED, gl.FLOAT, values);
-  const ordered = new Float32Array(canvasWidth * canvasHeight);
   let minValue = Infinity;
   let maxValue = -Infinity;
-  for (let y = 0; y < canvasHeight; y++) {
-    const srcRow = canvasHeight - 1 - y;
-    const srcOffset = srcRow * canvasWidth;
-    const dstOffset = y * canvasWidth;
-    for (let x = 0; x < canvasWidth; x++) {
-      const v = values[srcOffset + x];
-      ordered[dstOffset + x] = v;
-      if (v < minValue) minValue = v;
-      if (v > maxValue) maxValue = v;
-    }
+  for (let i = 0; i < values.length; i++) {
+    const v = values[i];
+    if (v < minValue) minValue = v;
+    if (v > maxValue) maxValue = v;
   }
 
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-  return { pixelValues: ordered, min: minValue, max: maxValue, fromGPU: true };
+  return { pixelValues: values, min: minValue, max: maxValue, fromGPU: true };
 }
 
 export function calculateFuncForWindow(func, windowBounds, canvasWidth, canvasHeight) {
