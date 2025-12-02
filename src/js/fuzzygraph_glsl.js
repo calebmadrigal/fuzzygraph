@@ -513,6 +513,14 @@ function calculateFuzzyFactor(fuzzyValue) {
   return 0.01 * fuzzyValue;
 }
 
+function applyFuzzyTransfer(value, rawMin, rawMax, fuzzyValue, alpha = 1.0) {
+  if (fuzzyValue >= 1) {
+    const fuzzyFactor = calculateFuzzyFactor(fuzzyValue);
+    return Math.pow((alpha * value) + 1e-6, fuzzyFactor);
+  }
+  return value < 0.02 ? rawMax : rawMin;
+}
+
 function createColormapLUT(colormapName, invertColor) {
   const lut = new Uint8Array(256 * 4);
   for (let i = 0; i < 256; i++) {
@@ -581,8 +589,10 @@ out vec4 outColor;
 uniform sampler2D uValues;
 uniform sampler2D uColormap;
 uniform vec2 uResolution;
-uniform float uMin;
-uniform float uMax;
+uniform float uNormMin;
+uniform float uNormMax;
+uniform float uRawMin;
+uniform float uRawMax;
 uniform float uFuzzy;
 uniform float uAlpha;
 
@@ -591,7 +601,7 @@ float transfer(float value) {
     float fuzzyFactor = 0.01 * uFuzzy;
     return pow((uAlpha * value) + 1e-6, fuzzyFactor);
   } else {
-    return value < 0.02 ? uMax : uMin;
+    return value < 0.02 ? uRawMax : uRawMin;
   }
 }
 
@@ -599,7 +609,7 @@ void main() {
   vec2 uv = vec2(gl_FragCoord.x / uResolution.x, 1.0 - (gl_FragCoord.y / uResolution.y));
   float value = texture(uValues, uv).r;
   float modified = transfer(value);
-  float t = clamp((modified - uMin) / max(1e-6, uMax - uMin), 0.0, 1.0);
+  float t = clamp((modified - uNormMin) / max(1e-6, uNormMax - uNormMin), 0.0, 1.0);
   vec4 cmap = texture(uColormap, vec2(t, 0.5));
   outColor = vec4(cmap.rgb, 1.0);
 }`;
@@ -692,7 +702,7 @@ function uploadColormapTexture(colormapName, invertColor) {
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 256, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, lut);
 }
 
-function renderToCanvas(canvasElem, pixelValues, minVal, maxVal, fuzzyValue, colormapName, invertColor) {
+function renderToCanvas(canvasElem, pixelValues, rawMin, rawMax, normMin, normMax, fuzzyValue, colormapName, invertColor) {
   ensureCanvasSize(canvasElem);
   const width = canvasElem.width;
   const height = canvasElem.height;
@@ -714,8 +724,10 @@ function renderToCanvas(canvasElem, pixelValues, minVal, maxVal, fuzzyValue, col
   gl.uniform1i(gl.getUniformLocation(glState.program, 'uColormap'), 1);
 
   gl.uniform2f(gl.getUniformLocation(glState.program, 'uResolution'), width, height);
-  gl.uniform1f(gl.getUniformLocation(glState.program, 'uMin'), minVal);
-  gl.uniform1f(gl.getUniformLocation(glState.program, 'uMax'), maxVal);
+  gl.uniform1f(gl.getUniformLocation(glState.program, 'uNormMin'), normMin);
+  gl.uniform1f(gl.getUniformLocation(glState.program, 'uNormMax'), normMax);
+  gl.uniform1f(gl.getUniformLocation(glState.program, 'uRawMin'), rawMin);
+  gl.uniform1f(gl.getUniformLocation(glState.program, 'uRawMax'), rawMax);
   gl.uniform1f(gl.getUniformLocation(glState.program, 'uFuzzy'), fuzzyValue);
   gl.uniform1f(gl.getUniformLocation(glState.program, 'uAlpha'), 1.0);
 
@@ -755,10 +767,15 @@ export function displayGraph(graphParams, canvasElem) {
     maxVal = graphParams['maxOverride'];
   }
 
+  const normMin = applyFuzzyTransfer(minVal, minVal, maxVal, graphParams['fuzzyLevel'], 1.0);
+  const normMax = applyFuzzyTransfer(maxVal, minVal, maxVal, graphParams['fuzzyLevel'], 1.0);
+
   renderToCanvas(canvasElem,
       pixelValues['fromGPU'] ? null : pixelValues['pixelValues'],
       minVal,
       maxVal,
+      normMin,
+      normMax,
       graphParams['fuzzyLevel'],
       graphParams['colorMap'],
       graphParams['invertColor']);
