@@ -4,7 +4,8 @@
 import { create, all } from 'mathjs';
 const math = create(all);
 
-import { evaluate_cmap } from './js-colormaps.js';
+// import { evaluate_cmap } from './js-colormaps.js';
+import { getMatplotlibColormap } from './ga_color.js';
 
 export const ZOOM_RATE = 1.5;
 export const MAX_FUZZY = 200;
@@ -444,10 +445,16 @@ export function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, c
   }
 
   // Determine the color scale based on the min and max values
-  //var colorMapper = truthygraphColormap(valueModifier(maxValue), valueModifier(minValue));
-
-  var colorMapper = getColormap(colormapName, invertColor, fuzzyModifier(minValue), fuzzyModifier(maxValue), colorStart, colorCycles);
   //var colorMapper = getColormap(colormapName, invertColor, minValue, maxValue);
+  //var colorMapper = getColormap(colormapName, invertColor, fuzzyModifier(minValue), fuzzyModifier(maxValue), colorStart, colorCycles);
+  const colorMapper = getMatplotlibColormap(
+    fuzzyModifier(minValue),
+    fuzzyModifier(maxValue),
+    colormapName,
+    invertColor,
+    colorCycles,
+    colorStart,
+  );
 
   // Set the color for each pixel based on the values
   for (var x = 0; x < canvasWidth; x++) {

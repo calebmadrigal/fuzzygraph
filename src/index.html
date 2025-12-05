@@ -1395,7 +1395,8 @@
     <script type="module">
         import { math } from "mathjs";
         import { atom, map } from "nanostores";
-        import { evaluate_cmap, data as js_colormaps_data } from "./js/js-colormaps";
+        //import { evaluate_cmap, data as js_colormaps_data } from "./js/js-colormaps";
+        import { matplotlibColorData } from "./js/ga_color";
         import {
             parseEquationString,
             displayGraph,
@@ -2428,7 +2429,8 @@
         // CONTROL PANEL / Color map
         function getColorMapList() {
             // TODO: CUSTOM item which opens a textarea for js code function color(value, min, max)
-            var colorMapList = Object.keys(js_colormaps_data);
+            // var colorMapList = Object.keys(js_colormaps_data);
+            var colorMapList = Object.keys(matplotlibColorData);
             return colorMapList;
         }
 

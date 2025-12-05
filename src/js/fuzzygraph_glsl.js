@@ -4,7 +4,8 @@
 import { create, all } from 'mathjs';
 const math = create(all);
 
-import { evaluate_cmap } from './js-colormaps.js';
+// import { evaluate_cmap } from './js-colormaps.js';
+import { getMatplotlibColormap } from './ga_color.js';
 
 export const ZOOM_RATE = 1.5;
 export const MAX_FUZZY = 200;
@@ -523,9 +524,11 @@ function applyFuzzyTransfer(value, rawMin, rawMax, fuzzyValue, alpha = 1.0) {
 
 function createColormapLUT(colormapName, invertColor, colorStart = 0, colorCycles = 1) {
   const lut = new Uint8Array(256 * 4);
+  const mapper = getMatplotlibColormap(0, 1, colormapName, invertColor, colorCycles, colorStart);
   for (let i = 0; i < 256; i++) {
     const normalizedValue = i / 255;
-    const color = evaluate_cmap(normalizedValue, colormapName, invertColor, colorStart, colorCycles);
+    // const color = evaluate_cmap(normalizedValue, colormapName, invertColor, colorStart, colorCycles);
+    const color = mapper(normalizedValue);
     const offset = i * 4;
     lut[offset] = color[0];
     lut[offset + 1] = color[1];
