@@ -20,12 +20,13 @@ export function getMatplotlibColormap(
   }
 
   const baseColors = matplotlibColorData[colormapName].colors;
-  const colors = colorResolutionMultiplier !== 1
+  var colors = colorResolutionMultiplier !== 1
     ? extendColorMap(baseColors, colorResolutionMultiplier)
     : baseColors;
 
   if (reverseColor) {
-    colors = [...colors].reverse();
+    // colors = [...colors].reverse();
+    colors = Array.from(colors).reverse();
   }
 
   const numColormapColors = colors.length;
