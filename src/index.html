@@ -462,6 +462,26 @@
                         </div>
                     </div>
 
+                    <!-- Reverse Color Switch -->
+                    <div class="flex items-center justify-between mt-4">
+                        <span class="text-sm font-medium text-gray-700">Reverse Color</span>
+                        <button
+                            id="reverseColorButton"
+                            type="button"
+                            role="switch"
+                            aria-checked="false"
+                            class="relative inline-flex h-6 w-12 items-center bg-gray-500 transition-colors duration-200
+                                   focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 rounded-none"
+                        >
+                            <span class="sr-only">Toggle color reversal</span>
+                            <span
+                                id="reverseColorSlider"
+                                class="pointer-events-none inline-block h-4 w-4 translate-x-1 bg-gray-50 transition-all duration-200
+                                       will-change-transform rounded-none shadow-md"
+                            ></span>
+                        </button>
+                    </div>
+
                     <!-- Invert Color Switch -->
                     <div class="flex items-center justify-between mt-4">
                         <span class="text-sm font-medium text-gray-700">Invert Color</span>
@@ -927,7 +947,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v3.1.0</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v4.0.0</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a> (non-binary) graphing calculator. FuzzyGraph is also free and <a href="https://github.com/calebmadrigal/fuzzygraph" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">open-source</a>.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1396,7 +1416,7 @@
         import { math } from "mathjs";
         import { atom, map } from "nanostores";
         //import { evaluate_cmap, data as js_colormaps_data } from "./js/js-colormaps";
-        import { matplotlibColorData } from "./js/ga_color";
+        import { matplotlibColorData } from "./js/ga_color.js";
         import {
             parseEquationString,
             displayGraph,
@@ -1410,7 +1430,7 @@
             cymatics_equation_generator
         } from './js/cymatics.js';
 
-        const version = '3';
+        const version = '4';
         const yHeightAtZoom1 = 6;
         const defaultMaxOverride = 5;
 
@@ -1418,7 +1438,8 @@
         const fuzzyLevel = atom(30);
         const showAxes = atom(true);
         const colorMap = atom('plasma');
-        const invertColor = atom(true);
+        const reverseColor = atom(true);
+        const invertColor = atom(false);
         const colorStart = atom(0);
         const colorCycles = atom(1);
         const xCenter = atom(0);
@@ -1535,6 +1556,7 @@
                     equationFunction: parsedEquation,
                     fuzzyLevel: fuzzyLevel.get(),
                     colorMap: colorMap.get(),
+                    reverseColor: reverseColor.get(),
                     invertColor: invertColor.get(),
                     colorStart: colorStart.get(),
                     colorCycles: colorCycles.get(),
@@ -1580,7 +1602,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v3.1.0.html';
+            a.download = 'FuzzyGraph_v4.0.0.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1633,6 +1655,7 @@
                     equationFunction: parsedEquation,
                     fuzzyLevel: fuzzyLevel.get(),
                     colorMap: colorMap.get(),
+                    reverseColor: reverseColor.get(),
                     invertColor: invertColor.get(),
                     colorStart: colorStart.get(),
                     colorCycles: colorCycles.get(),
@@ -2455,6 +2478,25 @@
             scheduleRepaint();
         });
 
+        // CONTROL PANEL / Reverse color
+        reverseColor.subscribe((show) => {
+            const slider = document.getElementById('reverseColorSlider');
+            const toggleEl = document.getElementById('reverseColorButton');
+
+            slider.classList.remove('translate-x-1', 'translate-x-7');
+            slider.classList.add(show ? 'translate-x-7' : 'translate-x-1');
+
+            toggleEl.classList.remove('bg-gray-500', 'bg-gray-800', 'bg-blue-600', 'bg-gray-200');
+            toggleEl.classList.add(show ? 'bg-gray-800' : 'bg-gray-500');
+
+            toggleEl.setAttribute('aria-checked', show);
+        });
+
+        document.getElementById('reverseColorButton').addEventListener('click', () => {
+            reverseColor.set(!reverseColor.get());
+            scheduleRepaint();
+        });
+
         // CONTROL PANEL / Invert color
         invertColor.subscribe((show) => {
             const slider = document.getElementById('invertColorSlider');
@@ -2852,6 +2894,7 @@
                 equation: getStrippedEquation(),
                 fuzzyLevel: fuzzyLevel.get(),
                 colorMap: colorMap.get(),
+                reverseColor: reverseColor.get(),
                 invertColor: invertColor.get(),
                 colorStart: colorStart.get(),
                 colorCycles: colorCycles.get(),
@@ -2928,6 +2971,9 @@
             }
             if (configObj['colorMap'] !== null && typeof configObj['colorMap'] !== 'undefined') {
                 colorMap.set(configObj['colorMap']);
+            }
+            if (configObj['reverseColor'] !== null && typeof configObj['reverseColor'] !== 'undefined') {
+                reverseColor.set(configObj['reverseColor']);
             }
             if (configObj['invertColor'] !== null && typeof configObj['invertColor'] !== 'undefined') {
                 invertColor.set(configObj['invertColor']);

@@ -393,7 +393,7 @@ export function truthygraphColormap(minInput, maxInput) {
     return mapper;
 }
 
-export function getColormap(colormapName, invertColor, minInput, maxInput, colorStart = 0, colorCycles = 1) {
+export function getColormap(colormapName, reverseColor, invertColor, minInput, maxInput, colorStart=0, colorCycles=1) {
   // Transform min and max inputs to [0, 1] so that it can be plugged into colorma
   const valueNormalizer = makeLinearMapper([minInput, maxInput], [0, 1], false);
   var mapper = function(val) {
@@ -402,7 +402,7 @@ export function getColormap(colormapName, invertColor, minInput, maxInput, color
     else if (normalizedValue < 0) { normalizedValue = 0; }
     else if (isNaN(normalizedValue)) { normalizedValue = 0; }  // Happens with divide by 0
     // return evaluate_cmap(normalizedValue, colormapName, invertColor);
-    return evaluate_cmap(normalizedValue, colormapName, invertColor, colorStart, colorCycles);
+    return evaluate_cmap(normalizedValue, colormapName, reverseColor, invertColor, colorStart, colorCycles);
   }
 
   return mapper;
@@ -416,7 +416,7 @@ function calculateFuzzyFactor(fuzzyValue) {
   return 0.01 * fuzzyValue;
 }
 
-export function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, colormapName, invertColor, colorStart, colorCycles, canvasElem) {
+export function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, colormapName, reverseColor, invertColor, colorStart, colorCycles, canvasElem) {
   var context = canvasElem.getContext('2d');
   var canvasWidth = context.canvas.width;
   var canvasHeight = context.canvas.height;
@@ -451,6 +451,7 @@ export function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, c
     fuzzyModifier(minValue),
     fuzzyModifier(maxValue),
     colormapName,
+    reverseColor,
     invertColor,
     colorCycles,
     colorStart,
@@ -514,6 +515,7 @@ export function displayGraph(graphParams, canvasElem) {
       maxVal,
       graphParams['fuzzyLevel'],
       graphParams['colorMap'],
+      graphParams['reverseColor'],
       graphParams['invertColor'],
       graphParams['colorStart'],
       graphParams['colorCycles'],
