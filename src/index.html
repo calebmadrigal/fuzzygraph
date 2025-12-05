@@ -528,7 +528,8 @@
                         <div class="mt-1 relative">
                           <!-- Input -->
                           <input 
-                            type="number" 
+                            type="text"
+                            inputmode="decimal"
                             id="minOverrideInput" 
                             name="minOverrideInput" 
                             class="no-spinner w-full px-3 py-2 pr-12 border border-gray-300 rounded-md shadow-sm 
@@ -561,7 +562,8 @@
                     
                         <div class="mt-1 relative">
                         <input 
-                            type="number" 
+                            type="text"
+                            inputmode="decimal"
                             id="maxOverrideInput" 
                             name="maxOverrideInput" 
                             class="no-spinner w-full px-3 py-2 pr-12 border border-gray-300 rounded-md shadow-sm 
@@ -947,7 +949,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v4.0.0</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v4.0.1</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a> (non-binary) graphing calculator. FuzzyGraph is also free and <a href="https://github.com/calebmadrigal/fuzzygraph" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">open-source</a>.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1602,7 +1604,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v4.0.0.html';
+            a.download = 'FuzzyGraph_v4.0.1.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1611,11 +1613,6 @@
 
         // Save Image
         async function saveImage(w=null, h=null, cX=null, cY=null, yH=null) {
-            // const sW = w ?? saveWidth.get();
-            // const sH = h ?? saveHeight.get();
-            // const sCX = cX ?? saveCenterX.get();
-            // const sCY = cY ?? saveCenterY.get();
-            // const sYH = yH ?? saveYHeight.get();
             const fallbackW = canvas.width;
             const fallbackH = canvas.height;
 
@@ -1960,9 +1957,13 @@
         const maxKnob = maxToggle.querySelector(".knob");
         const maxInput = document.getElementById("maxOverrideInput");
 
+        let minInputHasFocus = false;
+        let maxInputHasFocus = false;
+
         function setMinOverrideEnabled(enabled) {
             minToggle.setAttribute("aria-pressed", String(enabled));
-            minInput.disabled = !enabled;
+            minInput.readOnly = !enabled;
+            minInput.setAttribute("aria-disabled", String(!enabled));
 
             if (enabled) {
                 // ON: dark track, light knob, knob right (advanced-style)
@@ -1985,7 +1986,8 @@
 
         function setMaxOverrideEnabled(enabled) {
             maxToggle.setAttribute("aria-pressed", String(enabled));
-            maxInput.disabled = !enabled;
+            maxInput.readOnly = !enabled;
+            maxInput.setAttribute("aria-disabled", String(!enabled));
 
             if (enabled) {
                 // ON: dark track, light knob, knob right (advanced-style)
@@ -2021,23 +2023,15 @@
 
         minOverride.subscribe((minO) => {
             document.getElementById('minOverrideInput').value = minO;
-            if (minO == null || minO == '') {
-                setMinOverrideEnabled(false);
-            }
-            else {
-                setMinOverrideEnabled(true);
-            }
+            const shouldEnable = minInputHasFocus || (minO != null && minO != '');
+            setMinOverrideEnabled(shouldEnable);
             scheduleRepaint();
         });
 
         maxOverride.subscribe((maxO) => {
             document.getElementById('maxOverrideInput').value = maxO;
-            if (maxO == null || maxO == '') {
-                setMaxOverrideEnabled(false);
-            }
-            else {
-                setMaxOverrideEnabled(true);
-            }
+            const shouldEnable = maxInputHasFocus || (maxO != null && maxO != '');
+            setMaxOverrideEnabled(shouldEnable);
             scheduleRepaint();
         });
 
@@ -2060,8 +2054,32 @@
             minOverride.set(event.target.value);
         });
 
+        document.getElementById('minOverrideInput').addEventListener('focus', () => {
+            minInputHasFocus = true;
+            setMinOverrideEnabled(true);
+        });
+
+        document.getElementById('minOverrideInput').addEventListener('blur', () => {
+            minInputHasFocus = false;
+            const minVal = minOverride.get();
+            const shouldEnable = minVal != null && minVal != '';
+            setMinOverrideEnabled(shouldEnable);
+        });
+
         document.getElementById('maxOverrideInput').addEventListener('input', (event) => {
             maxOverride.set(event.target.value);
+        });
+
+        document.getElementById('maxOverrideInput').addEventListener('focus', () => {
+            maxInputHasFocus = true;
+            setMaxOverrideEnabled(true);
+        });
+
+        document.getElementById('maxOverrideInput').addEventListener('blur', () => {
+            maxInputHasFocus = false;
+            const maxVal = maxOverride.get();
+            const shouldEnable = maxVal != null && maxVal != '';
+            setMaxOverrideEnabled(shouldEnable);
         });
 
         document.getElementById('colorStartInput').addEventListener('input', (event) => {
