@@ -565,6 +565,32 @@
                         </div>
                     </div>
 
+                     <!-- Color Start -->
+                     <div class="mt-2">
+                        <label for="colorStartInput" class="block text-sm font-medium text-gray-600">
+                            Color Start
+                        </label>
+                        <input
+                            type="number"
+                            id="colorStartInput"
+                            name="colorStartInput"
+                            class="no-spinner w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                    </div>
+
+                    <!-- Color Cycles -->
+                    <div class="mt-2">
+                        <label for="colorCyclesInput" class="block text-sm font-medium text-gray-600">
+                            Color Cycles
+                        </label>
+                        <input
+                            type="number"
+                            id="colorCyclesInput"
+                            name="colorCyclesInput"
+                            class="no-spinner w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                    </div>
+
                 </div>
 
                 <div class="mt-16 text-center flex flex-col justify-end">
@@ -901,7 +927,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v3.0.4</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v3.1.0</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a> (non-binary) graphing calculator. FuzzyGraph is also free and <a href="https://github.com/calebmadrigal/fuzzygraph" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">open-source</a>.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1392,6 +1418,8 @@
         const showAxes = atom(true);
         const colorMap = atom('plasma');
         const invertColor = atom(true);
+        const colorStart = atom(0);
+        const colorCycles = atom(1);
         const xCenter = atom(0);
         const yCenter = atom(0);
         const yHeight = atom(yHeightAtZoom1);
@@ -1507,6 +1535,8 @@
                     fuzzyLevel: fuzzyLevel.get(),
                     colorMap: colorMap.get(),
                     invertColor: invertColor.get(),
+                    colorStart: colorStart.get(),
+                    colorCycles: colorCycles.get(),
                     xCenter: xCenter.get(),
                     yCenter: yCenter.get(),
                     yHeight: yHeight.get(),
@@ -1549,7 +1579,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v3.0.4.html';
+            a.download = 'FuzzyGraph_v3.1.0.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1603,6 +1633,8 @@
                     fuzzyLevel: fuzzyLevel.get(),
                     colorMap: colorMap.get(),
                     invertColor: invertColor.get(),
+                    colorStart: colorStart.get(),
+                    colorCycles: colorCycles.get(),
                     xCenter: parseFloat(sCX),
                     yCenter: parseFloat(sCY),
                     yHeight: parseFloat(sYH),
@@ -1985,6 +2017,16 @@
             scheduleRepaint();
         });
 
+        colorStart.subscribe((startVal) => {
+            document.getElementById('colorStartInput').value = startVal;
+            scheduleRepaint();
+        });
+
+        colorCycles.subscribe((cyclesVal) => {
+            document.getElementById('colorCyclesInput').value = cyclesVal;
+            scheduleRepaint();
+        });
+
         function clearMinAndMaxOverrides() {
             minOverride.set(null);
             maxOverride.set(defaultMaxOverride);
@@ -1996,6 +2038,16 @@
 
         document.getElementById('maxOverrideInput').addEventListener('input', (event) => {
             maxOverride.set(event.target.value);
+        });
+
+        document.getElementById('colorStartInput').addEventListener('input', (event) => {
+            const value = parseFloat(event.target.value);
+            colorStart.set(Number.isFinite(value) ? value : 0);
+        });
+
+        document.getElementById('colorCyclesInput').addEventListener('input', (event) => {
+            const value = parseFloat(event.target.value);
+            colorCycles.set(Number.isFinite(value) ? value : 1);
         });
 
         document.getElementById('saveImageButton').addEventListener('click', async () => {
@@ -2799,6 +2851,8 @@
                 fuzzyLevel: fuzzyLevel.get(),
                 colorMap: colorMap.get(),
                 invertColor: invertColor.get(),
+                colorStart: colorStart.get(),
+                colorCycles: colorCycles.get(),
                 xCenter: xCenter.get(),
                 yCenter: yCenter.get(),
                 yHeight: yHeight.get(),
@@ -2876,6 +2930,12 @@
             if (configObj['invertColor'] !== null && typeof configObj['invertColor'] !== 'undefined') {
                 invertColor.set(configObj['invertColor']);
             }
+            if (configObj['colorStart'] !== null && typeof configObj['colorStart'] !== 'undefined') {
+                colorStart.set(configObj['colorStart']);
+            }
+            if (configObj['colorCycles'] !== null && typeof configObj['colorCycles'] !== 'undefined') {
+                colorCycles.set(configObj['colorCycles']);
+            }
             if (configObj['xCenter'] !== null && typeof configObj['xCenter'] !== 'undefined') {
                 xCenter.set(configObj['xCenter']);
             }
@@ -2933,6 +2993,7 @@
             setConfigFromObj(configFromUrl);
 
             if (getParameterByName('download', urlFragmentId) != null) {
+                // TODO: Make these pull from other variables
                 const w = getParameterByName('w');
                 const h = getParameterByName('h');
                 const cX = getParameterByName('cx');

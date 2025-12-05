@@ -521,11 +521,11 @@ function applyFuzzyTransfer(value, rawMin, rawMax, fuzzyValue, alpha = 1.0) {
   return value < 0.02 ? rawMax : rawMin;
 }
 
-function createColormapLUT(colormapName, invertColor) {
+function createColormapLUT(colormapName, invertColor, colorStart = 0, colorCycles = 1) {
   const lut = new Uint8Array(256 * 4);
   for (let i = 0; i < 256; i++) {
     const normalizedValue = i / 255;
-    const color = evaluate_cmap(normalizedValue, colormapName, invertColor);
+    const color = evaluate_cmap(normalizedValue, colormapName, invertColor, colorStart, colorCycles);
     const offset = i * 4;
     lut[offset] = color[0];
     lut[offset + 1] = color[1];
@@ -698,15 +698,15 @@ function uploadValuesTexture(pixelValues, width, height) {
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.R32F, width, height, 0, gl.RED, gl.FLOAT, pixelValues);
 }
 
-function uploadColormapTexture(colormapName, invertColor) {
+function uploadColormapTexture(colormapName, invertColor, colorStart = 0, colorCycles = 1) {
   const gl = glState.gl;
-  const lut = createColormapLUT(colormapName, invertColor);
+  const lut = createColormapLUT(colormapName, invertColor, colorStart, colorCycles);
   gl.bindTexture(gl.TEXTURE_2D, glState.colormapTex);
   gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 256, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, lut);
 }
 
-function renderToCanvas(canvasElem, pixelValues, rawMin, rawMax, normMin, normMax, fuzzyValue, colormapName, invertColor) {
+function renderToCanvas(canvasElem, pixelValues, rawMin, rawMax, normMin, normMax, fuzzyValue, colormapName, invertColor, colorStart, colorCycles) {
   ensureCanvasSize(canvasElem);
   const width = canvasElem.width;
   const height = canvasElem.height;
@@ -714,7 +714,7 @@ function renderToCanvas(canvasElem, pixelValues, rawMin, rawMax, normMin, normMa
   const gl = glState.gl;
 
   uploadValuesTexture(pixelValues, width, height);
-  uploadColormapTexture(colormapName, invertColor);
+  uploadColormapTexture(colormapName, invertColor, colorStart, colorCycles);
 
   gl.useProgram(glState.program);
   gl.bindVertexArray(glState.vao);
@@ -754,12 +754,10 @@ export function displayGraph(graphParams, canvasElem) {
       canvasWidth,
       canvasHeight);
 
-  const t1 = performance.now();
   var pixelValues = calculateFuncForWindow(graphParams['equationFunction'],
       windowBounds,
       canvasWidth,
       canvasHeight);
-  const t2 = performance.now();
 
   var minVal = pixelValues['min'];
   var maxVal = pixelValues['max'];
@@ -782,17 +780,14 @@ export function displayGraph(graphParams, canvasElem) {
       normMax,
       graphParams['fuzzyLevel'],
       graphParams['colorMap'],
-      graphParams['invertColor']);
+      graphParams['invertColor'],
+      graphParams['colorStart'],
+      graphParams['colorCycles']);
 
   if (graphParams['showAxes']) {
     const windowBounds2 = calcWindowBounds(graphParams['xCenter'], graphParams['yCenter'], graphParams['yHeight'], canvasWidth, canvasHeight);
     drawAxes(canvasElem, graphParams['xCenter'], graphParams['yCenter'], windowBounds2['xMin'], windowBounds2['xMax'], windowBounds2['yMin'], windowBounds2['yMax']);
   }
-
-  const t3 = performance.now();
-
-  const elapsed1 = t2-t1;
-  const elapsed2 = t3-t2;
 
   return pixelValues;
 }
