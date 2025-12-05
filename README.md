@@ -19,9 +19,11 @@
 - [x] Basic API
 - [x] Shader-based rendering for speed (v3.0.0)
 - [x] More precise pan and zoom controls
+- [x] More control over color (v4.0.0)
 - [ ] More transfer function controls
-- [ ] More control over color
 - [ ] Animation
+- [ ] Mandelbrot set
+- [ ] Julia set
 
 # Author
 
