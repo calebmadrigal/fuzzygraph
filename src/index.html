@@ -462,6 +462,26 @@
                         </div>
                     </div>
 
+                    <!-- Reverse Color Switch -->
+                    <div class="flex items-center justify-between mt-4">
+                        <span class="text-sm font-medium text-gray-700">Reverse Color</span>
+                        <button
+                            id="reverseColorButton"
+                            type="button"
+                            role="switch"
+                            aria-checked="false"
+                            class="relative inline-flex h-6 w-12 items-center bg-gray-500 transition-colors duration-200
+                                   focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 rounded-none"
+                        >
+                            <span class="sr-only">Toggle color reversal</span>
+                            <span
+                                id="reverseColorSlider"
+                                class="pointer-events-none inline-block h-4 w-4 translate-x-1 bg-gray-50 transition-all duration-200
+                                       will-change-transform rounded-none shadow-md"
+                            ></span>
+                        </button>
+                    </div>
+
                     <!-- Invert Color Switch -->
                     <div class="flex items-center justify-between mt-4">
                         <span class="text-sm font-medium text-gray-700">Invert Color</span>
@@ -563,6 +583,32 @@
                             ></span>
                         </button>
                         </div>
+                    </div>
+
+                     <!-- Color Start -->
+                     <div class="mt-2">
+                        <label for="colorStartInput" class="block text-sm font-medium text-gray-600">
+                            Color Start
+                        </label>
+                        <input
+                            type="number"
+                            id="colorStartInput"
+                            name="colorStartInput"
+                            class="no-spinner w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                    </div>
+
+                    <!-- Color Cycles -->
+                    <div class="mt-2">
+                        <label for="colorCyclesInput" class="block text-sm font-medium text-gray-600">
+                            Color Cycles
+                        </label>
+                        <input
+                            type="number"
+                            id="colorCyclesInput"
+                            name="colorCyclesInput"
+                            class="no-spinner w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
                     </div>
 
                 </div>
@@ -901,7 +947,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v3.0.4</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v4.0.0</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a> (non-binary) graphing calculator. FuzzyGraph is also free and <a href="https://github.com/calebmadrigal/fuzzygraph" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">open-source</a>.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1369,7 +1415,8 @@
     <script type="module">
         import { math } from "mathjs";
         import { atom, map } from "nanostores";
-        import { evaluate_cmap, data as js_colormaps_data } from "./js/js-colormaps";
+        //import { evaluate_cmap, data as js_colormaps_data } from "./js/js-colormaps";
+        import { matplotlibColorData } from "./js/ga_color.js";
         import {
             parseEquationString,
             displayGraph,
@@ -1383,7 +1430,7 @@
             cymatics_equation_generator
         } from './js/cymatics.js';
 
-        const version = '3';
+        const version = '4';
         const yHeightAtZoom1 = 6;
         const defaultMaxOverride = 5;
 
@@ -1391,7 +1438,10 @@
         const fuzzyLevel = atom(30);
         const showAxes = atom(true);
         const colorMap = atom('plasma');
-        const invertColor = atom(true);
+        const reverseColor = atom(true);
+        const invertColor = atom(false);
+        const colorStart = atom(0);
+        const colorCycles = atom(1);
         const xCenter = atom(0);
         const yCenter = atom(0);
         const yHeight = atom(yHeightAtZoom1);
@@ -1506,7 +1556,10 @@
                     equationFunction: parsedEquation,
                     fuzzyLevel: fuzzyLevel.get(),
                     colorMap: colorMap.get(),
+                    reverseColor: reverseColor.get(),
                     invertColor: invertColor.get(),
+                    colorStart: colorStart.get(),
+                    colorCycles: colorCycles.get(),
                     xCenter: xCenter.get(),
                     yCenter: yCenter.get(),
                     yHeight: yHeight.get(),
@@ -1549,7 +1602,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v3.0.4.html';
+            a.download = 'FuzzyGraph_v4.0.0.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1602,7 +1655,10 @@
                     equationFunction: parsedEquation,
                     fuzzyLevel: fuzzyLevel.get(),
                     colorMap: colorMap.get(),
+                    reverseColor: reverseColor.get(),
                     invertColor: invertColor.get(),
+                    colorStart: colorStart.get(),
+                    colorCycles: colorCycles.get(),
                     xCenter: parseFloat(sCX),
                     yCenter: parseFloat(sCY),
                     yHeight: parseFloat(sYH),
@@ -1985,6 +2041,16 @@
             scheduleRepaint();
         });
 
+        colorStart.subscribe((startVal) => {
+            document.getElementById('colorStartInput').value = startVal;
+            scheduleRepaint();
+        });
+
+        colorCycles.subscribe((cyclesVal) => {
+            document.getElementById('colorCyclesInput').value = cyclesVal;
+            scheduleRepaint();
+        });
+
         function clearMinAndMaxOverrides() {
             minOverride.set(null);
             maxOverride.set(defaultMaxOverride);
@@ -1996,6 +2062,16 @@
 
         document.getElementById('maxOverrideInput').addEventListener('input', (event) => {
             maxOverride.set(event.target.value);
+        });
+
+        document.getElementById('colorStartInput').addEventListener('input', (event) => {
+            const value = parseFloat(event.target.value);
+            colorStart.set(Number.isFinite(value) ? value : 0);
+        });
+
+        document.getElementById('colorCyclesInput').addEventListener('input', (event) => {
+            const value = parseFloat(event.target.value);
+            colorCycles.set(Number.isFinite(value) ? value : 1);
         });
 
         document.getElementById('saveImageButton').addEventListener('click', async () => {
@@ -2376,7 +2452,8 @@
         // CONTROL PANEL / Color map
         function getColorMapList() {
             // TODO: CUSTOM item which opens a textarea for js code function color(value, min, max)
-            var colorMapList = Object.keys(js_colormaps_data);
+            // var colorMapList = Object.keys(js_colormaps_data);
+            var colorMapList = Object.keys(matplotlibColorData);
             return colorMapList;
         }
 
@@ -2398,6 +2475,25 @@
         });
         colorMapSelect.addEventListener('change', (event) => {
             colorMap.set(event.target.value);
+            scheduleRepaint();
+        });
+
+        // CONTROL PANEL / Reverse color
+        reverseColor.subscribe((show) => {
+            const slider = document.getElementById('reverseColorSlider');
+            const toggleEl = document.getElementById('reverseColorButton');
+
+            slider.classList.remove('translate-x-1', 'translate-x-7');
+            slider.classList.add(show ? 'translate-x-7' : 'translate-x-1');
+
+            toggleEl.classList.remove('bg-gray-500', 'bg-gray-800', 'bg-blue-600', 'bg-gray-200');
+            toggleEl.classList.add(show ? 'bg-gray-800' : 'bg-gray-500');
+
+            toggleEl.setAttribute('aria-checked', show);
+        });
+
+        document.getElementById('reverseColorButton').addEventListener('click', () => {
+            reverseColor.set(!reverseColor.get());
             scheduleRepaint();
         });
 
@@ -2798,7 +2894,10 @@
                 equation: getStrippedEquation(),
                 fuzzyLevel: fuzzyLevel.get(),
                 colorMap: colorMap.get(),
+                reverseColor: reverseColor.get(),
                 invertColor: invertColor.get(),
+                colorStart: colorStart.get(),
+                colorCycles: colorCycles.get(),
                 xCenter: xCenter.get(),
                 yCenter: yCenter.get(),
                 yHeight: yHeight.get(),
@@ -2873,8 +2972,17 @@
             if (configObj['colorMap'] !== null && typeof configObj['colorMap'] !== 'undefined') {
                 colorMap.set(configObj['colorMap']);
             }
+            if (configObj['reverseColor'] !== null && typeof configObj['reverseColor'] !== 'undefined') {
+                reverseColor.set(configObj['reverseColor']);
+            }
             if (configObj['invertColor'] !== null && typeof configObj['invertColor'] !== 'undefined') {
                 invertColor.set(configObj['invertColor']);
+            }
+            if (configObj['colorStart'] !== null && typeof configObj['colorStart'] !== 'undefined') {
+                colorStart.set(configObj['colorStart']);
+            }
+            if (configObj['colorCycles'] !== null && typeof configObj['colorCycles'] !== 'undefined') {
+                colorCycles.set(configObj['colorCycles']);
             }
             if (configObj['xCenter'] !== null && typeof configObj['xCenter'] !== 'undefined') {
                 xCenter.set(configObj['xCenter']);
@@ -2933,6 +3041,7 @@
             setConfigFromObj(configFromUrl);
 
             if (getParameterByName('download', urlFragmentId) != null) {
+                // TODO: Make these pull from other variables
                 const w = getParameterByName('w');
                 const h = getParameterByName('h');
                 const cX = getParameterByName('cx');

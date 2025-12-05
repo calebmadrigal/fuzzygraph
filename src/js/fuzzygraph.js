@@ -4,7 +4,8 @@
 import { create, all } from 'mathjs';
 const math = create(all);
 
-import { evaluate_cmap } from './js-colormaps.js';
+// import { evaluate_cmap } from './js-colormaps.js';
+import { getMatplotlibColormap } from './ga_color.js';
 
 export const ZOOM_RATE = 1.5;
 export const MAX_FUZZY = 200;
@@ -392,7 +393,7 @@ export function truthygraphColormap(minInput, maxInput) {
     return mapper;
 }
 
-export function getColormap(colormapName, invertColor, minInput, maxInput) {
+export function getColormap(colormapName, reverseColor, invertColor, minInput, maxInput, colorStart=0, colorCycles=1) {
   // Transform min and max inputs to [0, 1] so that it can be plugged into colorma
   const valueNormalizer = makeLinearMapper([minInput, maxInput], [0, 1], false);
   var mapper = function(val) {
@@ -401,7 +402,7 @@ export function getColormap(colormapName, invertColor, minInput, maxInput) {
     else if (normalizedValue < 0) { normalizedValue = 0; }
     else if (isNaN(normalizedValue)) { normalizedValue = 0; }  // Happens with divide by 0
     // return evaluate_cmap(normalizedValue, colormapName, invertColor);
-    return evaluate_cmap(normalizedValue, colormapName, invertColor);
+    return evaluate_cmap(normalizedValue, colormapName, reverseColor, invertColor, colorStart, colorCycles);
   }
 
   return mapper;
@@ -415,7 +416,7 @@ function calculateFuzzyFactor(fuzzyValue) {
   return 0.01 * fuzzyValue;
 }
 
-export function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, colormapName, invertColor, canvasElem) {
+export function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, colormapName, reverseColor, invertColor, colorStart, colorCycles, canvasElem) {
   var context = canvasElem.getContext('2d');
   var canvasWidth = context.canvas.width;
   var canvasHeight = context.canvas.height;
@@ -444,10 +445,17 @@ export function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, c
   }
 
   // Determine the color scale based on the min and max values
-  //var colorMapper = truthygraphColormap(valueModifier(maxValue), valueModifier(minValue));
-
-  var colorMapper = getColormap(colormapName, invertColor, fuzzyModifier(minValue), fuzzyModifier(maxValue));
   //var colorMapper = getColormap(colormapName, invertColor, minValue, maxValue);
+  //var colorMapper = getColormap(colormapName, invertColor, fuzzyModifier(minValue), fuzzyModifier(maxValue), colorStart, colorCycles);
+  const colorMapper = getMatplotlibColormap(
+    fuzzyModifier(minValue),
+    fuzzyModifier(maxValue),
+    colormapName,
+    reverseColor,
+    invertColor,
+    colorCycles,
+    colorStart,
+  );
 
   // Set the color for each pixel based on the values
   for (var x = 0; x < canvasWidth; x++) {
@@ -487,12 +495,10 @@ export function displayGraph(graphParams, canvasElem) {
       canvasWidth,
       canvasHeight);
 
-  const t1 = performance.now();
   var pixelValues = calculateFuncForWindow(graphParams['equationFunction'],
       windowBounds,
       canvasWidth,
       canvasHeight);
-  const t2 = performance.now();
 
   var minVal = pixelValues['min'];
   var maxVal = pixelValues['max'];
@@ -509,18 +515,16 @@ export function displayGraph(graphParams, canvasElem) {
       maxVal,
       graphParams['fuzzyLevel'],
       graphParams['colorMap'],
+      graphParams['reverseColor'],
       graphParams['invertColor'],
+      graphParams['colorStart'],
+      graphParams['colorCycles'],
       canvasElem);
 
   if (graphParams['showAxes']) {
     const windowBounds = calcWindowBounds(graphParams['xCenter'], graphParams['yCenter'], graphParams['yHeight'], canvasWidth, canvasHeight);
 		drawAxes(canvasElem, graphParams['xCenter'], graphParams['yCenter'], windowBounds['xMin'], windowBounds['xMax'], windowBounds['yMin'], windowBounds['yMax']);
   }
-
-  const t3 = performance.now();
-
-  const elapsed1 = t2-t1;
-  const elapsed2 = t3-t2;
 
   // return pixelValues['pixelValues'];
   return pixelValues;
