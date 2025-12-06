@@ -949,7 +949,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v4.0.2</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v4.1.0</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a> (non-binary) graphing calculator. FuzzyGraph is also free and <a href="https://github.com/calebmadrigal/fuzzygraph" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">open-source</a>.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1473,6 +1473,15 @@
         const showAdvancedHelpModal = atom(false);
         const showEquationModal = atom(false);
         const showCymaticsModal = atom(false);
+        const CY_PARAM_MAP = {
+            cyNumResonators: 'numResonators',
+            cyDistance: 'distance',
+            cyAmplitude: 'amplitude',
+            cyFrequency: 'frequency',
+            cyPhase: 'phase',
+            cyCombineOperator: 'combineOperator',
+            cyRotateRadians: 'rotateRadians'
+        };
         const cymaticsConfig = map({
             numResonators: 2,
             distance: 2,
@@ -1604,7 +1613,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v4.0.2.html';
+            a.download = 'FuzzyGraph_v4.1.0.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -2907,6 +2916,29 @@
 
         /////////////////////////////////////////////////////////////////////////////////////// URL Handling
 
+        function flattenCymaticsConfig(configObj) {
+            const flattened = {};
+            for (const [cyKey, configKey] of Object.entries(CY_PARAM_MAP)) {
+                const val = configObj[configKey];
+                if (typeof val !== 'undefined') {
+                    flattened[cyKey] = val;
+                }
+            }
+            return flattened;
+        }
+
+        function buildCymaticsConfigFromParams(params) {
+            const mapped = {};
+            let hasAny = false;
+            for (const [cyKey, configKey] of Object.entries(CY_PARAM_MAP)) {
+                if (params[cyKey] !== null && typeof params[cyKey] !== 'undefined') {
+                    mapped[configKey] = params[cyKey];
+                    hasAny = true;
+                }
+            }
+            return hasAny ? mapped : null;
+        }
+
         function getAppConfig() {
             var graphConfig = {
                 equation: getStrippedEquation(),
@@ -2927,8 +2959,8 @@
             };
 
             if (unmodifiedCymaticsEquation.get()) {
-                graphConfig['cymaticsConfig'] = cymaticsConfig.get();
-                // NOTE: No need to include a long equation if we can just load it from the cymaticsConfig
+                Object.assign(graphConfig, flattenCymaticsConfig(cymaticsConfig.get()));
+                // No need to include a long equation if we can just load it from the cymaticsConfig
                 delete graphConfig.equation;
             }
 
@@ -3020,11 +3052,15 @@
             if (configObj['maxOverride'] != null && typeof configObj['maxOverride'] !== 'undefined') {
                 maxOverride.set(configObj['maxOverride']);
             }
-            if (configObj['cymaticsConfig'] != null && typeof configObj['cymaticsConfig'] !== 'undefined') {
-                cymaticsConfig.set(configObj['cymaticsConfig']);
+            const cymaticsConfigFromParams = buildCymaticsConfigFromParams(configObj);
+            if (cymaticsConfigFromParams !== null) {
+                cymaticsConfig.set(
+                    Object.assign({}, cymaticsConfig.get(), cymaticsConfigFromParams)
+                );
                 // If this was a cymatics equation, load the equation from the cymatics config
                 const cymaticsEqStr = get_cymatics_equation_generator(cymaticsConfig.get());
                 equation.set(cymaticsEqStr);
+                unmodifiedCymaticsEquation.set(true);
             }
 
         }
@@ -3044,17 +3080,12 @@
                 }
             }
 
-            const raw = getParameterByName("cymaticsConfig", urlFragmentId);
-            let cymaticsConfigObj = null;
-            if (raw) {
-                try {
-                    cymaticsConfigObj = JSON.parse(decodeURIComponent(raw));
-                } catch (e) {
-                    console.warn("Invalid cymaticsConfig JSON");
+            for (const cyParam of Object.keys(CY_PARAM_MAP)) {
+                const cyValue = getParameterByName(cyParam, urlFragmentId);
+                if (cyValue !== null && cyValue !== '') {
+                    configFromUrl[cyParam] = parseUrlParam(cyParam, cyValue);
                 }
             }
-
-            configFromUrl.cymaticsConfig = cymaticsConfigObj;
 
             setConfigFromObj(configFromUrl);
 
@@ -3070,11 +3101,6 @@
 
         function getShareUrl() {
             var appConfig = getAppConfig();
-
-            if (appConfig.cymaticsConfig) {
-                const cymaticsConfStr = encodeURIComponent(JSON.stringify(appConfig.cymaticsConfig));
-                appConfig.cymaticsConfig = cymaticsConfStr;
-            }
 
             if (appConfig['minOverride'] == null || appConfig['minOverride'] == '') {
                 appConfig['minOverride'] = minVal.get();
