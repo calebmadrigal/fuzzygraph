@@ -22,6 +22,7 @@
 - [x] More control over color (v4.0.0)
 - [x] Mandelbrot set (v4.2.0)
 - [x] Julia set (v4.3.0)
+- [ ] Improved fractal rendering at deep zoom
 - [ ] More transfer function controls
 - [ ] Animation
 
