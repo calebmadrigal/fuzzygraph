@@ -15,6 +15,11 @@ export function isMandelbrotEquation(eqStr) {
   return eqStr.toLowerCase().includes('mandelbrot');
 }
 
+export function isJuliaEquation(eqStr) {
+  if (!eqStr || typeof eqStr !== 'string') return false;
+  return eqStr.toLowerCase().includes('julia');
+}
+
 export function parseMandelbrotParams(eqStr, { defaultMax = 1000, defaultThreshold = 100, onParamsParsed } = {}) {
   const maxMatch = eqStr.match(/max_iterations\s*=\s*([-+]?\d*\.?\d+(?:e[-+]?\d+)?)/i);
   const thresholdMatch = eqStr.match(/threshold\s*=\s*([-+]?\d*\.?\d+(?:e[-+]?\d+)?)/i);
@@ -66,6 +71,72 @@ export function createMandelbrotFunction(eqStr, options = {}) {
   mandelbrotFunc._isJsFunction = true;
 
   return mandelbrotFunc;
+}
+
+export function parseJuliaParams(
+  eqStr,
+  {
+    defaultMax = 1000,
+    defaultThreshold = 100,
+    defaultCRe = -0.7,
+    defaultCIm = 0.185,
+    onParamsParsed
+  } = {}
+) {
+  const maxMatch = eqStr.match(/max_iterations\s*=\s*([-+]?\d*\.?\d+(?:e[-+]?\d+)?)/i);
+  const thresholdMatch = eqStr.match(/threshold\s*=\s*([-+]?\d*\.?\d+(?:e[-+]?\d+)?)/i);
+  const cReMatch = eqStr.match(/c_re\s*=\s*([-+]?\d*\.?\d+(?:e[-+]?\d+)?)/i);
+  const cImMatch = eqStr.match(/c_im\s*=\s*([-+]?\d*\.?\d+(?:e[-+]?\d+)?)/i);
+
+  const parsedMax = Number(maxMatch && maxMatch[1]);
+  const parsedThreshold = Number(thresholdMatch && thresholdMatch[1]);
+  const parsedCRe = Number(cReMatch && cReMatch[1]);
+  const parsedCIm = Number(cImMatch && cImMatch[1]);
+
+  const maxVal = Number.isFinite(parsedMax) ? parsedMax : defaultMax;
+  const thresholdVal = Number.isFinite(parsedThreshold) ? parsedThreshold : defaultThreshold;
+  const cRe = Number.isFinite(parsedCRe) ? parsedCRe : defaultCRe;
+  const cIm = Number.isFinite(parsedCIm) ? parsedCIm : defaultCIm;
+
+  if (typeof onParamsParsed === 'function') {
+    onParamsParsed({ maxVal, thresholdVal, cRe, cIm });
+  }
+
+  return { maxVal, thresholdVal, cRe, cIm };
+}
+
+export function createJuliaFunction(eqStr, options = {}) {
+  const { maxVal, thresholdVal, cRe, cIm } = parseJuliaParams(eqStr, options);
+  const maxIterations = Math.max(1, Math.floor(maxVal));
+  const thresholdValue = thresholdVal;
+
+  const juliaFunc = (x, y) => {
+    let zx = x;
+    let zy = y;
+    let stepsTaken = 0;
+
+    for (; stepsTaken < maxIterations; stepsTaken++) {
+      const prevZx = zx;
+      const prevZy = zy;
+      const nextZx = prevZx * prevZx - prevZy * prevZy + cRe;
+      const nextZy = 2 * prevZx * prevZy + cIm;
+      zx = nextZx;
+      zy = nextZy;
+
+      if (Math.hypot(zx, zy) > thresholdValue) {
+        break;
+      }
+    }
+
+    const resultSteps = stepsTaken === maxIterations ? maxIterations - 1 : stepsTaken;
+    return resultSteps;
+  };
+
+  juliaFunc._source = eqStr;
+  juliaFunc._isPolar = false;
+  juliaFunc._isJsFunction = true;
+
+  return juliaFunc;
 }
 
 // // // // // // // Math stuff

@@ -20,11 +20,12 @@
 - [x] Shader-based rendering for speed (v3.0.0)
 - [x] More precise pan and zoom controls
 - [x] More control over color (v4.0.0)
+- [x] Mandelbrot set (v4.2.0)
+- [x] Julia set (v4.3.0)
 - [ ] More transfer function controls
 - [ ] Animation
-- [ ] Mandelbrot set
-- [ ] Julia set
 
 # Author
 
 Caleb Madrigal (https://gods.art).
+
