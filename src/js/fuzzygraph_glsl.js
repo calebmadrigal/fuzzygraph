@@ -10,6 +10,42 @@ import { getMatplotlibColormap } from './ga_color.js';
 export const ZOOM_RATE = 1.5;
 export const MAX_FUZZY = 200;
 
+export function isMandelbrotEquation(eqStr) {
+  if (!eqStr || typeof eqStr !== 'string') return false;
+  return eqStr.toLowerCase().includes('mandelbrot');
+}
+
+export function parseMandelbrotParams(eqStr, { defaultMax = 1000, defaultThreshold = 100, onParamsParsed } = {}) {
+  const maxMatch = eqStr.match(/max_iterations\s*=\s*([-+]?\d*\.?\d+(?:e[-+]?\d+)?)/i);
+  const thresholdMatch = eqStr.match(/threshold\s*=\s*([-+]?\d*\.?\d+(?:e[-+]?\d+)?)/i);
+
+  const parsedMax = Number(maxMatch && maxMatch[1]);
+  const parsedThreshold = Number(thresholdMatch && thresholdMatch[1]);
+
+  const maxVal = Number.isFinite(parsedMax) ? parsedMax : defaultMax;
+  const thresholdVal = Number.isFinite(parsedThreshold) ? parsedThreshold : defaultThreshold;
+
+  if (typeof onParamsParsed === 'function') {
+    onParamsParsed({ maxVal, thresholdVal });
+  }
+
+  return { maxVal, thresholdVal };
+}
+
+export function createMandelbrotFunction(eqStr, options = {}) {
+  const { maxVal, thresholdVal } = parseMandelbrotParams(eqStr, options);
+  const maxIterations = Math.max(1, Math.floor(maxVal));
+
+  return {
+    _source: eqStr,
+    _isPolar: false,
+    _isJsFunction: false,
+    _isMandelbrot: true,
+    maxIterations,
+    threshold: thresholdVal
+  };
+}
+
 // // // // // // // Math stuff
 
 export function makeLinearMapper(inRange, outRange, intOut) {
@@ -189,6 +225,44 @@ function glslNumber(val) {
   return `${num}`;
 }
 
+function buildMandelbrotShader(maxIterations, threshold) {
+  const maxIterInt = Math.max(1, Math.floor(maxIterations));
+  return `#version 300 es
+precision highp float;
+in vec2 vUv;
+out vec4 outColor;
+uniform vec2 uResolution;
+uniform vec4 uBounds;
+
+void main() {
+  vec2 frag = gl_FragCoord.xy;
+  float x = mix(uBounds.x, uBounds.y, frag.x / uResolution.x);
+  float y = mix(uBounds.z, uBounds.w, (uResolution.y - frag.y) / uResolution.y);
+
+  float zx = x;
+  float zy = y;
+  float cx = x;
+  float cy = y;
+  int steps = 0;
+
+  for (int i = 0; i < ${maxIterInt}; i++) {
+    float nextZx = (zx * zx) - (zy * zy) + cx;
+    float nextZy = 2.0 * zx * zy + cy;
+    zx = nextZx;
+    zy = nextZy;
+
+    if (length(vec2(zx, zy)) > ${glslNumber(threshold)}) {
+      break;
+    }
+
+    steps++;
+  }
+
+  float result = steps == ${maxIterInt} ? float(${maxIterInt - 1}) : float(steps);
+  outColor = vec4(result, 0.0, 0.0, 1.0);
+}`;
+}
+
 function nodeToGLSL(node) {
   switch (node.type) {
     case 'ConstantNode':
@@ -274,6 +348,19 @@ void main() {
 }`;
 }
 
+function getMandelbrotProgram(gl, func) {
+  const cached = glState.mandelbrotProgram;
+  if (cached && cached._maxIterations === func.maxIterations && cached._threshold === func.threshold) {
+    return cached;
+  }
+  const fragSrc = buildMandelbrotShader(func.maxIterations, func.threshold);
+  const program = createProgram(gl, VERT_SRC, fragSrc);
+  program._maxIterations = func.maxIterations;
+  program._threshold = func.threshold;
+  glState.mandelbrotProgram = program;
+  return program;
+}
+
 function ensureValueResources(gl, width, height) {
   const sameSize = glState.valueSize && glState.valueSize.width === width && glState.valueSize.height === height;
   const needsTex = !glState.valuesTex;
@@ -313,7 +400,41 @@ function getEvalProgram(gl, eqStr, isPolar) {
   return program;
 }
 
+function evaluateMandelbrotToTexture(func, windowBounds, canvasWidth, canvasHeight) {
+  ensureGL(canvasWidth, canvasHeight);
+  const gl = glState.gl;
+  ensureValueResources(gl, canvasWidth, canvasHeight);
+  const program = getMandelbrotProgram(gl, func);
+
+  gl.useProgram(program);
+  gl.bindVertexArray(glState.vao);
+  gl.viewport(0, 0, canvasWidth, canvasHeight);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, glState.valueFbo);
+
+  gl.uniform2f(gl.getUniformLocation(program, 'uResolution'), canvasWidth, canvasHeight);
+  gl.uniform4f(gl.getUniformLocation(program, 'uBounds'), windowBounds['xMin'], windowBounds['xMax'], windowBounds['yMin'], windowBounds['yMax']);
+
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+  const values = new Float32Array(canvasWidth * canvasHeight);
+  gl.readPixels(0, 0, canvasWidth, canvasHeight, gl.RED, gl.FLOAT, values);
+  let minValue = Infinity;
+  let maxValue = -Infinity;
+  for (let i = 0; i < values.length; i++) {
+    const v = values[i];
+    if (v < minValue) minValue = v;
+    if (v > maxValue) maxValue = v;
+  }
+
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+  return { pixelValues: values, min: minValue, max: maxValue, fromGPU: true };
+}
+
 function evaluateEquationToTexture(func, windowBounds, canvasWidth, canvasHeight) {
+  if (func && func._isMandelbrot) {
+    return evaluateMandelbrotToTexture(func, windowBounds, canvasWidth, canvasHeight);
+  }
   if (!func || !func._source || func._isJsFunction) {
     throw new Error('Equation source unavailable for GPU evaluation.');
   }
@@ -347,6 +468,33 @@ function evaluateEquationToTexture(func, windowBounds, canvasWidth, canvasHeight
   return { pixelValues: values, min: minValue, max: maxValue, fromGPU: true };
 }
 
+function buildMandelbrotCpuEvaluator(func) {
+  const maxIterations = Math.max(1, Math.floor(func.maxIterations || 0));
+  const thresholdVal = func.threshold;
+  return (x, y) => {
+    let zx = x;
+    let zy = y;
+    const cx = x;
+    const cy = y;
+    let stepsTaken = 0;
+
+    for (; stepsTaken < maxIterations; stepsTaken++) {
+      const prevZx = zx;
+      const prevZy = zy;
+      const nextZx = prevZx * prevZx - prevZy * prevZy + cx;
+      const nextZy = 2 * prevZx * prevZy + cy;
+      zx = nextZx;
+      zy = nextZy;
+
+      if (Math.hypot(zx, zy) > thresholdVal) {
+        break;
+      }
+    }
+
+    return stepsTaken === maxIterations ? maxIterations - 1 : stepsTaken;
+  };
+}
+
 export function calculateFuncForWindow(func, windowBounds, canvasWidth, canvasHeight) {
   try {
     return evaluateEquationToTexture(func, windowBounds, canvasWidth, canvasHeight);
@@ -359,12 +507,13 @@ export function calculateFuncForWindow(func, windowBounds, canvasWidth, canvasHe
   var minValue = 9999999;
   var maxValue = -9999999;
   var pixelValues = new Float32Array(canvasWidth * canvasHeight);
+  const fallbackFunc = func && func._isMandelbrot ? buildMandelbrotCpuEvaluator(func) : func;
 
   for (var pixelX = 0; pixelX < canvasWidth; pixelX++) {
     for (var pixelY = 0; pixelY < canvasHeight; pixelY++) {
       var x = pixelToXMapper(pixelX);
       var y = pixelToYMapper(pixelY);
-      var result = func(x, y);
+      var result = fallbackFunc(x, y);
       if (result > maxValue) {
         maxValue = result;
       }
@@ -625,6 +774,7 @@ const glState = {
   gl: null,
   program: null,
   evalProgram: null,
+  mandelbrotProgram: null,
   vao: null,
   valuesTex: null,
   valueFbo: null,
