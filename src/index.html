@@ -949,7 +949,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v4.3.1</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v4.3.2</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a> (non-binary) graphing calculator. FuzzyGraph is also free and <a href="https://github.com/calebmadrigal/fuzzygraph" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">open-source</a>.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1866,7 +1866,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v4.3.1.html';
+            a.download = 'FuzzyGraph_v4.3.2.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -2309,7 +2309,11 @@
 
         function clearMinAndMaxOverrides() {
             minOverride.set(null);
-            maxOverride.set(defaultMaxOverride);
+            if (fractal_mode.get()) {
+                maxOverride.set('');
+            } else {
+                maxOverride.set(defaultMaxOverride);
+            }
         }
 
         document.getElementById('minOverrideInput').addEventListener('input', (event) => {
@@ -2972,6 +2976,29 @@
             dragState.isDragging = false;
         });
 
+        canvas.addEventListener('dblclick', (event) => {
+            event.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const sx = canvas.width / rect.width;
+            const sy = canvas.height / rect.height;
+            const xPixel = (event.clientX - rect.left) * sx;
+            const yPixel = (event.clientY - rect.top) * sy;
+
+            const windowBounds = calcWindowBounds(xCenter.get(), yCenter.get(), yHeight.get(), canvas.width, canvas.height);
+            const pixelToXMapper = makeLinearMapper([0, canvas.width], [windowBounds['xMin'], windowBounds['xMax']], false);
+            const pixelToYMapper = makeLinearMapper([canvas.height, 0], [windowBounds['yMin'], windowBounds['yMax']], false);
+
+            xCenter.set(pixelToXMapper(xPixel));
+            yCenter.set(pixelToYMapper(yPixel));
+            yHeight.set(yHeight.get() * (1 / ZOOM_RATE));
+
+            if (!advancedMode.get()) {
+                clearMinAndMaxOverrides();
+            }
+
+            scheduleRepaint();
+        });
+
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault(); // Prevent scrolling
             const touch = e.touches[0];
@@ -3043,8 +3070,9 @@
                 if (px >= 0 && px < canvas.width && py >= 0 && py < canvas.height) {
                     const errorVal = pixelValuesTemp[py * canvas.width + px];
                     if (Number.isFinite(errorVal)) {
-                        const errorValStr = errorVal.toFixed(precision);
-                        const label = fractal_mode.get() ? 'steps' : 'error';
+                        const isFractal = fractal_mode.get();
+                        const errorValStr = isFractal ? Math.round(errorVal).toString() : errorVal.toFixed(precision);
+                        const label = isFractal ? 'steps' : 'error';
                         hoverMsg.set(`(${xStr}, ${yStr}): ${label} = ${errorValStr}`);
                     }
                 }
