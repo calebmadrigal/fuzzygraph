@@ -1504,7 +1504,10 @@
             calcWindowBounds,
             getXWidth,
             makeLinearMapper,
-            ZOOM_RATE
+            ZOOM_RATE,
+            isMandelbrotEquation,
+            createMandelbrotFunction,
+            parseMandelbrotParams
         } from './js/fuzzygraph_glsl.js';
         import {
             uniformly_distributed_points,
@@ -1591,73 +1594,22 @@
             return equation.get().replace(/\s+/g, "");
         }
 
-        function isMandelbrotEquation(eqStr) {
-            if (!eqStr || typeof eqStr !== 'string') return false;
-            return eqStr.toLowerCase().includes('mandelbrot');
-        }
-
-        function parseMandelbrotParams(eqStr) {
-            const baseMax = Number(max_iterations.get()) || 100;
-            const baseThreshold = Number(threshold.get()) || 2;
-
-            const maxMatch = eqStr.match(/max_iterations\s*=\s*([-+]?\d*\.?\d+(?:e[-+]?\d+)?)/i);
-            const thresholdMatch = eqStr.match(/threshold\s*=\s*([-+]?\d*\.?\d+(?:e[-+]?\d+)?)/i);
-
-            const parsedMax = Number(maxMatch && maxMatch[1]);
-            const parsedThreshold = Number(thresholdMatch && thresholdMatch[1]);
-
-            const maxVal = Number.isFinite(parsedMax) ? parsedMax : baseMax;
-            const thresholdVal = Number.isFinite(parsedThreshold) ? parsedThreshold : baseThreshold;
-
-            max_iterations.set(maxVal);
-            threshold.set(thresholdVal);
-
-            return { maxVal, thresholdVal };
-        }
-
-        function createMandelbrotFunction(eqStr) {
-            const { maxVal, thresholdVal } = parseMandelbrotParams(eqStr);
-
-            const mandelbrotFunc = (x, y) => {
-                const maxSteps = Math.max(1, Math.floor(maxVal));
-                const thresholdValue = thresholdVal;
-                let zx = x;
-                let zy = y;
-                const cx = x;
-                const cy = y;
-                let stepsTaken = 0;
-
-                for (; stepsTaken < maxSteps; stepsTaken++) {
-                    const prevZx = zx;
-                    const prevZy = zy;
-                    const nextZx = prevZx * prevZx - prevZy * prevZy + cx;
-                    const nextZy = 2 * prevZx * prevZy + cy;
-                    zx = nextZx;
-                    zy = nextZy;
-
-                    if (Math.hypot(zx, zy) > thresholdValue) {
-                        break;
-                    }
-                }
-
-                const resultSteps = stepsTaken === maxSteps ? maxSteps - 1 : stepsTaken;
-                return resultSteps;
-            };
-
-            mandelbrotFunc._source = eqStr;
-            mandelbrotFunc._isPolar = false;
-            mandelbrotFunc._isJsFunction = true;
-
-            return mandelbrotFunc;
-        }
-
         function getParsedEquation() {
             const eqStr = getStrippedEquation();
             const isMandelbrot = isMandelbrotEquation(eqStr);
             mandelbrot_mode.set(isMandelbrot);
 
             if (isMandelbrot) {
-                return createMandelbrotFunction(eqStr);
+                const baseMax = Number(max_iterations.get()) || 100;
+                const baseThreshold = Number(threshold.get()) || 2;
+                return createMandelbrotFunction(eqStr, {
+                    defaultMax: baseMax,
+                    defaultThreshold: baseThreshold,
+                    onParamsParsed: ({ maxVal, thresholdVal }) => {
+                        max_iterations.set(maxVal);
+                        threshold.set(thresholdVal);
+                    }
+                });
             }
 
             return parseEquationString(eqStr);
@@ -2554,7 +2506,14 @@
             const eqStripped = eq.replace(/\s+/g, '');
             if (isMandelbrotEquation(eqStripped)) {
                 mandelbrot_mode.set(true);
-                parseMandelbrotParams(eqStripped);
+                parseMandelbrotParams(eqStripped, {
+                    defaultMax: Number(max_iterations.get()) || 100,
+                    defaultThreshold: Number(threshold.get()) || 2,
+                    onParamsParsed: ({ maxVal, thresholdVal }) => {
+                        max_iterations.set(maxVal);
+                        threshold.set(thresholdVal);
+                    }
+                });
             } else {
                 mandelbrot_mode.set(false);
             }

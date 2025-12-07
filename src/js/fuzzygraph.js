@@ -10,6 +10,64 @@ import { getMatplotlibColormap } from './ga_color.js';
 export const ZOOM_RATE = 1.5;
 export const MAX_FUZZY = 200;
 
+export function isMandelbrotEquation(eqStr) {
+  if (!eqStr || typeof eqStr !== 'string') return false;
+  return eqStr.toLowerCase().includes('mandelbrot');
+}
+
+export function parseMandelbrotParams(eqStr, { defaultMax = 100, defaultThreshold = 2, onParamsParsed } = {}) {
+  const maxMatch = eqStr.match(/max_iterations\s*=\s*([-+]?\d*\.?\d+(?:e[-+]?\d+)?)/i);
+  const thresholdMatch = eqStr.match(/threshold\s*=\s*([-+]?\d*\.?\d+(?:e[-+]?\d+)?)/i);
+
+  const parsedMax = Number(maxMatch && maxMatch[1]);
+  const parsedThreshold = Number(thresholdMatch && thresholdMatch[1]);
+
+  const maxVal = Number.isFinite(parsedMax) ? parsedMax : defaultMax;
+  const thresholdVal = Number.isFinite(parsedThreshold) ? parsedThreshold : defaultThreshold;
+
+  if (typeof onParamsParsed === 'function') {
+    onParamsParsed({ maxVal, thresholdVal });
+  }
+
+  return { maxVal, thresholdVal };
+}
+
+export function createMandelbrotFunction(eqStr, options = {}) {
+  const { maxVal, thresholdVal } = parseMandelbrotParams(eqStr, options);
+  const maxIterations = Math.max(1, Math.floor(maxVal));
+  const thresholdValue = thresholdVal;
+
+  const mandelbrotFunc = (x, y) => {
+    let zx = x;
+    let zy = y;
+    const cx = x;
+    const cy = y;
+    let stepsTaken = 0;
+
+    for (; stepsTaken < maxIterations; stepsTaken++) {
+      const prevZx = zx;
+      const prevZy = zy;
+      const nextZx = prevZx * prevZx - prevZy * prevZy + cx;
+      const nextZy = 2 * prevZx * prevZy + cy;
+      zx = nextZx;
+      zy = nextZy;
+
+      if (Math.hypot(zx, zy) > thresholdValue) {
+        break;
+      }
+    }
+
+    const resultSteps = stepsTaken === maxIterations ? maxIterations - 1 : stepsTaken;
+    return resultSteps;
+  };
+
+  mandelbrotFunc._source = eqStr;
+  mandelbrotFunc._isPolar = false;
+  mandelbrotFunc._isJsFunction = true;
+
+  return mandelbrotFunc;
+}
+
 // // // // // // // Math stuff
 
 export function makeLinearMapper(inRange, outRange, intOut) {
