@@ -78,7 +78,7 @@ export function parseJuliaParams(
   {
     defaultMax = 1000,
     defaultThreshold = 100,
-    defaultCRe = -0.7,
+    defaultCRe = -0.796,
     defaultCIm = 0.185,
     onParamsParsed
   } = {}
