@@ -949,7 +949,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v4.2.0</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v4.3.0</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a> (non-binary) graphing calculator. FuzzyGraph is also free and <a href="https://github.com/calebmadrigal/fuzzygraph" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">open-source</a>.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1145,7 +1145,8 @@
 
             <!-- Equation generators -->
             <button class="fn" id="openCymaticsModal" title="Digital Cymatics Equation Generator">ψ</button>
-            <button class="fn" id="openMandelbrotModal" title="Mandelbrot Generator">M</button>
+            <button class="fn" id="openMandelbrotModal" title="Mandelbrot Generator">Mandelbrot</button>
+            <button class="fn" id="openJuliaModal" title="Julia Set Generator">Julia</button>
         </div>
 
         <div style="font-size:12px; color:#666; margin-top:8px;">
@@ -1488,6 +1489,112 @@
         </div>
     </div>
 
+    <!-- Julia Modal -->
+    <div
+        id="juliaModal"
+        class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 ">
+        <div
+            x-transition
+            class="relative bg-white rounded-lg shadow-lg p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto mx-4"
+        >
+            <button
+                id="juliaModalClose"
+                class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold focus:outline-none"
+                type="button"
+            >
+                &times;
+            </button>
+
+            <h2 class="text-xl font-semibold mb-4">
+                Julia Set Parameters
+            </h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label
+                        for="juliaMaxIterationsInput"
+                        class="block text-sm font-medium text-gray-600"
+                    >Max Iterations</label>
+                    <input
+                        type="number"
+                        id="juliaMaxIterationsInput"
+                        name="juliaMaxIterationsInput"
+                        min="1"
+                        step="1"
+                        required
+                        class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                </div>
+                <div>
+                    <label
+                        for="juliaThresholdInput"
+                        class="block text-sm font-medium text-gray-600"
+                    >Threshold</label>
+                    <input
+                        type="number"
+                        id="juliaThresholdInput"
+                        name="juliaThresholdInput"
+                        step="any"
+                        min="0"
+                        required
+                        class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                </div>
+                <div>
+                    <label
+                        for="juliaCRealInput"
+                        class="block text-sm font-medium text-gray-600"
+                    >C Real</label>
+                    <input
+                        type="number"
+                        id="juliaCRealInput"
+                        name="juliaCRealInput"
+                        step="any"
+                        required
+                        class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                </div>
+                <div>
+                    <label
+                        for="juliaCImagInput"
+                        class="block text-sm font-medium text-gray-600"
+                    >C Imaginary</label>
+                    <input
+                        type="number"
+                        id="juliaCImagInput"
+                        name="juliaCImagInput"
+                        step="any"
+                        required
+                        class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                </div>
+            </div>
+
+            <div class="mt-6 flex items-center justify-center pb-20 sm:pb-6">
+                <button
+                    type="button"
+                    id="insertJuliaButton"
+                    class="px-6 py-2 bg-gray-800 text-white font-semibold rounded-md shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
+                >
+                    <span class="inline text-gray-200 mr-2">Insert Julia</span>
+                    <svg
+                        class="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 4v16m8-8H4"
+                        />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         window.process = { env: { NODE_ENV: "development" } };
@@ -1507,7 +1614,10 @@
             ZOOM_RATE,
             isMandelbrotEquation,
             createMandelbrotFunction,
-            parseMandelbrotParams
+            parseMandelbrotParams,
+            isJuliaEquation,
+            createJuliaFunction,
+            parseJuliaParams
         } from './js/fuzzygraph_glsl.js';
         import {
             uniformly_distributed_points,
@@ -1558,7 +1668,10 @@
         const showEquationModal = atom(false);
         const showCymaticsModal = atom(false);
         const showMandelbrotModal = atom(false);
+        const showJuliaModal = atom(false);
         const mandelbrot_mode = atom(false);
+        const julia_mode = atom(false);
+        const fractal_mode = atom(false);
         const CY_PARAM_MAP = {
             cyNumResonators: 'numResonators',
             cyDistance: 'distance',
@@ -1588,16 +1701,29 @@
         const saveShowAxes = atom(true);
         const saveDefaultConfig = atom(true);
 
+        const juliaCReal = atom(-0.7);
+        const juliaCImag = atom(0.185);
+
         var pixelValuesStore = atom([]);
 
         function getStrippedEquation() {
             return equation.get().replace(/\s+/g, "");
         }
 
+        const updateFractalMode = () => {
+            fractal_mode.set(mandelbrot_mode.get() || julia_mode.get());
+        };
+
+        mandelbrot_mode.listen(updateFractalMode);
+        julia_mode.listen(updateFractalMode);
+
         function getParsedEquation() {
             const eqStr = getStrippedEquation();
             const isMandelbrot = isMandelbrotEquation(eqStr);
+            const isJulia = isJuliaEquation(eqStr);
             mandelbrot_mode.set(isMandelbrot);
+            julia_mode.set(isJulia);
+            updateFractalMode();
 
             if (isMandelbrot) {
                 const baseMax = Number(max_iterations.get()) || 1000;
@@ -1608,6 +1734,26 @@
                     onParamsParsed: ({ maxVal, thresholdVal }) => {
                         max_iterations.set(maxVal);
                         threshold.set(thresholdVal);
+                    }
+                });
+            }
+
+            if (isJulia) {
+                const baseMax = Number(max_iterations.get()) || 1000;
+                const baseThreshold = Number(threshold.get()) || 100;
+                const baseCRe = Number(juliaCReal.get());
+                const baseCIm = Number(juliaCImag.get());
+
+                return createJuliaFunction(eqStr, {
+                    defaultMax: baseMax,
+                    defaultThreshold: baseThreshold,
+                    defaultCRe: baseCRe,
+                    defaultCIm: baseCIm,
+                    onParamsParsed: ({ maxVal, thresholdVal, cRe, cIm }) => {
+                        max_iterations.set(maxVal);
+                        threshold.set(thresholdVal);
+                        juliaCReal.set(cRe);
+                        juliaCImag.set(cIm);
                     }
                 });
             }
@@ -1720,7 +1866,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v4.2.0.html';
+            a.download = 'FuzzyGraph_v4.3.0.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -2198,8 +2344,8 @@
             setMaxOverrideEnabled(shouldEnable);
         });
 
-        mandelbrot_mode.listen((isMandelbrot) => {
-            if (isMandelbrot) {
+        fractal_mode.listen((isFractal) => {
+            if (isFractal) {
                 maxOverride.set('');
             }
 
@@ -2370,6 +2516,8 @@
                 showEquationModal.set(false);
                 showCymaticsModal.set(false);
                 showGotoModal.set(false);
+                showMandelbrotModal.set(false);
+                showJuliaModal.set(false);
                 closePopover();
             }
         });
@@ -2515,6 +2663,7 @@
             const eqStripped = eq.replace(/\s+/g, '');
             if (isMandelbrotEquation(eqStripped)) {
                 mandelbrot_mode.set(true);
+                julia_mode.set(false);
                 parseMandelbrotParams(eqStripped, {
                     defaultMax: Number(max_iterations.get()) || 1000,
                     defaultThreshold: Number(threshold.get()) || 100,
@@ -2523,9 +2672,26 @@
                         threshold.set(thresholdVal);
                     }
                 });
+            } else if (isJuliaEquation(eqStripped)) {
+                mandelbrot_mode.set(false);
+                julia_mode.set(true);
+                parseJuliaParams(eqStripped, {
+                    defaultMax: Number(max_iterations.get()) || 1000,
+                    defaultThreshold: Number(threshold.get()) || 100,
+                    defaultCRe: Number(juliaCReal.get()),
+                    defaultCIm: Number(juliaCImag.get()),
+                    onParamsParsed: ({ maxVal, thresholdVal, cRe, cIm }) => {
+                        max_iterations.set(maxVal);
+                        threshold.set(thresholdVal);
+                        juliaCReal.set(cRe);
+                        juliaCImag.set(cIm);
+                    }
+                });
             } else {
                 mandelbrot_mode.set(false);
+                julia_mode.set(false);
             }
+            updateFractalMode();
 
             scheduleRepaint();
         });
@@ -2878,7 +3044,7 @@
                     const errorVal = pixelValuesTemp[py * canvas.width + px];
                     if (Number.isFinite(errorVal)) {
                         const errorValStr = errorVal.toFixed(precision);
-                        const label = mandelbrot_mode.get() ? 'steps' : 'error';
+                        const label = fractal_mode.get() ? 'steps' : 'error';
                         hoverMsg.set(`(${xStr}, ${yStr}): ${label} = ${errorValStr}`);
                     }
                 }
@@ -3361,13 +3527,30 @@
         const insertMandelbrotBtn = document.getElementById('insertMandelbrotButton');
         const maxIterationsInput = document.getElementById('maxIterationsInput');
         const thresholdInput = document.getElementById('thresholdInput');
+        const juliaModal = document.getElementById('juliaModal');
+        const openJuliaBtn = document.getElementById('openJuliaModal');
+        const closeJuliaBtn = document.getElementById('juliaModalClose');
+        const insertJuliaBtn = document.getElementById('insertJuliaButton');
+        const juliaMaxIterationsInput = document.getElementById('juliaMaxIterationsInput');
+        const juliaThresholdInput = document.getElementById('juliaThresholdInput');
+        const juliaCRealInput = document.getElementById('juliaCRealInput');
+        const juliaCImagInput = document.getElementById('juliaCImagInput');
 
         if (maxIterationsInput) maxIterationsInput.value = max_iterations.get();
         if (thresholdInput) thresholdInput.value = threshold.get();
+        if (juliaMaxIterationsInput) juliaMaxIterationsInput.value = max_iterations.get();
+        if (juliaThresholdInput) juliaThresholdInput.value = threshold.get();
+        if (juliaCRealInput) juliaCRealInput.value = juliaCReal.get();
+        if (juliaCImagInput) juliaCImagInput.value = juliaCImag.get();
 
         showMandelbrotModal.subscribe((isOpen) => {
             if (!mandelbrotModal) return;
             mandelbrotModal.classList.toggle('hidden', !isOpen);
+        });
+
+        showJuliaModal.subscribe((isOpen) => {
+            if (!juliaModal) return;
+            juliaModal.classList.toggle('hidden', !isOpen);
         });
 
         if (openMandelbrotBtn) {
@@ -3377,8 +3560,19 @@
             });
         }
 
+        if (openJuliaBtn) {
+            openJuliaBtn.addEventListener('click', () => {
+                closePopover();
+                showJuliaModal.set(true);
+            });
+        }
+
         if (closeMandelbrotBtn) {
             closeMandelbrotBtn.addEventListener('click', () => showMandelbrotModal.set(false));
+        }
+
+        if (closeJuliaBtn) {
+            closeJuliaBtn.addEventListener('click', () => showJuliaModal.set(false));
         }
 
         if (maxIterationsInput) {
@@ -3395,12 +3589,50 @@
             });
         }
 
+        if (juliaMaxIterationsInput) {
+            juliaMaxIterationsInput.addEventListener('input', (e) => {
+                const val = Number(e.target.value);
+                max_iterations.set(Number.isFinite(val) ? val : 0);
+            });
+        }
+
+        if (juliaThresholdInput) {
+            juliaThresholdInput.addEventListener('input', (e) => {
+                const val = Number(e.target.value);
+                threshold.set(Number.isFinite(val) ? val : 0);
+            });
+        }
+
+        if (juliaCRealInput) {
+            juliaCRealInput.addEventListener('input', (e) => {
+                const val = Number(e.target.value);
+                juliaCReal.set(Number.isFinite(val) ? val : 0);
+            });
+        }
+
+        if (juliaCImagInput) {
+            juliaCImagInput.addEventListener('input', (e) => {
+                const val = Number(e.target.value);
+                juliaCImag.set(Number.isFinite(val) ? val : 0);
+            });
+        }
+
         max_iterations.subscribe((val) => {
             if (maxIterationsInput) maxIterationsInput.value = val;
+            if (juliaMaxIterationsInput) juliaMaxIterationsInput.value = val;
         });
 
         threshold.subscribe((val) => {
             if (thresholdInput) thresholdInput.value = val;
+            if (juliaThresholdInput) juliaThresholdInput.value = val;
+        });
+
+        juliaCReal.subscribe((val) => {
+            if (juliaCRealInput) juliaCRealInput.value = val;
+        });
+
+        juliaCImag.subscribe((val) => {
+            if (juliaCImagInput) juliaCImagInput.value = val;
         });
 
         if (insertMandelbrotBtn) {
@@ -3411,6 +3643,19 @@
                 equation.set(eqStr);
                 unmodifiedCymaticsEquation.set(false);
                 showMandelbrotModal.set(false);
+            });
+        }
+
+        if (insertJuliaBtn) {
+            insertJuliaBtn.addEventListener('click', () => {
+                const maxVal = Number(max_iterations.get()) || 100;
+                const thresholdVal = Number(threshold.get()) || 2;
+                const cReVal = Number(juliaCReal.get());
+                const cImVal = Number(juliaCImag.get());
+                const eqStr = `julia(max_iterations=${maxVal}, threshold=${thresholdVal}, c_re=${cReVal}, c_im=${cImVal})`;
+                equation.set(eqStr);
+                unmodifiedCymaticsEquation.set(false);
+                showJuliaModal.set(false);
             });
         }
 
