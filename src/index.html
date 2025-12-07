@@ -1519,8 +1519,8 @@
         const defaultMaxOverride = 5;
 
         const equation = atom('y ≈ x^2 - 1');
-        const max_iterations = atom(100);
-        const threshold = atom(2);
+        const max_iterations = atom(1000);
+        const threshold = atom(100);
         const fuzzyLevel = atom(30);
         const showAxes = atom(true);
         const colorMap = atom('plasma');
@@ -1600,8 +1600,8 @@
             mandelbrot_mode.set(isMandelbrot);
 
             if (isMandelbrot) {
-                const baseMax = Number(max_iterations.get()) || 100;
-                const baseThreshold = Number(threshold.get()) || 2;
+                const baseMax = Number(max_iterations.get()) || 1000;
+                const baseThreshold = Number(threshold.get()) || 100;
                 return createMandelbrotFunction(eqStr, {
                     defaultMax: baseMax,
                     defaultThreshold: baseThreshold,
@@ -2120,7 +2120,7 @@
                 maxKnob.classList.add("translate-x-1", "bg-gray-700");
                 maxInput.classList.add("bg-gray-100", "text-gray-500");
 
-                maxOverride.set(null);
+                maxOverride.set('');
             }
         }
 
@@ -2195,6 +2195,15 @@
             maxInputHasFocus = false;
             const maxVal = maxOverride.get();
             const shouldEnable = maxVal != null && maxVal != '';
+            setMaxOverrideEnabled(shouldEnable);
+        });
+
+        mandelbrot_mode.listen((isMandelbrot) => {
+            if (isMandelbrot) {
+                maxOverride.set('');
+            }
+
+            const shouldEnable = maxInputHasFocus || (maxOverride.get() != null && maxOverride.get() != '');
             setMaxOverrideEnabled(shouldEnable);
         });
 
@@ -2507,8 +2516,8 @@
             if (isMandelbrotEquation(eqStripped)) {
                 mandelbrot_mode.set(true);
                 parseMandelbrotParams(eqStripped, {
-                    defaultMax: Number(max_iterations.get()) || 100,
-                    defaultThreshold: Number(threshold.get()) || 2,
+                    defaultMax: Number(max_iterations.get()) || 1000,
+                    defaultThreshold: Number(threshold.get()) || 100,
                     onParamsParsed: ({ maxVal, thresholdVal }) => {
                         max_iterations.set(maxVal);
                         threshold.set(thresholdVal);

@@ -15,7 +15,7 @@ export function isMandelbrotEquation(eqStr) {
   return eqStr.toLowerCase().includes('mandelbrot');
 }
 
-export function parseMandelbrotParams(eqStr, { defaultMax = 100, defaultThreshold = 2, onParamsParsed } = {}) {
+export function parseMandelbrotParams(eqStr, { defaultMax = 1000, defaultThreshold = 100, onParamsParsed } = {}) {
   const maxMatch = eqStr.match(/max_iterations\s*=\s*([-+]?\d*\.?\d+(?:e[-+]?\d+)?)/i);
   const thresholdMatch = eqStr.match(/threshold\s*=\s*([-+]?\d*\.?\d+(?:e[-+]?\d+)?)/i);
 
