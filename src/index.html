@@ -949,7 +949,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v4.1.0</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v4.2.0</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a> (non-binary) graphing calculator. FuzzyGraph is also free and <a href="https://github.com/calebmadrigal/fuzzygraph" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">open-source</a>.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1081,7 +1081,7 @@
 
         <!-- Action grid: now with top-row keys -->
         <div id="fnGrid"
-            style="display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:6px; max-height:320px; overflow:auto;">
+            style="display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:6px; max-height:346px; overflow:auto;">
             <!-- Top row: basic variable and operator keys -->
             <button class="fn" id="clearEquationBtn" title="C">CLEAR</button>
             <button class="fn" data-insert="y" title="y">y</button>
@@ -1145,6 +1145,7 @@
 
             <!-- Equation generators -->
             <button class="fn" id="openCymaticsModal" title="Digital Cymatics Equation Generator">ψ</button>
+            <button class="fn" id="openMandelbrotModal" title="Mandelbrot Generator">M</button>
         </div>
 
         <div style="font-size:12px; color:#666; margin-top:8px;">
@@ -1409,6 +1410,84 @@
         </div>
     </div>
 
+    <!-- Mandelbrot Modal -->
+    <div
+        id="mandelbrotModal"
+        class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 ">
+        <div
+            x-transition
+            class="relative bg-white rounded-lg shadow-lg p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto mx-4"
+        >
+            <button
+                id="mandelbrotModalClose"
+                class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl font-bold focus:outline-none"
+                type="button"
+            >
+                &times;
+            </button>
+
+            <h2 class="text-xl font-semibold mb-4">
+                Mandelbrot Parameters
+            </h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label
+                        for="maxIterationsInput"
+                        class="block text-sm font-medium text-gray-600"
+                    >Max Iterations</label>
+                    <input
+                        type="number"
+                        id="maxIterationsInput"
+                        name="maxIterationsInput"
+                        min="1"
+                        step="1"
+                        required
+                        class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                </div>
+                <div>
+                    <label
+                        for="thresholdInput"
+                        class="block text-sm font-medium text-gray-600"
+                    >Threshold</label>
+                    <input
+                        type="number"
+                        id="thresholdInput"
+                        name="thresholdInput"
+                        step="any"
+                        min="0"
+                        required
+                        class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                </div>
+            </div>
+
+            <div class="mt-6 flex items-center justify-center pb-20 sm:pb-6">
+                <button
+                    type="button"
+                    id="insertMandelbrotButton"
+                    class="px-6 py-2 bg-gray-800 text-white font-semibold rounded-md shadow-sm hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center justify-center"
+                >
+                    <span class="inline text-gray-200 mr-2">Insert Mandelbrot</span>
+                    <svg
+                        class="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 4v16m8-8H4"
+                        />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         window.process = { env: { NODE_ENV: "development" } };
@@ -1437,6 +1516,8 @@
         const defaultMaxOverride = 5;
 
         const equation = atom('y ≈ x^2 - 1');
+        const max_iterations = atom(100);
+        const threshold = atom(2);
         const fuzzyLevel = atom(30);
         const showAxes = atom(true);
         const colorMap = atom('plasma');
@@ -1473,6 +1554,8 @@
         const showAdvancedHelpModal = atom(false);
         const showEquationModal = atom(false);
         const showCymaticsModal = atom(false);
+        const showMandelbrotModal = atom(false);
+        const mandelbrot_mode = atom(false);
         const CY_PARAM_MAP = {
             cyNumResonators: 'numResonators',
             cyDistance: 'distance',
@@ -1506,6 +1589,78 @@
 
         function getStrippedEquation() {
             return equation.get().replace(/\s+/g, "");
+        }
+
+        function isMandelbrotEquation(eqStr) {
+            if (!eqStr || typeof eqStr !== 'string') return false;
+            return eqStr.toLowerCase().includes('mandelbrot');
+        }
+
+        function parseMandelbrotParams(eqStr) {
+            const baseMax = Number(max_iterations.get()) || 100;
+            const baseThreshold = Number(threshold.get()) || 2;
+
+            const maxMatch = eqStr.match(/max_iterations\s*=\s*([-+]?\d*\.?\d+(?:e[-+]?\d+)?)/i);
+            const thresholdMatch = eqStr.match(/threshold\s*=\s*([-+]?\d*\.?\d+(?:e[-+]?\d+)?)/i);
+
+            const parsedMax = Number(maxMatch && maxMatch[1]);
+            const parsedThreshold = Number(thresholdMatch && thresholdMatch[1]);
+
+            const maxVal = Number.isFinite(parsedMax) ? parsedMax : baseMax;
+            const thresholdVal = Number.isFinite(parsedThreshold) ? parsedThreshold : baseThreshold;
+
+            max_iterations.set(maxVal);
+            threshold.set(thresholdVal);
+
+            return { maxVal, thresholdVal };
+        }
+
+        function createMandelbrotFunction(eqStr) {
+            const { maxVal, thresholdVal } = parseMandelbrotParams(eqStr);
+
+            const mandelbrotFunc = (x, y) => {
+                const maxSteps = Math.max(1, Math.floor(maxVal));
+                const thresholdValue = thresholdVal;
+                let zx = x;
+                let zy = y;
+                const cx = x;
+                const cy = y;
+                let stepsTaken = 0;
+
+                for (; stepsTaken < maxSteps; stepsTaken++) {
+                    const prevZx = zx;
+                    const prevZy = zy;
+                    const nextZx = prevZx * prevZx - prevZy * prevZy + cx;
+                    const nextZy = 2 * prevZx * prevZy + cy;
+                    zx = nextZx;
+                    zy = nextZy;
+
+                    if (Math.hypot(zx, zy) > thresholdValue) {
+                        break;
+                    }
+                }
+
+                const resultSteps = stepsTaken === maxSteps ? maxSteps - 1 : stepsTaken;
+                return resultSteps;
+            };
+
+            mandelbrotFunc._source = eqStr;
+            mandelbrotFunc._isPolar = false;
+            mandelbrotFunc._isJsFunction = true;
+
+            return mandelbrotFunc;
+        }
+
+        function getParsedEquation() {
+            const eqStr = getStrippedEquation();
+            const isMandelbrot = isMandelbrotEquation(eqStr);
+            mandelbrot_mode.set(isMandelbrot);
+
+            if (isMandelbrot) {
+                return createMandelbrotFunction(eqStr);
+            }
+
+            return parseEquationString(eqStr);
         }
 
         function checkCanvasSize(canvas) {
@@ -1560,7 +1715,7 @@
             const canvas = document.getElementById('mainCanvas');
 
             // Compile equation using math.js (parseEquationString)
-            const parsedEquation = parseEquationString(getStrippedEquation());
+            const parsedEquation = getParsedEquation();
 
             if (parsedEquation) {
                 var graphConfig = {
@@ -1613,7 +1768,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v4.1.0.html';
+            a.download = 'FuzzyGraph_v4.2.0.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1655,7 +1810,7 @@
                 saveCanvas.height = sH;
 
                 // Compile equation using math.js (parseEquationString)
-                const parsedEquation = parseEquationString(getStrippedEquation());
+                const parsedEquation = getParsedEquation();
 
                 var graphConfig = {
                     equationFunction: parsedEquation,
@@ -2396,6 +2551,14 @@
                 clearMinAndMaxOverrides();
             }
 
+            const eqStripped = eq.replace(/\s+/g, '');
+            if (isMandelbrotEquation(eqStripped)) {
+                mandelbrot_mode.set(true);
+                parseMandelbrotParams(eqStripped);
+            } else {
+                mandelbrot_mode.set(false);
+            }
+
             scheduleRepaint();
         });
 
@@ -2740,11 +2903,16 @@
             document.getElementById('hoverMsgDiv').style.display = 'block';
 
             const pixelValuesTemp = pixelValuesStore.get();
-            if (pixelValuesTemp) {
-                const errorVal = pixelValuesTemp[yPixel * canvas.width + xPixel]
-                if (errorVal) {
-                    const errorValStr = errorVal.toFixed(precision);
-                    hoverMsg.set(`(${xStr}, ${yStr}): error = ${errorValStr}`);
+            if (pixelValuesTemp && pixelValuesTemp.length) {
+                const px = Math.floor(xPixel);
+                const py = Math.floor(yPixel);
+                if (px >= 0 && px < canvas.width && py >= 0 && py < canvas.height) {
+                    const errorVal = pixelValuesTemp[py * canvas.width + px];
+                    if (Number.isFinite(errorVal)) {
+                        const errorValStr = errorVal.toFixed(precision);
+                        const label = mandelbrot_mode.get() ? 'steps' : 'error';
+                        hoverMsg.set(`(${xStr}, ${yStr}): ${label} = ${errorValStr}`);
+                    }
                 }
             }
         });
@@ -2942,6 +3110,8 @@
         function getAppConfig() {
             var graphConfig = {
                 equation: getStrippedEquation(),
+                max_iterations: max_iterations.get(),
+                threshold: threshold.get(),
                 fuzzyLevel: fuzzyLevel.get(),
                 colorMap: colorMap.get(),
                 reverseColor: reverseColor.get(),
@@ -3012,6 +3182,12 @@
             // Update stores
             if (configObj['equation'] !== null && typeof configObj['equation'] !== 'undefined') {
                 equation.set(configObj['equation']);
+            }
+            if (configObj['max_iterations'] !== null && typeof configObj['max_iterations'] !== 'undefined') {
+                max_iterations.set(configObj['max_iterations']);
+            }
+            if (configObj['threshold'] !== null && typeof configObj['threshold'] !== 'undefined') {
+                threshold.set(configObj['threshold']);
             }
             if (configObj['fuzzyLevel'] !== null && typeof configObj['fuzzyLevel'] !== 'undefined') {
                 fuzzyLevel.set(configObj['fuzzyLevel']);
@@ -3211,6 +3387,65 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
+        const mandelbrotModal = document.getElementById('mandelbrotModal');
+        const openMandelbrotBtn = document.getElementById('openMandelbrotModal');
+        const closeMandelbrotBtn = document.getElementById('mandelbrotModalClose');
+        const insertMandelbrotBtn = document.getElementById('insertMandelbrotButton');
+        const maxIterationsInput = document.getElementById('maxIterationsInput');
+        const thresholdInput = document.getElementById('thresholdInput');
+
+        if (maxIterationsInput) maxIterationsInput.value = max_iterations.get();
+        if (thresholdInput) thresholdInput.value = threshold.get();
+
+        showMandelbrotModal.subscribe((isOpen) => {
+            if (!mandelbrotModal) return;
+            mandelbrotModal.classList.toggle('hidden', !isOpen);
+        });
+
+        if (openMandelbrotBtn) {
+            openMandelbrotBtn.addEventListener('click', () => {
+                closePopover();
+                showMandelbrotModal.set(true);
+            });
+        }
+
+        if (closeMandelbrotBtn) {
+            closeMandelbrotBtn.addEventListener('click', () => showMandelbrotModal.set(false));
+        }
+
+        if (maxIterationsInput) {
+            maxIterationsInput.addEventListener('input', (e) => {
+                const val = Number(e.target.value);
+                max_iterations.set(Number.isFinite(val) ? val : 0);
+            });
+        }
+
+        if (thresholdInput) {
+            thresholdInput.addEventListener('input', (e) => {
+                const val = Number(e.target.value);
+                threshold.set(Number.isFinite(val) ? val : 0);
+            });
+        }
+
+        max_iterations.subscribe((val) => {
+            if (maxIterationsInput) maxIterationsInput.value = val;
+        });
+
+        threshold.subscribe((val) => {
+            if (thresholdInput) thresholdInput.value = val;
+        });
+
+        if (insertMandelbrotBtn) {
+            insertMandelbrotBtn.addEventListener('click', () => {
+                const maxVal = Number(max_iterations.get()) || 100;
+                const thresholdVal = Number(threshold.get()) || 2;
+                const eqStr = `mandelbrot(max_iterations=${maxVal}, threshold=${thresholdVal})`;
+                equation.set(eqStr);
+                unmodifiedCymaticsEquation.set(false);
+                showMandelbrotModal.set(false);
+            });
+        }
+
         const modal = document.getElementById('cymaticsModal');
         const openBtn = document.getElementById('openCymaticsModal');
         const closeBtn = document.getElementById('cymaticsModalClose');
