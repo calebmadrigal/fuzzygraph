@@ -9,6 +9,9 @@
 - No sign-ups or user tracking (no cookies, no analytics code, etc)
 - Saves images with equation and graph configuration (including pan, zoom, color map, etc) embedded in the saved PNG file such that images exported fom FuzzyGraph can be opened (which loads the config from the PNG image metadata).
 - Share links (which embeds the graph config in url parameters)
+- Digital Cymatics Equation Generator (Equation → + → ψ)
+- Mandelbrot Set visaulizer (Equation → + → Mandelbrot)
+- Julia Set visualizer (Equation → + → Julia)
 
 # Roadmap
 
@@ -22,6 +25,7 @@
 - [x] More control over color (v4.0.0)
 - [x] Mandelbrot set (v4.2.0)
 - [x] Julia set (v4.3.0)
+- [ ] Improved fractal rendering at deep zoom
 - [ ] More transfer function controls
 - [ ] Animation
 
