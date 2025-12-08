@@ -749,18 +749,29 @@
 
                     <div class="grid grid-cols-2 gap-4">
                         <div>
+                            <label for="saveZoomInput" class="block text-sm font-medium text-gray-600">Zoom (decimal)</label>
+                            <input
+                                type="number"
+                                id="saveZoomInput"
+                                name="saveZoomInput"
+                                step="any"
+                                required
+                                class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Enter zoom"
+                            >
+                        </div>
+                        <div>
                             <label for="yHeight" class="block text-sm font-medium text-gray-600">yHeight (decimal)</label>
-                            <input 
-                                type="number" 
-                                id="saveYHeightInput" 
-                                name="saveYHeightInput" 
-                                step="any" 
-                                required 
+                            <input
+                                type="number"
+                                id="saveYHeightInput"
+                                name="saveYHeightInput"
+                                step="any"
+                                required
                                 class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 placeholder="Enter yHeight"
                             >
                         </div>
-                        <div>&nbsp;</div>
                     </div>
 
                 </div>
@@ -949,7 +960,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v4.3.2</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v4.4.0</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a> (non-binary) graphing calculator. FuzzyGraph is also free and <a href="https://github.com/calebmadrigal/fuzzygraph" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">open-source</a>.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1640,7 +1651,40 @@
         const colorCycles = atom(1);
         const xCenter = atom(0);
         const yCenter = atom(0);
-        const yHeight = atom(yHeightAtZoom1);
+
+        const zoom = atom(1);  // Corresponds to a yHeight of 6
+
+        const getYHeightFromZoom = (zoomVal) => {
+            const numericZoom = Number(zoomVal);
+            if (!Number.isFinite(numericZoom) || numericZoom === 0) {
+                return yHeightAtZoom1;
+            }
+            return yHeightAtZoom1 / numericZoom;
+        };
+
+        const getZoomFromYHeight = (heightVal) => {
+            const numericHeight = Number(heightVal);
+            if (!Number.isFinite(numericHeight) || numericHeight === 0) {
+                return 1;
+            }
+            return yHeightAtZoom1 / numericHeight;
+        };
+
+        const getYHeight = () => getYHeightFromZoom(zoom.get());
+
+        const setZoomSafely = (zoomVal) => {
+            const numericZoom = Number(zoomVal);
+            if (Number.isFinite(numericZoom) && numericZoom !== 0) {
+                zoom.set(numericZoom);
+            }
+        };
+
+        const setZoomFromYHeight = (heightVal) => {
+            const computedZoom = getZoomFromYHeight(heightVal);
+            if (Number.isFinite(computedZoom) && computedZoom !== 0) {
+                zoom.set(computedZoom);
+            }
+        };
 
         // Advanced stuff
         const advancedMode = atom(false);
@@ -1697,7 +1741,8 @@
         const saveHeight = atom(0);
         const saveCenterX = atom(0);
         const saveCenterY = atom(0);
-        const saveYHeight = atom(yHeightAtZoom1);
+        const saveZoom = atom(zoom.get());
+        const saveYHeight = atom(getYHeight());
         const saveShowAxes = atom(true);
         const saveDefaultConfig = atom(true);
 
@@ -1826,7 +1871,7 @@
                     colorCycles: colorCycles.get(),
                     xCenter: xCenter.get(),
                     yCenter: yCenter.get(),
-                    yHeight: yHeight.get(),
+                    yHeight: getYHeight(),
                     showAxes: showAxes.get(),
                     minOverride: minOverride.get(),
                     maxOverride: maxOverride.get()
@@ -1866,7 +1911,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v4.3.2.html';
+            a.download = 'FuzzyGraph_v4.4.0.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1874,7 +1919,7 @@
         }
 
         // Save Image
-        async function saveImage(w=null, h=null, cX=null, cY=null, yH=null) {
+        async function saveImage(w=null, h=null, cX=null, cY=null, z=null, yH=null) {
             const fallbackW = canvas.width;
             const fallbackH = canvas.height;
 
@@ -1887,9 +1932,19 @@
             const sH = toNumberOr(h ?? saveHeight.get(), fallbackH);
             const sCX = toNumberOr(cX ?? saveCenterX.get(), xCenter.get());
             const sCY = toNumberOr(cY ?? saveCenterY.get(), yCenter.get());
-            const sYH = toNumberOr(yH ?? saveYHeight.get(), yHeight.get());
+            const sZoom = toNumberOr(z ?? saveZoom.get(), zoom.get());
+            const sYH = toNumberOr(yH ?? saveYHeight.get(), getYHeight());
 
-            if (w | h | cX | cY | yH) {
+            let finalZoom = Number.isFinite(sZoom) && sZoom !== 0 ? sZoom : null;
+            if (!finalZoom && Number.isFinite(sYH) && sYH !== 0) {
+                finalZoom = getZoomFromYHeight(sYH);
+            }
+            if (!finalZoom) {
+                finalZoom = zoom.get();
+            }
+            const finalYHeight = getYHeightFromZoom(finalZoom);
+
+            if (w || h || cX || cY || z || yH) {
                 // If we received any of these, then this is not from the UI, and we need to render
                 saveDefaultConfig.set(false);
             }
@@ -1920,7 +1975,7 @@
                     colorCycles: colorCycles.get(),
                     xCenter: parseFloat(sCX),
                     yCenter: parseFloat(sCY),
-                    yHeight: parseFloat(sYH),
+                    yHeight: parseFloat(finalYHeight),
                     minOverride: minOverride.get(),
                     maxOverride: maxOverride.get(),
                     showAxes: saveShowAxes.get()
@@ -2054,6 +2109,10 @@
 
             // Embed graph config data into the PNG file (so it can be re-opened in FuzzyGraph)
             var graphConfig = getAppConfig();
+            graphConfig['zoom'] = finalZoom;
+            graphConfig['xCenter'] = parseFloat(sCX);
+            graphConfig['yCenter'] = parseFloat(sCY);
+            graphConfig['showAxes'] = saveShowAxes.get();
 
             // Don't add advanced stuff if not in advanced mode
             if (!graphConfig['advancedMode']) {
@@ -2447,7 +2506,19 @@
             saveDefaultConfig.set(false);
         });
         document.getElementById('saveYHeightInput').addEventListener('input', (event) => {
+            const yHeightVal = Number(event.target.value);
             saveYHeight.set(event.target.value);
+            if (Number.isFinite(yHeightVal) && yHeightVal !== 0) {
+                saveZoom.set(getZoomFromYHeight(yHeightVal));
+            }
+            saveDefaultConfig.set(false);
+        });
+        document.getElementById('saveZoomInput').addEventListener('input', (event) => {
+            const zoomVal = Number(event.target.value);
+            saveZoom.set(event.target.value);
+            if (Number.isFinite(zoomVal) && zoomVal !== 0) {
+                saveYHeight.set(getYHeightFromZoom(zoomVal));
+            }
             saveDefaultConfig.set(false);
         });
         document.getElementById('saveAxesToggle').addEventListener('click', () => {
@@ -2470,11 +2541,14 @@
         saveYHeight.subscribe((val) => {
             document.getElementById('saveYHeightInput').value = val;
         });
+        saveZoom.subscribe((val) => {
+            document.getElementById('saveZoomInput').value = val;
+        });
 
         function populateGotoModalFields() {
             document.getElementById('gotoCenterXInput').value = xCenter.get();
             document.getElementById('gotoCenterYInput').value = yCenter.get();
-            document.getElementById('gotoZoomInput').value = yHeightAtZoom1 / yHeight.get();
+            document.getElementById('gotoZoomInput').value = zoom.get();
         }
 
 
@@ -2495,7 +2569,9 @@
                 saveHeight.set(canvas.height);
                 saveCenterX.set(xCenter.get());
                 saveCenterY.set(yCenter.get());
-                saveYHeight.set(yHeight.get());
+                const currentZoom = zoom.get();
+                saveZoom.set(currentZoom);
+                saveYHeight.set(getYHeightFromZoom(currentZoom));
                 saveShowAxes.set(showAxes.get());
                 saveDefaultConfig.set(true);
             }
@@ -2587,15 +2663,15 @@
         document.getElementById('gotoSubmitButton').addEventListener('click', () => {
             const newX = parseFloat(document.getElementById('gotoCenterXInput').value);
             const newY = parseFloat(document.getElementById('gotoCenterYInput').value);
-            const zoom = parseFloat(document.getElementById('gotoZoomInput').value);
+            const newZoom = parseFloat(document.getElementById('gotoZoomInput').value);
 
-            if (!Number.isFinite(newX) || !Number.isFinite(newY) || !Number.isFinite(zoom) || zoom === 0) {
+            if (!Number.isFinite(newX) || !Number.isFinite(newY) || !Number.isFinite(newZoom) || newZoom === 0) {
                 return;
             }
 
             xCenter.set(newX);
             yCenter.set(newY);
-            yHeight.set(yHeightAtZoom1 / zoom);
+            setZoomSafely(newZoom);
             scheduleRepaint();
             showGotoModal.set(false);
         });
@@ -2856,7 +2932,7 @@
 
         // Zoom In
         document.getElementById('zoomInButton').addEventListener('click', () => {
-            yHeight.set(yHeight.get() * (1 / ZOOM_RATE));
+            zoom.set(zoom.get() * ZOOM_RATE);
 
             // If not in advancedMode, clear min and max overrides on zoom. The reason is because
             // the window changes, so the min and max values can change drastically.
@@ -2868,7 +2944,7 @@
         });
         // Zoom Out
         document.getElementById('zoomOutButton').addEventListener('click', () => {
-            yHeight.set(yHeight.get() * ZOOM_RATE);
+            zoom.set(zoom.get() * (1 / ZOOM_RATE));
 
             // If not in advancedMode, clear min and max overrides on zoom. The reason is because
             // the window changes, so the min and max values can change drastically.
@@ -2880,7 +2956,7 @@
         });
         // Home
         document.getElementById('homeButton').addEventListener('click', () => {
-            yHeight.set(yHeightAtZoom1);
+            zoom.set(1);
             xCenter.set(0);
             yCenter.set(0);
             scheduleRepaint();
@@ -2930,14 +3006,15 @@
 
         function updatePosition(event) {
             const canvas = event.target;
-            var xWidth = getXWidth(yHeight.get(), canvas.width, canvas.height);
+            const currentYHeight = getYHeight();
+            var xWidth = getXWidth(currentYHeight, canvas.width, canvas.height);
 
             var xOffsetPixels = event.x - dragState.startX;
             var yOffsetPixels = event.y - dragState.startY;
 
             // First, we have to convert the offset in pixels into the offset in our graphing window
             var xOffset = xOffsetPixels * (xWidth / canvas.clientWidth);
-            var yOffset = yOffsetPixels * (yHeight.get() / canvas.clientHeight);
+            var yOffset = yOffsetPixels * (currentYHeight / canvas.clientHeight);
 
             // Then we need to move the center of our graphing window accordingly
             xCenter.set(xCenter.get() - xOffset);
@@ -2984,13 +3061,14 @@
             const xPixel = (event.clientX - rect.left) * sx;
             const yPixel = (event.clientY - rect.top) * sy;
 
-            const windowBounds = calcWindowBounds(xCenter.get(), yCenter.get(), yHeight.get(), canvas.width, canvas.height);
+            const yHeightVal = getYHeight();
+            const windowBounds = calcWindowBounds(xCenter.get(), yCenter.get(), yHeightVal, canvas.width, canvas.height);
             const pixelToXMapper = makeLinearMapper([0, canvas.width], [windowBounds['xMin'], windowBounds['xMax']], false);
             const pixelToYMapper = makeLinearMapper([canvas.height, 0], [windowBounds['yMin'], windowBounds['yMax']], false);
 
             xCenter.set(pixelToXMapper(xPixel));
             yCenter.set(pixelToYMapper(yPixel));
-            yHeight.set(yHeight.get() * (1 / ZOOM_RATE));
+            zoom.set(zoom.get() * ZOOM_RATE);
 
             if (!advancedMode.get()) {
                 clearMinAndMaxOverrides();
@@ -3029,7 +3107,7 @@
         function getPrecision() {
             const errorRange = maxVal.get() - minVal.get();
             const errorRangeLeadingZeros = countLeadingZeros(getDecimalPart(errorRange.toString()));
-            const yHeightVal = yHeight.get();
+            const yHeightVal = getYHeight();
             const heightLeadingZeros = countLeadingZeros(getDecimalPart(yHeightVal.toString()));
             if (yHeightVal >= 0.01) {
                 return 7;
@@ -3052,7 +3130,8 @@
 
             const r = canvas.getBoundingClientRect();
             const sx = canvas.width / r.width, sy = canvas.height / r.height;
-            const windowBounds = calcWindowBounds(xCenter.get(), yCenter.get(), yHeight.get(), canvas.width, canvas.height);
+            const yHeightVal = getYHeight();
+            const windowBounds = calcWindowBounds(xCenter.get(), yCenter.get(), yHeightVal, canvas.width, canvas.height);
             var pixelToXMapper = makeLinearMapper([0, canvas.width], [windowBounds['xMin'], windowBounds['xMax']], false);
             var pixelToYMapper = makeLinearMapper([canvas.height, 0], [windowBounds['yMin'], windowBounds['yMax']], false);
             const xPixel = (event.clientX - r.left) * sx;
@@ -3282,7 +3361,7 @@
                 colorCycles: colorCycles.get(),
                 xCenter: xCenter.get(),
                 yCenter: yCenter.get(),
-                yHeight: yHeight.get(),
+                zoom: zoom.get(),
                 showAxes: showAxes.get(),
                 advancedMode: advancedMode.get(),
                 minOverride: minOverride.get(),
@@ -3378,8 +3457,10 @@
             if (configObj['yCenter'] !== null && typeof configObj['yCenter'] !== 'undefined') {
                 yCenter.set(configObj['yCenter']);
             }
-            if (configObj['yHeight'] !== null && typeof configObj['yHeight'] !== 'undefined') {
-                yHeight.set(configObj['yHeight']);
+            if (configObj['zoom'] !== null && typeof configObj['zoom'] !== 'undefined') {
+                setZoomSafely(configObj['zoom']);
+            } else if (configObj['yHeight'] !== null && typeof configObj['yHeight'] !== 'undefined') {
+                setZoomFromYHeight(configObj['yHeight']);
             }
             if (configObj['advancedMode'] != null && typeof configObj['advancedMode'] !== 'undefined') {
                 advancedMode.set(configObj['advancedMode']);
@@ -3418,6 +3499,11 @@
                 }
             }
 
+            const yHeightParam = getParameterByName('yHeight', urlFragmentId);
+            if (yHeightParam !== null && yHeightParam !== '') {
+                configFromUrl['yHeight'] = parseUrlParam('yHeight', yHeightParam);
+            }
+
             for (const cyParam of Object.keys(CY_PARAM_MAP)) {
                 const cyValue = getParameterByName(cyParam, urlFragmentId);
                 if (cyValue !== null && cyValue !== '') {
@@ -3432,8 +3518,9 @@
                 const h = getParameterByName('h');
                 const cX = getParameterByName('centerX');
                 const cY = getParameterByName('centerY');
+                const z = getParameterByName('zoom');
                 const yH = getParameterByName('yHeight');
-                saveImage(w, h, cX, cY, yH);
+                saveImage(w, h, cX, cY, z, yH);
             }
         }
 
