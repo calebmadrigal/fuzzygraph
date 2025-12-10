@@ -324,19 +324,24 @@ export function calcWindowBounds(xCenter, yCenter, yHeight, canvasWidth, canvasH
   };
 }
 
-export function calculateFuncForWindow(func, windowBounds, canvasWidth, canvasHeight) {
+export function calculateFuncForWindow(func, windowBounds, canvasWidth, canvasHeight, rotationRadians = 0) {
   var pixelToXMapper = makeLinearMapper([0, canvasWidth], [windowBounds['xMin'], windowBounds['xMax']], false);
   var pixelToYMapper = makeLinearMapper([canvasHeight, 0], [windowBounds['yMin'], windowBounds['yMax']], false);
   var minValue = 9999999;
   var maxValue = -9999999;
   var pixelValues = new Array(canvasWidth * canvasHeight);
+  const hasRotation = Number.isFinite(rotationRadians) && rotationRadians !== 0;
+  const cosTheta = hasRotation ? Math.cos(rotationRadians) : 1;
+  const sinTheta = hasRotation ? Math.sin(rotationRadians) : 0;
 
   // Calculate values for each pixel, and find the min and max values
   for (var pixelX = 0; pixelX < canvasWidth; pixelX++) {
     for (var pixelY = 0; pixelY < canvasHeight; pixelY++) {
       var x = pixelToXMapper(pixelX);
       var y = pixelToYMapper(pixelY);
-      var result = func(x, y);
+      const rotatedX = hasRotation ? (x * cosTheta - y * sinTheta) : x;
+      const rotatedY = hasRotation ? (x * sinTheta + y * cosTheta) : y;
+      var result = func(rotatedX, rotatedY);
       if (result > maxValue) {
         maxValue = result;
       }
@@ -627,7 +632,8 @@ export function displayGraph(graphParams, canvasElem) {
   var pixelValues = calculateFuncForWindow(graphParams['equationFunction'],
       windowBounds,
       canvasWidth,
-      canvasHeight);
+      canvasHeight,
+      graphParams['rotationRadians']);
 
   var minVal = pixelValues['min'];
   var maxVal = pixelValues['max'];

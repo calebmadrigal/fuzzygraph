@@ -669,11 +669,15 @@ function buildJuliaCpuEvaluator(func) {
   };
 }
 
-export function calculateFuncForWindow(func, windowBounds, canvasWidth, canvasHeight) {
-  try {
-    return evaluateEquationToTexture(func, windowBounds, canvasWidth, canvasHeight);
-  } catch (err) {
-    console.warn('Falling back to CPU evaluation:', err);
+export function calculateFuncForWindow(func, windowBounds, canvasWidth, canvasHeight, rotationRadians = 0) {
+  const hasRotation = Number.isFinite(rotationRadians) && rotationRadians !== 0;
+
+  if (!hasRotation) {
+    try {
+      return evaluateEquationToTexture(func, windowBounds, canvasWidth, canvasHeight);
+    } catch (err) {
+      console.warn('Falling back to CPU evaluation:', err);
+    }
   }
 
   var pixelToXMapper = makeLinearMapper([0, canvasWidth], [windowBounds['xMin'], windowBounds['xMax']], false);
@@ -681,6 +685,8 @@ export function calculateFuncForWindow(func, windowBounds, canvasWidth, canvasHe
   var minValue = 9999999;
   var maxValue = -9999999;
   var pixelValues = new Float32Array(canvasWidth * canvasHeight);
+  const cosTheta = hasRotation ? Math.cos(rotationRadians) : 1;
+  const sinTheta = hasRotation ? Math.sin(rotationRadians) : 0;
   const fallbackFunc = func && func._isMandelbrot
     ? buildMandelbrotCpuEvaluator(func)
     : func && func._isJulia
@@ -691,7 +697,9 @@ export function calculateFuncForWindow(func, windowBounds, canvasWidth, canvasHe
     for (var pixelY = 0; pixelY < canvasHeight; pixelY++) {
       var x = pixelToXMapper(pixelX);
       var y = pixelToYMapper(pixelY);
-      var result = fallbackFunc(x, y);
+      const rotatedX = hasRotation ? (x * cosTheta - y * sinTheta) : x;
+      const rotatedY = hasRotation ? (x * sinTheta + y * cosTheta) : y;
+      var result = fallbackFunc(rotatedX, rotatedY);
       if (result > maxValue) {
         maxValue = result;
       }
@@ -1088,7 +1096,8 @@ export function displayGraph(graphParams, canvasElem) {
   var pixelValues = calculateFuncForWindow(graphParams['equationFunction'],
       windowBounds,
       canvasWidth,
-      canvasHeight);
+      canvasHeight,
+      graphParams['rotationRadians']);
 
   var minVal = pixelValues['min'];
   var maxVal = pixelValues['max'];

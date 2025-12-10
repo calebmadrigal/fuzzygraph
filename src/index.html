@@ -613,6 +613,21 @@
                         >
                     </div>
 
+                    <!-- Rotation (degrees) -->
+                    <div class="mt-2">
+                        <label for="rotationDegreesInput" class="block text-sm font-medium text-gray-600">
+                            Rotation (degrees)
+                        </label>
+                        <input
+                            type="number"
+                            inputmode="decimal"
+                            step="any"
+                            id="rotationDegreesInput"
+                            name="rotationDegreesInput"
+                            class="no-spinner w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                    </div>
+
                 </div>
 
                 <div class="mt-16 text-center flex flex-col justify-end">
@@ -1649,6 +1664,7 @@
         const invertColor = atom(false);
         const colorStart = atom(0);
         const colorCycles = atom(1);
+        const rotationDegrees = atom(0);
         const xCenter = atom(0);
         const yCenter = atom(0);
 
@@ -1764,8 +1780,9 @@
 
         function getParsedEquation() {
             const eqStr = getStrippedEquation();
-            const isMandelbrot = isMandelbrotEquation(eqStr);
-            const isJulia = isJuliaEquation(eqStr);
+            const { equation: baseEquation } = parseRotationWrapper(eqStr);
+            const isMandelbrot = isMandelbrotEquation(baseEquation);
+            const isJulia = isJuliaEquation(baseEquation);
             mandelbrot_mode.set(isMandelbrot);
             julia_mode.set(isJulia);
             updateFractalMode();
@@ -1773,7 +1790,7 @@
             if (isMandelbrot) {
                 const baseMax = Number(max_iterations.get()) || 1000;
                 const baseThreshold = Number(threshold.get()) || 100;
-                return createMandelbrotFunction(eqStr, {
+                return createMandelbrotFunction(baseEquation, {
                     defaultMax: baseMax,
                     defaultThreshold: baseThreshold,
                     onParamsParsed: ({ maxVal, thresholdVal }) => {
@@ -1789,7 +1806,7 @@
                 const baseCRe = Number(juliaCReal.get());
                 const baseCIm = Number(juliaCImag.get());
 
-                return createJuliaFunction(eqStr, {
+                return createJuliaFunction(baseEquation, {
                     defaultMax: baseMax,
                     defaultThreshold: baseThreshold,
                     defaultCRe: baseCRe,
@@ -1803,7 +1820,7 @@
                 });
             }
 
-            return parseEquationString(eqStr);
+            return parseEquationString(baseEquation);
         }
 
         function checkCanvasSize(canvas) {
@@ -1874,7 +1891,8 @@
                     yHeight: getYHeight(),
                     showAxes: showAxes.get(),
                     minOverride: minOverride.get(),
-                    maxOverride: maxOverride.get()
+                    maxOverride: maxOverride.get(),
+                    rotationRadians: toRadians(rotationDegrees.get())
                 };
 
                 const graphResult = displayGraph(graphConfig, canvas);
@@ -2262,6 +2280,46 @@
             return str.length > 8 ? str.slice(0, 8) : str;
         }
 
+        function parseRotationWrapper(eqStr) {
+            const trimmed = (eqStr || '').trim();
+            if (!trimmed.toLowerCase().startsWith('rotate(') || !trimmed.endsWith(')')) {
+                return { equation: trimmed, rotationDegrees: 0 };
+            }
+
+            const innerContent = trimmed.slice('rotate('.length, -1);
+            let depth = 0;
+            let splitIndex = -1;
+
+            for (let i = innerContent.length - 1; i >= 0; i--) {
+                const ch = innerContent[i];
+                if (ch === ')') depth++;
+                else if (ch === '(') depth--;
+                else if (ch === ',' && depth === 0) {
+                    splitIndex = i;
+                    break;
+                }
+            }
+
+            if (splitIndex === -1) {
+                return { equation: trimmed, rotationDegrees: 0 };
+            }
+
+            const innerEquation = innerContent.slice(0, splitIndex).trim();
+            const angleStr = innerContent.slice(splitIndex + 1).trim();
+            const parsedAngle = Number(angleStr);
+
+            if (!Number.isFinite(parsedAngle)) {
+                return { equation: innerEquation, rotationDegrees: 0 };
+            }
+
+            return { equation: innerEquation, rotationDegrees: parsedAngle };
+        }
+
+        function toRadians(degreesVal) {
+            const numeric = Number(degreesVal);
+            return Number.isFinite(numeric) ? numeric * (Math.PI / 180) : 0;
+        }
+
         minVal.subscribe((minV) => {
             document.getElementById('minDisplay').textContent = formatNumber(minV);
         });
@@ -2280,6 +2338,7 @@
 
         let minInputHasFocus = false;
         let maxInputHasFocus = false;
+        let updatingRotationFromEquation = false;
 
         function setMinOverrideEnabled(enabled) {
             minToggle.setAttribute("aria-pressed", String(enabled));
@@ -2366,6 +2425,29 @@
             scheduleRepaint();
         });
 
+        rotationDegrees.subscribe((rotationDeg) => {
+            const rotationInput = document.getElementById('rotationDegreesInput');
+            if (rotationInput && rotationInput !== document.activeElement) {
+                rotationInput.value = rotationDeg;
+            }
+
+            if (updatingRotationFromEquation) {
+                return;
+            }
+
+            const equationInput = document.getElementById('equationInput');
+            if (!equationInput) return;
+
+            const currentEquation = equationInput.value.trim();
+            const { equation: baseEquation } = parseRotationWrapper(currentEquation);
+            const hasRotation = Number.isFinite(rotationDeg) && rotationDeg !== 0;
+            const nextEquation = hasRotation ? `rotate(${baseEquation}, ${rotationDeg})` : baseEquation;
+
+            if (equation.get() !== nextEquation) {
+                equation.set(nextEquation);
+            }
+        });
+
         function clearMinAndMaxOverrides() {
             minOverride.set(null);
             if (fractal_mode.get()) {
@@ -2424,6 +2506,11 @@
         document.getElementById('colorCyclesInput').addEventListener('input', (event) => {
             const value = parseFloat(event.target.value);
             colorCycles.set(Number.isFinite(value) ? value : 1);
+        });
+
+        document.getElementById('rotationDegreesInput').addEventListener('input', (event) => {
+            const value = Number(event.target.value);
+            rotationDegrees.set(Number.isFinite(value) ? value : 0);
         });
 
         document.getElementById('saveImageButton').addEventListener('click', async () => {
@@ -2741,10 +2828,16 @@
             }
 
             const eqStripped = eq.replace(/\s+/g, '');
-            if (isMandelbrotEquation(eqStripped)) {
+            const { equation: baseEquation, rotationDegrees: rotationFromEquation } = parseRotationWrapper(eqStripped);
+
+            updatingRotationFromEquation = true;
+            rotationDegrees.set(rotationFromEquation);
+            updatingRotationFromEquation = false;
+
+            if (isMandelbrotEquation(baseEquation)) {
                 mandelbrot_mode.set(true);
                 julia_mode.set(false);
-                parseMandelbrotParams(eqStripped, {
+                parseMandelbrotParams(baseEquation, {
                     defaultMax: Number(max_iterations.get()) || 1000,
                     defaultThreshold: Number(threshold.get()) || 100,
                     onParamsParsed: ({ maxVal, thresholdVal }) => {
@@ -2752,10 +2845,10 @@
                         threshold.set(thresholdVal);
                     }
                 });
-            } else if (isJuliaEquation(eqStripped)) {
+            } else if (isJuliaEquation(baseEquation)) {
                 mandelbrot_mode.set(false);
                 julia_mode.set(true);
-                parseJuliaParams(eqStripped, {
+                parseJuliaParams(baseEquation, {
                     defaultMax: Number(max_iterations.get()) || 1000,
                     defaultThreshold: Number(threshold.get()) || 100,
                     defaultCRe: Number(juliaCReal.get()),
