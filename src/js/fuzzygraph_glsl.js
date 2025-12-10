@@ -278,9 +278,14 @@ function glslNumber(val) {
   return `${num}`;
 }
 
-function buildMandelbrotShader(maxIterations, threshold) {
+function buildMandelbrotShader(maxIterations, threshold, useSmooth) {
   const maxIterInt = Math.max(1, Math.floor(maxIterations));
   const bailoutSq = glslNumber(threshold * threshold);
+  const smoothLogic = useSmooth
+    ? `    float mag = sqrt(escapedMagSq);
+    float smooth = float(steps) + 1.0 - log2(log(mag)) / log2(2.0);
+    result = smooth;`
+    : `    result = float(steps);`;
   return `#version 300 es
 precision highp float;
 in vec2 vUv;
@@ -321,9 +326,7 @@ void main() {
 
   float result;
   if (escaped) {
-    float mag = sqrt(escapedMagSq);
-    float smooth = float(steps) + 1.0 - log2(log(mag)) / log2(2.0);
-    result = smooth;
+${smoothLogic}
   } else {
     result = float(${maxIterInt});
   }
@@ -331,9 +334,14 @@ void main() {
 }`;
 }
 
-function buildJuliaShader(maxIterations, threshold, cRe, cIm) {
+function buildJuliaShader(maxIterations, threshold, cRe, cIm, useSmooth) {
   const maxIterInt = Math.max(1, Math.floor(maxIterations));
   const bailoutSq = glslNumber(threshold * threshold);
+  const smoothLogic = useSmooth
+    ? `    float mag = sqrt(escapedMagSq);
+    float smooth = float(steps) + 1.0 - log2(log(mag)) / log2(2.0);
+    result = smooth;`
+    : `    result = float(steps);`;
   return `#version 300 es
 precision highp float;
 in vec2 vUv;
@@ -374,9 +382,7 @@ void main() {
 
   float result;
   if (escaped) {
-    float mag = sqrt(escapedMagSq);
-    float smooth = float(steps) + 1.0 - log2(log(mag)) / log2(2.0);
-    result = smooth;
+${smoothLogic}
   } else {
     result = float(${maxIterInt});
   }
@@ -472,38 +478,30 @@ void main() {
 }`;
 }
 
-function getMandelbrotProgram(gl, func) {
-  const cached = glState.mandelbrotProgram;
-  if (cached && cached._maxIterations === func.maxIterations && cached._threshold === func.threshold) {
+function getMandelbrotProgram(gl, func, useSmoothColoring) {
+  glState.mandelbrotPrograms = glState.mandelbrotPrograms || {};
+  const key = `${func.maxIterations}|${func.threshold}|${useSmoothColoring ? 'smooth' : 'flat'}`;
+  const cached = glState.mandelbrotPrograms[key];
+  if (cached) {
     return cached;
   }
-  const fragSrc = buildMandelbrotShader(func.maxIterations, func.threshold);
+  const fragSrc = buildMandelbrotShader(func.maxIterations, func.threshold, useSmoothColoring);
   const program = createProgram(gl, VERT_SRC, fragSrc);
-  program._maxIterations = func.maxIterations;
-  program._threshold = func.threshold;
-  glState.mandelbrotProgram = program;
+  glState.mandelbrotPrograms[key] = program;
   return program;
 }
 
-function getJuliaProgram(gl, func) {
-  const cached = glState.juliaProgram;
-  if (
-    cached &&
-    cached._maxIterations === func.maxIterations &&
-    cached._threshold === func.threshold &&
-    cached._cRe === func.cRe &&
-    cached._cIm === func.cIm
-  ) {
+function getJuliaProgram(gl, func, useSmoothColoring) {
+  glState.juliaPrograms = glState.juliaPrograms || {};
+  const key = `${func.maxIterations}|${func.threshold}|${func.cRe}|${func.cIm}|${useSmoothColoring ? 'smooth' : 'flat'}`;
+  const cached = glState.juliaPrograms[key];
+  if (cached) {
     return cached;
   }
 
-  const fragSrc = buildJuliaShader(func.maxIterations, func.threshold, func.cRe, func.cIm);
+  const fragSrc = buildJuliaShader(func.maxIterations, func.threshold, func.cRe, func.cIm, useSmoothColoring);
   const program = createProgram(gl, VERT_SRC, fragSrc);
-  program._maxIterations = func.maxIterations;
-  program._threshold = func.threshold;
-  program._cRe = func.cRe;
-  program._cIm = func.cIm;
-  glState.juliaProgram = program;
+  glState.juliaPrograms[key] = program;
   return program;
 }
 
@@ -546,11 +544,11 @@ function getEvalProgram(gl, eqStr, isPolar) {
   return program;
 }
 
-function evaluateMandelbrotToTexture(func, windowBounds, canvasWidth, canvasHeight, cosTheta = 1, sinTheta = 0) {
+function evaluateMandelbrotToTexture(func, windowBounds, canvasWidth, canvasHeight, cosTheta = 1, sinTheta = 0, useSmoothColoring = false) {
   ensureGL(canvasWidth, canvasHeight);
   const gl = glState.gl;
   ensureValueResources(gl, canvasWidth, canvasHeight);
-  const program = getMandelbrotProgram(gl, func);
+  const program = getMandelbrotProgram(gl, func, useSmoothColoring);
 
   gl.useProgram(program);
   gl.bindVertexArray(glState.vao);
@@ -578,11 +576,11 @@ function evaluateMandelbrotToTexture(func, windowBounds, canvasWidth, canvasHeig
   return { pixelValues: values, min: minValue, max: maxValue, fromGPU: true };
 }
 
-function evaluateJuliaToTexture(func, windowBounds, canvasWidth, canvasHeight, cosTheta = 1, sinTheta = 0) {
+function evaluateJuliaToTexture(func, windowBounds, canvasWidth, canvasHeight, cosTheta = 1, sinTheta = 0, useSmoothColoring = false) {
   ensureGL(canvasWidth, canvasHeight);
   const gl = glState.gl;
   ensureValueResources(gl, canvasWidth, canvasHeight);
-  const program = getJuliaProgram(gl, func);
+  const program = getJuliaProgram(gl, func, useSmoothColoring);
 
   gl.useProgram(program);
   gl.bindVertexArray(glState.vao);
@@ -610,12 +608,12 @@ function evaluateJuliaToTexture(func, windowBounds, canvasWidth, canvasHeight, c
   return { pixelValues: values, min: minValue, max: maxValue, fromGPU: true };
 }
 
-function evaluateEquationToTexture(func, windowBounds, canvasWidth, canvasHeight, cosTheta = 1, sinTheta = 0) {
+function evaluateEquationToTexture(func, windowBounds, canvasWidth, canvasHeight, cosTheta = 1, sinTheta = 0, useSmoothColoring = false) {
   if (func && func._isMandelbrot) {
-    return evaluateMandelbrotToTexture(func, windowBounds, canvasWidth, canvasHeight, cosTheta, sinTheta);
+    return evaluateMandelbrotToTexture(func, windowBounds, canvasWidth, canvasHeight, cosTheta, sinTheta, useSmoothColoring);
   }
   if (func && func._isJulia) {
-    return evaluateJuliaToTexture(func, windowBounds, canvasWidth, canvasHeight, cosTheta, sinTheta);
+    return evaluateJuliaToTexture(func, windowBounds, canvasWidth, canvasHeight, cosTheta, sinTheta, useSmoothColoring);
   }
   if (!func || !func._source || func._isJsFunction) {
     throw new Error('Equation source unavailable for GPU evaluation.');
@@ -705,13 +703,14 @@ function buildJuliaCpuEvaluator(func) {
   };
 }
 
-export function calculateFuncForWindow(func, windowBounds, canvasWidth, canvasHeight, rotationRadians = 0) {
+export function calculateFuncForWindow(func, windowBounds, canvasWidth, canvasHeight, rotationRadians = 0, zoomLevel = 1) {
   const hasRotation = Number.isFinite(rotationRadians) && rotationRadians !== 0;
   const cosTheta = hasRotation ? Math.cos(rotationRadians) : 1;
   const sinTheta = hasRotation ? -Math.sin(rotationRadians) : 0;
+  const useSmoothColoring = Number.isFinite(zoomLevel) && zoomLevel > 5000;
 
   try {
-    return evaluateEquationToTexture(func, windowBounds, canvasWidth, canvasHeight, cosTheta, sinTheta);
+    return evaluateEquationToTexture(func, windowBounds, canvasWidth, canvasHeight, cosTheta, sinTheta, useSmoothColoring);
   } catch (err) {
     console.warn('Falling back to CPU evaluation:', err);
   }
@@ -994,7 +993,8 @@ const glState = {
   gl: null,
   program: null,
   evalProgram: null,
-  mandelbrotProgram: null,
+  mandelbrotPrograms: null,
+  juliaPrograms: null,
   vao: null,
   valuesTex: null,
   valueFbo: null,
@@ -1131,7 +1131,8 @@ export function displayGraph(graphParams, canvasElem) {
       windowBounds,
       canvasWidth,
       canvasHeight,
-      graphParams['rotationRadians']);
+      graphParams['rotationRadians'],
+      graphParams['zoom']);
 
   var minVal = pixelValues['min'];
   var maxVal = pixelValues['max'];

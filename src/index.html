@@ -975,7 +975,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v4.5.2</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v4.5.3</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a> (non-binary) graphing calculator. FuzzyGraph is also free and <a href="https://github.com/calebmadrigal/fuzzygraph" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">open-source</a>.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1889,6 +1889,7 @@
                     xCenter: xCenter.get(),
                     yCenter: yCenter.get(),
                     yHeight: getYHeight(),
+                    zoom: zoom.get(),
                     showAxes: showAxes.get(),
                     minOverride: minOverride.get(),
                     maxOverride: maxOverride.get(),
@@ -1929,7 +1930,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v4.5.2.html';
+            a.download = 'FuzzyGraph_v4.5.3.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1994,6 +1995,7 @@
                     xCenter: parseFloat(sCX),
                     yCenter: parseFloat(sCY),
                     yHeight: parseFloat(finalYHeight),
+                    zoom: parseFloat(finalZoom),
                     minOverride: minOverride.get(),
                     maxOverride: maxOverride.get(),
                     showAxes: saveShowAxes.get()
