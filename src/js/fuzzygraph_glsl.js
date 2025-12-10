@@ -280,6 +280,7 @@ function glslNumber(val) {
 
 function buildMandelbrotShader(maxIterations, threshold) {
   const maxIterInt = Math.max(1, Math.floor(maxIterations));
+  const bailoutSq = glslNumber(threshold * threshold);
   return `#version 300 es
 precision highp float;
 in vec2 vUv;
@@ -300,6 +301,8 @@ void main() {
   float cx = rotatedX;
   float cy = rotatedY;
   int steps = 0;
+  float escapedMagSq = 0.0;
+  bool escaped = false;
 
   for (int i = 0; i < ${maxIterInt}; i++) {
     float nextZx = (zx * zx) - (zy * zy) + cx;
@@ -307,20 +310,30 @@ void main() {
     zx = nextZx;
     zy = nextZy;
 
-    if (length(vec2(zx, zy)) > ${glslNumber(threshold)}) {
+    escapedMagSq = (zx * zx) + (zy * zy);
+    if (escapedMagSq > ${bailoutSq}) {
+      escaped = true;
       break;
     }
 
     steps++;
   }
 
-  float result = steps == ${maxIterInt} ? float(${maxIterInt - 1}) : float(steps);
+  float result;
+  if (escaped) {
+    float mag = sqrt(escapedMagSq);
+    float smooth = float(steps) + 1.0 - log2(log(mag)) / log2(2.0);
+    result = smooth;
+  } else {
+    result = float(${maxIterInt});
+  }
   outColor = vec4(result, 0.0, 0.0, 1.0);
 }`;
 }
 
 function buildJuliaShader(maxIterations, threshold, cRe, cIm) {
   const maxIterInt = Math.max(1, Math.floor(maxIterations));
+  const bailoutSq = glslNumber(threshold * threshold);
   return `#version 300 es
 precision highp float;
 in vec2 vUv;
@@ -341,6 +354,8 @@ void main() {
   float cx = ${glslNumber(cRe)};
   float cy = ${glslNumber(cIm)};
   int steps = 0;
+  float escapedMagSq = 0.0;
+  bool escaped = false;
 
   for (int i = 0; i < ${maxIterInt}; i++) {
     float nextZx = (zx * zx) - (zy * zy) + cx;
@@ -348,14 +363,23 @@ void main() {
     zx = nextZx;
     zy = nextZy;
 
-    if (length(vec2(zx, zy)) > ${glslNumber(threshold)}) {
+    escapedMagSq = (zx * zx) + (zy * zy);
+    if (escapedMagSq > ${bailoutSq}) {
+      escaped = true;
       break;
     }
 
     steps++;
   }
 
-  float result = steps == ${maxIterInt} ? float(${maxIterInt - 1}) : float(steps);
+  float result;
+  if (escaped) {
+    float mag = sqrt(escapedMagSq);
+    float smooth = float(steps) + 1.0 - log2(log(mag)) / log2(2.0);
+    result = smooth;
+  } else {
+    result = float(${maxIterInt});
+  }
   outColor = vec4(result, 0.0, 0.0, 1.0);
 }`;
 }
