@@ -332,7 +332,7 @@ export function calculateFuncForWindow(func, windowBounds, canvasWidth, canvasHe
   var pixelValues = new Array(canvasWidth * canvasHeight);
   const hasRotation = Number.isFinite(rotationRadians) && rotationRadians !== 0;
   const cosTheta = hasRotation ? Math.cos(rotationRadians) : 1;
-  const sinTheta = hasRotation ? Math.sin(rotationRadians) : 0;
+  const sinTheta = hasRotation ? -Math.sin(rotationRadians) : 0;
 
   // Calculate values for each pixel, and find the min and max values
   for (var pixelX = 0; pixelX < canvasWidth; pixelX++) {

@@ -286,16 +286,19 @@ in vec2 vUv;
 out vec4 outColor;
 uniform vec2 uResolution;
 uniform vec4 uBounds;
+uniform vec2 uRotation;
 
 void main() {
   vec2 frag = gl_FragCoord.xy;
   float x = mix(uBounds.x, uBounds.y, frag.x / uResolution.x);
   float y = mix(uBounds.z, uBounds.w, (uResolution.y - frag.y) / uResolution.y);
+  float rotatedX = x * uRotation.x - y * uRotation.y;
+  float rotatedY = x * uRotation.y + y * uRotation.x;
 
-  float zx = x;
-  float zy = y;
-  float cx = x;
-  float cy = y;
+  float zx = rotatedX;
+  float zy = rotatedY;
+  float cx = rotatedX;
+  float cy = rotatedY;
   int steps = 0;
 
   for (int i = 0; i < ${maxIterInt}; i++) {
@@ -324,14 +327,17 @@ in vec2 vUv;
 out vec4 outColor;
 uniform vec2 uResolution;
 uniform vec4 uBounds;
+uniform vec2 uRotation;
 
 void main() {
   vec2 frag = gl_FragCoord.xy;
   float x = mix(uBounds.x, uBounds.y, frag.x / uResolution.x);
   float y = mix(uBounds.z, uBounds.w, (uResolution.y - frag.y) / uResolution.y);
+  float rotatedX = x * uRotation.x - y * uRotation.y;
+  float rotatedY = x * uRotation.y + y * uRotation.x;
 
-  float zx = x;
-  float zy = y;
+  float zx = rotatedX;
+  float zy = rotatedY;
   float cx = ${glslNumber(cRe)};
   float cy = ${glslNumber(cIm)};
   int steps = 0;
@@ -426,14 +432,17 @@ in vec2 vUv;
 out vec4 outColor;
 uniform vec2 uResolution;
 uniform vec4 uBounds;
+uniform vec2 uRotation;
 float evalEquation(float x, float y) {
 ${polarPrelude}
   return ${expr};
 }
 void main() {
   vec2 frag = gl_FragCoord.xy;
-  float x = mix(uBounds.x, uBounds.y, frag.x / uResolution.x);
-  float y = mix(uBounds.z, uBounds.w, (uResolution.y - frag.y) / uResolution.y);
+  float rawX = mix(uBounds.x, uBounds.y, frag.x / uResolution.x);
+  float rawY = mix(uBounds.z, uBounds.w, (uResolution.y - frag.y) / uResolution.y);
+  float x = rawX * uRotation.x - rawY * uRotation.y;
+  float y = rawX * uRotation.y + rawY * uRotation.x;
   float val = abs(evalEquation(x, y));
   outColor = vec4(val, 0.0, 0.0, 1.0);
 }`;
@@ -513,7 +522,7 @@ function getEvalProgram(gl, eqStr, isPolar) {
   return program;
 }
 
-function evaluateMandelbrotToTexture(func, windowBounds, canvasWidth, canvasHeight) {
+function evaluateMandelbrotToTexture(func, windowBounds, canvasWidth, canvasHeight, cosTheta = 1, sinTheta = 0) {
   ensureGL(canvasWidth, canvasHeight);
   const gl = glState.gl;
   ensureValueResources(gl, canvasWidth, canvasHeight);
@@ -526,6 +535,7 @@ function evaluateMandelbrotToTexture(func, windowBounds, canvasWidth, canvasHeig
 
   gl.uniform2f(gl.getUniformLocation(program, 'uResolution'), canvasWidth, canvasHeight);
   gl.uniform4f(gl.getUniformLocation(program, 'uBounds'), windowBounds['xMin'], windowBounds['xMax'], windowBounds['yMin'], windowBounds['yMax']);
+  gl.uniform2f(gl.getUniformLocation(program, 'uRotation'), cosTheta, sinTheta);
 
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
@@ -544,7 +554,7 @@ function evaluateMandelbrotToTexture(func, windowBounds, canvasWidth, canvasHeig
   return { pixelValues: values, min: minValue, max: maxValue, fromGPU: true };
 }
 
-function evaluateJuliaToTexture(func, windowBounds, canvasWidth, canvasHeight) {
+function evaluateJuliaToTexture(func, windowBounds, canvasWidth, canvasHeight, cosTheta = 1, sinTheta = 0) {
   ensureGL(canvasWidth, canvasHeight);
   const gl = glState.gl;
   ensureValueResources(gl, canvasWidth, canvasHeight);
@@ -557,6 +567,7 @@ function evaluateJuliaToTexture(func, windowBounds, canvasWidth, canvasHeight) {
 
   gl.uniform2f(gl.getUniformLocation(program, 'uResolution'), canvasWidth, canvasHeight);
   gl.uniform4f(gl.getUniformLocation(program, 'uBounds'), windowBounds['xMin'], windowBounds['xMax'], windowBounds['yMin'], windowBounds['yMax']);
+  gl.uniform2f(gl.getUniformLocation(program, 'uRotation'), cosTheta, sinTheta);
 
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
@@ -575,12 +586,12 @@ function evaluateJuliaToTexture(func, windowBounds, canvasWidth, canvasHeight) {
   return { pixelValues: values, min: minValue, max: maxValue, fromGPU: true };
 }
 
-function evaluateEquationToTexture(func, windowBounds, canvasWidth, canvasHeight) {
+function evaluateEquationToTexture(func, windowBounds, canvasWidth, canvasHeight, cosTheta = 1, sinTheta = 0) {
   if (func && func._isMandelbrot) {
-    return evaluateMandelbrotToTexture(func, windowBounds, canvasWidth, canvasHeight);
+    return evaluateMandelbrotToTexture(func, windowBounds, canvasWidth, canvasHeight, cosTheta, sinTheta);
   }
   if (func && func._isJulia) {
-    return evaluateJuliaToTexture(func, windowBounds, canvasWidth, canvasHeight);
+    return evaluateJuliaToTexture(func, windowBounds, canvasWidth, canvasHeight, cosTheta, sinTheta);
   }
   if (!func || !func._source || func._isJsFunction) {
     throw new Error('Equation source unavailable for GPU evaluation.');
@@ -597,6 +608,7 @@ function evaluateEquationToTexture(func, windowBounds, canvasWidth, canvasHeight
 
   gl.uniform2f(gl.getUniformLocation(program, 'uResolution'), canvasWidth, canvasHeight);
   gl.uniform4f(gl.getUniformLocation(program, 'uBounds'), windowBounds['xMin'], windowBounds['xMax'], windowBounds['yMin'], windowBounds['yMax']);
+  gl.uniform2f(gl.getUniformLocation(program, 'uRotation'), cosTheta, sinTheta);
 
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
@@ -671,13 +683,13 @@ function buildJuliaCpuEvaluator(func) {
 
 export function calculateFuncForWindow(func, windowBounds, canvasWidth, canvasHeight, rotationRadians = 0) {
   const hasRotation = Number.isFinite(rotationRadians) && rotationRadians !== 0;
+  const cosTheta = hasRotation ? Math.cos(rotationRadians) : 1;
+  const sinTheta = hasRotation ? -Math.sin(rotationRadians) : 0;
 
-  if (!hasRotation) {
-    try {
-      return evaluateEquationToTexture(func, windowBounds, canvasWidth, canvasHeight);
-    } catch (err) {
-      console.warn('Falling back to CPU evaluation:', err);
-    }
+  try {
+    return evaluateEquationToTexture(func, windowBounds, canvasWidth, canvasHeight, cosTheta, sinTheta);
+  } catch (err) {
+    console.warn('Falling back to CPU evaluation:', err);
   }
 
   var pixelToXMapper = makeLinearMapper([0, canvasWidth], [windowBounds['xMin'], windowBounds['xMax']], false);
@@ -685,8 +697,6 @@ export function calculateFuncForWindow(func, windowBounds, canvasWidth, canvasHe
   var minValue = 9999999;
   var maxValue = -9999999;
   var pixelValues = new Float32Array(canvasWidth * canvasHeight);
-  const cosTheta = hasRotation ? Math.cos(rotationRadians) : 1;
-  const sinTheta = hasRotation ? Math.sin(rotationRadians) : 0;
   const fallbackFunc = func && func._isMandelbrot
     ? buildMandelbrotCpuEvaluator(func)
     : func && func._isJulia
