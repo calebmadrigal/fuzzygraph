@@ -975,7 +975,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v4.5.3</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v4.5.4</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a> (non-binary) graphing calculator. FuzzyGraph is also free and <a href="https://github.com/calebmadrigal/fuzzygraph" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">open-source</a>.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1669,6 +1669,7 @@
         const yCenter = atom(0);
 
         const zoom = atom(1);  // Corresponds to a yHeight of 6
+        let lastRotationRadians = 0;
 
         const getYHeightFromZoom = (zoomVal) => {
             const numericZoom = Number(zoomVal);
@@ -1930,7 +1931,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v4.5.3.html';
+            a.download = 'FuzzyGraph_v4.5.4.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -2322,6 +2323,18 @@
             return Number.isFinite(numeric) ? numeric * (Math.PI / 180) : 0;
         }
 
+        function rotatePointAroundOrigin(x, y, radians) {
+            const cosTheta = Math.cos(radians);
+            const sinTheta = -Math.sin(radians);
+
+            return {
+                x: x * cosTheta - y * sinTheta,
+                y: x * sinTheta + y * cosTheta
+            };
+        }
+
+        lastRotationRadians = toRadians(rotationDegrees.get());
+
         minVal.subscribe((minV) => {
             document.getElementById('minDisplay').textContent = formatNumber(minV);
         });
@@ -2431,6 +2444,20 @@
             const rotationInput = document.getElementById('rotationDegreesInput');
             if (rotationInput && rotationInput !== document.activeElement) {
                 rotationInput.value = rotationDeg;
+            }
+
+            const newRotationRadians = toRadians(rotationDeg);
+            if (Number.isFinite(newRotationRadians) && newRotationRadians !== lastRotationRadians) {
+                const deltaRadians = lastRotationRadians - newRotationRadians;
+                const { x: adjustedXCenter, y: adjustedYCenter } = rotatePointAroundOrigin(
+                    xCenter.get(),
+                    yCenter.get(),
+                    deltaRadians
+                );
+
+                xCenter.set(adjustedXCenter);
+                yCenter.set(adjustedYCenter);
+                lastRotationRadians = newRotationRadians;
             }
 
             if (updatingRotationFromEquation) {
