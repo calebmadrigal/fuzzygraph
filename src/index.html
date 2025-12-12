@@ -975,7 +975,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v4.5.4</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v4.5.5</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a> (non-binary) graphing calculator. FuzzyGraph is also free and <a href="https://github.com/calebmadrigal/fuzzygraph" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">open-source</a>.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1931,7 +1931,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v4.5.4.html';
+            a.download = 'FuzzyGraph_v4.5.5.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1969,6 +1969,12 @@
                 saveDefaultConfig.set(false);
             }
 
+            const { rotationDegrees: rotationFromEquation } = parseRotationWrapper(getStrippedEquation());
+            const rotationDegForSave = Number.isFinite(rotationDegrees.get())
+                ? rotationDegrees.get()
+                : (Number.isFinite(rotationFromEquation) ? rotationFromEquation : 0);
+            const rotationRadForSave = toRadians(rotationDegForSave);
+
             let saveCanvas = null;
 
             if (saveDefaultConfig.get()) {
@@ -1999,7 +2005,8 @@
                     zoom: parseFloat(finalZoom),
                     minOverride: minOverride.get(),
                     maxOverride: maxOverride.get(),
-                    showAxes: saveShowAxes.get()
+                    showAxes: saveShowAxes.get(),
+                    rotationRadians: rotationRadForSave
                 };
 
                 displayGraph(graphConfig, saveCanvas);
@@ -2130,6 +2137,7 @@
 
             // Embed graph config data into the PNG file (so it can be re-opened in FuzzyGraph)
             var graphConfig = getAppConfig();
+            graphConfig['rotationDegrees'] = rotationDegForSave;
             graphConfig['zoom'] = finalZoom;
             graphConfig['xCenter'] = parseFloat(sCX);
             graphConfig['yCenter'] = parseFloat(sCY);
@@ -3484,6 +3492,7 @@
                 xCenter: xCenter.get(),
                 yCenter: yCenter.get(),
                 zoom: zoom.get(),
+                rotationDegrees: rotationDegrees.get(),
                 showAxes: showAxes.get(),
                 advancedMode: advancedMode.get(),
                 minOverride: minOverride.get(),
@@ -3578,6 +3587,9 @@
             }
             if (configObj['yCenter'] !== null && typeof configObj['yCenter'] !== 'undefined') {
                 yCenter.set(configObj['yCenter']);
+            }
+            if (configObj['rotationDegrees'] !== null && typeof configObj['rotationDegrees'] !== 'undefined') {
+                rotationDegrees.set(configObj['rotationDegrees']);
             }
             if (configObj['zoom'] !== null && typeof configObj['zoom'] !== 'undefined') {
                 setZoomSafely(configObj['zoom']);
