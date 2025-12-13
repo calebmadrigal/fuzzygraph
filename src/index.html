@@ -975,7 +975,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v4.5.6</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v4.5.7</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a> (non-binary) graphing calculator. FuzzyGraph is also free and <a href="https://github.com/calebmadrigal/fuzzygraph" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">open-source</a>.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1931,7 +1931,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v4.5.6.html';
+            a.download = 'FuzzyGraph_v4.5.7.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1939,7 +1939,7 @@
         }
 
         // Save Image
-        async function saveImage(w=null, h=null, cX=null, cY=null, z=null, yH=null) {
+        async function saveImage(w=null, h=null, cX=null, cY=null, z=null, yH=null, filename=null) {
             const fallbackW = canvas.width;
             const fallbackH = canvas.height;
 
@@ -2156,8 +2156,10 @@
 
             const imgBlobWithData = await addJsonITXtToPng(imgBlob, graphConfig);
 
-            const filename = getFilenameWithTimestamp();
-            downloadBlob(imgBlobWithData, filename);
+            const finalFilename = (filename && String(filename).trim() !== '')
+                ? filename
+                : getFilenameWithTimestamp();
+            downloadBlob(imgBlobWithData, finalFilename);
         }
 
 
@@ -3654,7 +3656,8 @@
                 const cY = getParameterByName('yCenter');
                 const z = getParameterByName('zoom');
                 const yH = getParameterByName('yHeight');
-                saveImage(w, h, cX, cY, z, yH);
+                const filename = getParameterByName('filename');
+                saveImage(w, h, cX, cY, z, yH, filename);
             }
         }
 
