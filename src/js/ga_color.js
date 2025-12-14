@@ -35,7 +35,7 @@ export function getMatplotlibColormap(
 
   return function mapValue(value) {
     const adjusted = valToIndex(value);
-    const wrappedIndex = ((adjusted % numColormapColors) + numColormapColors) % numColormapColors;
+    const wrappedIndex = (adjusted % numColormapColors);
     const [r, g, b] = colors[wrappedIndex];
     if (invertColor) {
       return [255 - Math.round(r * 255), 255 - Math.round(g * 255), 255 - Math.round(b * 255)];
