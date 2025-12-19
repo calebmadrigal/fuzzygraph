@@ -550,7 +550,7 @@ function calculateFuzzyFactor(fuzzyValue) {
   return 0.01 * fuzzyValue;
 }
 
-export function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, colormapName, reverseColor, invertColor, colorStart, colorCycles, canvasElem) {
+export function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, colormapName, reverseColor, invertColor, colorStart, colorCycles, canvasElem, hueShiftDegrees = 0, saturationPercent = 0, luminosityPercent = 0) {
   var context = canvasElem.getContext('2d');
   var canvasWidth = context.canvas.width;
   var canvasHeight = context.canvas.height;
@@ -589,6 +589,10 @@ export function displayFuzzyGraph(pixelValues, minValue, maxValue, fuzzyValue, c
     invertColor,
     colorCycles,
     colorStart,
+    1,
+    hueShiftDegrees,
+    saturationPercent,
+    luminosityPercent,
   );
 
   // Set the color for each pixel based on the values
@@ -645,6 +649,10 @@ export function displayGraph(graphParams, canvasElem) {
     maxVal = graphParams['maxOverride'];
   }
 
+  const hueShift = graphParams['hueShiftDegrees'] ?? 0;
+  const saturationAdjust = graphParams['saturationPercent'] ?? 0;
+  const luminosityAdjust = graphParams['luminosityPercent'] ?? 0;
+
   displayFuzzyGraph(pixelValues['pixelValues'],
       minVal,
       maxVal,
@@ -654,7 +662,10 @@ export function displayGraph(graphParams, canvasElem) {
       graphParams['invertColor'],
       graphParams['colorStart'],
       graphParams['colorCycles'],
-      canvasElem);
+      canvasElem,
+      hueShift,
+      saturationAdjust,
+      luminosityAdjust);
 
   if (graphParams['showAxes']) {
     const windowBounds = calcWindowBounds(graphParams['xCenter'], graphParams['yCenter'], graphParams['yHeight'], canvasWidth, canvasHeight);

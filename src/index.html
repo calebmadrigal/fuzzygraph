@@ -432,6 +432,106 @@
 
                 </div>
 
+                <!-- Advanced Controls Section -->
+                <div id="advancedControlsSection" class="hidden">
+                    <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200 flex items-center gap-1">
+                        <span>Advanced Controls</span>
+                        <button id="advancedHelpButton"
+                            class="text-gray-500 hover:text-blue-500 flex items-center p-1 rounded-md hover:bg-gray-100">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8.228 9c.549-1.165 2.03-2 3.772-2
+                                2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907
+                                -.542.104-.994.54-.994 1.093m0 3h.01
+                                M12 21a9 9 0 110-18 9 9 0 010 18z" />
+                            </svg>
+                      </button>
+                    </h3>
+
+                    <div>
+                        <label for="minOverrideInput" class="block text-sm font-medium text-gray-600">
+                          Min Override (min: <span id="minDisplay" class="text-xs">0</span>)
+                        </label>
+
+                        <div class="mt-1 relative">
+                          <!-- Input -->
+                          <input
+                            type="text"
+                            inputmode="decimal"
+                            id="minOverrideInput"
+                            name="minOverrideInput"
+                            class="no-spinner w-full px-3 py-2 pr-12 border border-gray-300 rounded-md shadow-sm
+                                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          >
+
+                          <!-- Toggle inside input (small advanced-style) -->
+                          <button
+                            type="button"
+                            id="minOverrideToggle"
+                            class="absolute inset-y-0 right-2 my-auto h-5 w-9 flex items-center px-0
+                                   bg-gray-800 transition-colors duration-200 rounded-none"
+                            aria-pressed="false"
+                            tabindex="-1"
+                          >
+                            <span
+                              class="knob inline-block h-3 w-3 translate-x-5 bg-gray-50 shadow transform
+                                     transition-transform duration-200 will-change-transform rounded-none"
+                            ></span>
+                          </button>
+                        </div>
+                      </div>
+
+
+                    <!-- Max Override -->
+                    <div>
+                        <label for="maxOverrideInput" class="block text-sm font-medium text-gray-600 mt-2">
+                        Max Override (max: <span id="maxDisplay" class="text-xs">0</span>)
+                        </label>
+
+                        <div class="mt-1 relative">
+                        <input
+                            type="text"
+                            inputmode="decimal"
+                            id="maxOverrideInput"
+                            name="maxOverrideInput"
+                            class="no-spinner w-full px-3 py-2 pr-12 border border-gray-300 rounded-md shadow-sm
+                                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+
+                        <!-- Toggle inside input (small advanced-style) -->
+                        <button
+                            type="button"
+                            id="maxOverrideToggle"
+                            class="absolute inset-y-0 right-2 my-auto h-5 w-9 flex items-center px-0
+                                bg-gray-800 transition-colors duration-200 rounded-none"
+                            aria-pressed="false"
+                            tabindex="-1"
+                        >
+                            <span
+                            class="knob inline-block h-3 w-3 translate-x-5 bg-gray-50 shadow transform
+                                    transition-transform duration-200 will-change-transform rounded-none"
+                            ></span>
+                        </button>
+                        </div>
+                    </div>
+
+                    <!-- Rotation (degrees) -->
+                    <div class="mt-2">
+                        <label for="rotationDegreesInput" class="block text-sm font-medium text-gray-600">
+                            Rotation (degrees)
+                        </label>
+                        <input
+                            type="number"
+                            inputmode="decimal"
+                            step="any"
+                            id="rotationDegreesInput"
+                            name="rotationDegreesInput"
+                            class="no-spinner w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                    </div>
+
+                </div>
+
                 <!-- Color Section -->
                 <div>
                     <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200 flex items-center gap-1">
@@ -504,91 +604,14 @@
 
                 </div>
 
-                <!-- Advanced Section -->
-                <div id="advancedSection" class="hidden">
+                <!-- Advanced Color Section -->
+                <div id="advancedColorSection" class="hidden mt-8">
                     <h3 class="text-lg font-semibold text-gray-900 pb-2 mb-4 border-b-2 border-gray-200 flex items-center gap-1">
-                        <span>Advanced</span>
-                        <button id="advancedHelpButton"
-                            class="text-gray-500 hover:text-blue-500 flex items-center p-1 rounded-md hover:bg-gray-100">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8.228 9c.549-1.165 2.03-2 3.772-2 
-                                2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907
-                                -.542.104-.994.54-.994 1.093m0 3h.01
-                                M12 21a9 9 0 110-18 9 9 0 010 18z" />
-                            </svg>
-                      </button>
+                        <span>Advanced Color</span>
                     </h3>
 
-                    <div>
-                        <label for="minOverrideInput" class="block text-sm font-medium text-gray-600">
-                          Min Override (min: <span id="minDisplay" class="text-xs">0</span>)
-                        </label>
-                      
-                        <div class="mt-1 relative">
-                          <!-- Input -->
-                          <input 
-                            type="text"
-                            inputmode="decimal"
-                            id="minOverrideInput" 
-                            name="minOverrideInput" 
-                            class="no-spinner w-full px-3 py-2 pr-12 border border-gray-300 rounded-md shadow-sm 
-                                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                          >
-                      
-                          <!-- Toggle inside input (small advanced-style) -->
-                          <button
-                            type="button"
-                            id="minOverrideToggle"
-                            class="absolute inset-y-0 right-2 my-auto h-5 w-9 flex items-center px-0
-                                   bg-gray-800 transition-colors duration-200 rounded-none"
-                            aria-pressed="false"
-                            tabindex="-1"
-                          >
-                            <span
-                              class="knob inline-block h-3 w-3 translate-x-5 bg-gray-50 shadow transform 
-                                     transition-transform duration-200 will-change-transform rounded-none"
-                            ></span>
-                          </button>
-                        </div>
-                      </div>
-                      
-
-                    <!-- Max Override -->
-                    <div>
-                        <label for="maxOverrideInput" class="block text-sm font-medium text-gray-600 mt-2">
-                        Max Override (max: <span id="maxDisplay" class="text-xs">0</span>)
-                        </label>
-                    
-                        <div class="mt-1 relative">
-                        <input 
-                            type="text"
-                            inputmode="decimal"
-                            id="maxOverrideInput" 
-                            name="maxOverrideInput" 
-                            class="no-spinner w-full px-3 py-2 pr-12 border border-gray-300 rounded-md shadow-sm 
-                                focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        >
-                    
-                        <!-- Toggle inside input (small advanced-style) -->
-                        <button
-                            type="button"
-                            id="maxOverrideToggle"
-                            class="absolute inset-y-0 right-2 my-auto h-5 w-9 flex items-center px-0
-                                bg-gray-800 transition-colors duration-200 rounded-none"
-                            aria-pressed="false"
-                            tabindex="-1"
-                        >
-                            <span
-                            class="knob inline-block h-3 w-3 translate-x-5 bg-gray-50 shadow transform 
-                                    transition-transform duration-200 will-change-transform rounded-none"
-                            ></span>
-                        </button>
-                        </div>
-                    </div>
-
-                     <!-- Color Start -->
-                     <div class="mt-2">
+                    <!-- Color Start -->
+                    <div class="mt-2">
                         <label for="colorStartInput" class="block text-sm font-medium text-gray-600">
                             Color Start
                         </label>
@@ -613,21 +636,53 @@
                         >
                     </div>
 
-                    <!-- Rotation (degrees) -->
+                    <!-- Hue Shift -->
                     <div class="mt-2">
-                        <label for="rotationDegreesInput" class="block text-sm font-medium text-gray-600">
-                            Rotation (degrees)
+                        <label for="hueShiftInput" class="block text-sm font-medium text-gray-600">
+                            Hue Shift (degrees)
                         </label>
                         <input
                             type="number"
-                            inputmode="decimal"
-                            step="any"
-                            id="rotationDegreesInput"
-                            name="rotationDegreesInput"
+                            id="hueShiftInput"
+                            name="hueShiftInput"
+                            min="-180"
+                            max="180"
+                            step="1"
                             class="no-spinner w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         >
                     </div>
 
+                    <!-- Saturation Adjustment -->
+                    <div class="mt-2">
+                        <label for="saturationAdjustInput" class="block text-sm font-medium text-gray-600">
+                            Saturation (% change)
+                        </label>
+                        <input
+                            type="number"
+                            id="saturationAdjustInput"
+                            name="saturationAdjustInput"
+                            min="-100"
+                            max="100"
+                            step="1"
+                            class="no-spinner w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                    </div>
+
+                    <!-- Luminosity Adjustment -->
+                    <div class="mt-2">
+                        <label for="luminosityAdjustInput" class="block text-sm font-medium text-gray-600">
+                            Luminosity (% change)
+                        </label>
+                        <input
+                            type="number"
+                            id="luminosityAdjustInput"
+                            name="luminosityAdjustInput"
+                            min="-100"
+                            max="100"
+                            step="1"
+                            class="no-spinner w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        >
+                    </div>
                 </div>
 
                 <div class="mt-16 text-center flex flex-col justify-end">
@@ -975,7 +1030,7 @@
                 &times;
             </button>
 
-            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v4.5.8</h2>
+            <h2 class="text-xl font-semibold mb-4">FuzzyGraph v4.5.9</h2>
             <p>FuzzyGraph is the world's first <a href="https://en.wikipedia.org/wiki/Fuzzy_logic" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">fuzzy</a> (non-binary) graphing calculator. FuzzyGraph is also free and <a href="https://github.com/calebmadrigal/fuzzygraph" class="text-cyan-500 underline hover:text-cyan-300 underline transition-colors duration-200">open-source</a>.</p>
             <br />
             <p>Conventional graphing apps show where the LEFT and RIGHT side of the equation are EXACTLY equal. By
@@ -1664,6 +1719,9 @@
         const invertColor = atom(false);
         const colorStart = atom(0);
         const colorCycles = atom(1);
+        const hueShiftDegrees = atom(0);
+        const saturationPercent = atom(0);
+        const luminosityPercent = atom(0);
         const rotationDegrees = atom(0);
         const xCenter = atom(0);
         const yCenter = atom(0);
@@ -1887,6 +1945,9 @@
                     invertColor: invertColor.get(),
                     colorStart: colorStart.get(),
                     colorCycles: colorCycles.get(),
+                    hueShiftDegrees: hueShiftDegrees.get(),
+                    saturationPercent: saturationPercent.get(),
+                    luminosityPercent: luminosityPercent.get(),
                     xCenter: xCenter.get(),
                     yCenter: yCenter.get(),
                     yHeight: getYHeight(),
@@ -1931,7 +1992,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'FuzzyGraph_v4.5.8.html';
+            a.download = 'FuzzyGraph_v4.5.9.html';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -2450,6 +2511,21 @@
             scheduleRepaint();
         });
 
+        hueShiftDegrees.subscribe((hueVal) => {
+            document.getElementById('hueShiftInput').value = hueVal;
+            scheduleRepaint();
+        });
+
+        saturationPercent.subscribe((satVal) => {
+            document.getElementById('saturationAdjustInput').value = satVal;
+            scheduleRepaint();
+        });
+
+        luminosityPercent.subscribe((lumVal) => {
+            document.getElementById('luminosityAdjustInput').value = lumVal;
+            scheduleRepaint();
+        });
+
         rotationDegrees.subscribe((rotationDeg) => {
             const rotationInput = document.getElementById('rotationDegreesInput');
             if (rotationInput && rotationInput !== document.activeElement) {
@@ -2547,6 +2623,21 @@
             colorCycles.set(Number.isFinite(value) ? value : 1);
         });
 
+        document.getElementById('hueShiftInput').addEventListener('input', (event) => {
+            const value = parseFloat(event.target.value);
+            hueShiftDegrees.set(Number.isFinite(value) ? value : 0);
+        });
+
+        document.getElementById('saturationAdjustInput').addEventListener('input', (event) => {
+            const value = parseFloat(event.target.value);
+            saturationPercent.set(Number.isFinite(value) ? value : 0);
+        });
+
+        document.getElementById('luminosityAdjustInput').addEventListener('input', (event) => {
+            const value = parseFloat(event.target.value);
+            luminosityPercent.set(Number.isFinite(value) ? value : 0);
+        });
+
         document.getElementById('rotationDegreesInput').addEventListener('input', (event) => {
             const value = Number(event.target.value);
             rotationDegrees.set(Number.isFinite(value) ? value : 0);
@@ -2560,7 +2651,8 @@
             const checked = advancedMode;
             const btn = document.getElementById('modeToggle');
             const thumb = document.getElementById('modeThumb');
-            const advancedSection = document.getElementById('advancedSection');
+            const advancedControlsSection = document.getElementById('advancedControlsSection');
+            const advancedColorSection = document.getElementById('advancedColorSection');
             const label = document.getElementById('modeLabel');
 
             btn.setAttribute('aria-checked', String(checked));
@@ -2571,14 +2663,16 @@
                 btn.classList.add('bg-gray-800');
                 // thumb.classList.remove('bg-gray-700');
                 // thumb.classList.add('bg-gray-50');
-                advancedSection.classList.remove('hidden');
+                advancedControlsSection.classList.remove('hidden');
+                advancedColorSection.classList.remove('hidden');
                 label.textContent = 'Advanced';
             } else {
                 btn.classList.remove('bg-gray-800');
                 btn.classList.add('bg-gray-500');
                 // thumb.classList.remove('bg-gray-50');
                 // thumb.classList.add('bg-gray-700');
-                advancedSection.classList.add('hidden');
+                advancedControlsSection.classList.add('hidden');
+                advancedColorSection.classList.add('hidden');
                 label.textContent = 'Basic';
 
                 // Clear min and max overrides since they are no longer visible
@@ -3491,6 +3585,9 @@
                 invertColor: invertColor.get(),
                 colorStart: colorStart.get(),
                 colorCycles: colorCycles.get(),
+                hueShiftDegrees: hueShiftDegrees.get(),
+                saturationPercent: saturationPercent.get(),
+                luminosityPercent: luminosityPercent.get(),
                 xCenter: xCenter.get(),
                 yCenter: yCenter.get(),
                 zoom: zoom.get(),
@@ -3583,6 +3680,15 @@
             }
             if (configObj['colorCycles'] !== null && typeof configObj['colorCycles'] !== 'undefined') {
                 colorCycles.set(configObj['colorCycles']);
+            }
+            if (configObj['hueShiftDegrees'] !== null && typeof configObj['hueShiftDegrees'] !== 'undefined') {
+                hueShiftDegrees.set(configObj['hueShiftDegrees']);
+            }
+            if (configObj['saturationPercent'] !== null && typeof configObj['saturationPercent'] !== 'undefined') {
+                saturationPercent.set(configObj['saturationPercent']);
+            }
+            if (configObj['luminosityPercent'] !== null && typeof configObj['luminosityPercent'] !== 'undefined') {
+                luminosityPercent.set(configObj['luminosityPercent']);
             }
             if (configObj['xCenter'] !== null && typeof configObj['xCenter'] !== 'undefined') {
                 xCenter.set(configObj['xCenter']);

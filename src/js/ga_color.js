@@ -14,20 +14,31 @@ export function getMatplotlibColormap(
   cycles = 1,
   startOffset = 0,
   colorResolutionMultiplier = 1,
+  hueShiftDegrees = 0,
+  saturationPercent = 0,
+  luminosityPercent = 0,
 ) {
   if (!(colormapName in matplotlibColorData)) {
     throw new Error(`Colormap ${colormapName} does not exist!`);
   }
 
   const baseColors = matplotlibColorData[colormapName].colors;
-  var colors = colorResolutionMultiplier !== 1
-    ? extendColorMap(baseColors, colorResolutionMultiplier)
-    : baseColors;
+  let colors;
+  if (colorResolutionMultiplier !== 1) {
+    colors = extendColorMap(baseColors, colorResolutionMultiplier);
+  } else {
+    colors = Array.from(baseColors);
+  }
 
   if (reverseColor) {
-    // colors = [...colors].reverse();
     colors = Array.from(colors).reverse();
   }
+
+  colors = applyColorTweaks(colors, {
+    hueShiftDegrees,
+    saturationPercent,
+    luminosityPercent,
+  });
 
   const numColormapColors = colors.length;
   const numColors = Math.max(1, Math.round(numColormapColors * cycles));
@@ -74,7 +85,10 @@ function extendColorMap(originalColorList, colorResolutionMultiplier) {
 
   for (let i = 0; i < originalColorList.length - 1; i++) {
     const segment = addColorsBetween(originalColorList[i], originalColorList[i + 1], addBetween);
-    extended.push(...segment.slice(0, -1));
+    const segmentWithoutLast = segment.slice(0, -1);
+    for (let j = 0; j < segmentWithoutLast.length; j++) {
+      extended.push(segmentWithoutLast[j]);
+    }
   }
 
   extended.push(originalColorList[originalColorList.length - 1]);
@@ -107,5 +121,83 @@ function addPointsBetween(a, b, numPointsToAdd) {
 
   points.push(b);
   return points;
+}
+
+function applyColorTweaks(colors, { hueShiftDegrees = 0, saturationPercent = 0, luminosityPercent = 0 }) {
+  const hueShift = hueShiftDegrees / 360;
+  const saturationScale = 1 + (saturationPercent / 100);
+  const lightnessShift = luminosityPercent / 100;
+
+  // Convert each RGB triple to HSL, apply intuitive adjustments, then convert back.
+  return colors.map(([r, g, b]) => {
+    const { h, s, l } = rgbToHsl(r, g, b);
+
+    const adjustedHue = normalizeHue(h + hueShift);
+    const adjustedSaturation = clamp01(s * saturationScale);
+    const adjustedLightness = clamp01(l + lightnessShift);
+
+    return hslToRgb(adjustedHue, adjustedSaturation, adjustedLightness);
+  });
+}
+
+function normalizeHue(hue) {
+  const normalized = hue % 1;
+  return normalized < 0 ? normalized + 1 : normalized;
+}
+
+function clamp01(value) {
+  return Math.min(1, Math.max(0, value));
+}
+
+function rgbToHsl(r, g, b) {
+  const rNorm = clamp01(r);
+  const gNorm = clamp01(g);
+  const bNorm = clamp01(b);
+
+  const max = Math.max(rNorm, gNorm, bNorm);
+  const min = Math.min(rNorm, gNorm, bNorm);
+  const delta = max - min;
+
+  let hue = 0;
+  if (delta !== 0) {
+    if (max === rNorm) {
+      hue = ((gNorm - bNorm) / delta) % 6;
+    } else if (max === gNorm) {
+      hue = (bNorm - rNorm) / delta + 2;
+    } else {
+      hue = (rNorm - gNorm) / delta + 4;
+    }
+    hue /= 6;
+  }
+
+  const lightness = (max + min) / 2;
+  const saturation = delta === 0 ? 0 : delta / (1 - Math.abs(2 * lightness - 1));
+
+  return { h: hue, s: saturation, l: lightness };
+}
+
+function hslToRgb(h, s, l) {
+  if (s === 0) {
+    return [l, l, l];
+  }
+
+  const hueToRgb = (p, q, t) => {
+    let tVal = t;
+    if (tVal < 0) tVal += 1;
+    if (tVal > 1) tVal -= 1;
+    if (tVal < 1 / 6) return p + (q - p) * 6 * tVal;
+    if (tVal < 1 / 2) return q;
+    if (tVal < 2 / 3) return p + (q - p) * (2 / 3 - tVal) * 6;
+    return p;
+  };
+
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+  const p = 2 * l - q;
+
+  const r = hueToRgb(p, q, h + 1 / 3);
+  const g = hueToRgb(p, q, h);
+  const b = hueToRgb(p, q, h - 1 / 3);
+
+  return [r, g, b];
 }
 

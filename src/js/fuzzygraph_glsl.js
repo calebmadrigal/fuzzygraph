@@ -890,9 +890,21 @@ function applyFuzzyTransfer(value, rawMin, rawMax, fuzzyValue, alpha = 1.0) {
   return value < 0.02 ? rawMax : rawMin;
 }
 
-function createColormapLUT(colormapName, reverseColor, invertColor, colorStart = 0, colorCycles = 1) {
+function createColormapLUT(colormapName, reverseColor, invertColor, colorStart = 0, colorCycles = 1, hueShiftDegrees = 0, saturationPercent = 0, luminosityPercent = 0) {
   const lut = new Uint8Array(256 * 4);
-  const mapper = getMatplotlibColormap(0, 1, colormapName, reverseColor, invertColor, colorCycles, colorStart);
+  const mapper = getMatplotlibColormap(
+    0,
+    1,
+    colormapName,
+    reverseColor,
+    invertColor,
+    colorCycles,
+    colorStart,
+    1,
+    hueShiftDegrees,
+    saturationPercent,
+    luminosityPercent,
+  );
   for (let i = 0; i < 256; i++) {
     const normalizedValue = i / 255;
     // const color = evaluate_cmap(normalizedValue, colormapName, invertColor, colorStart, colorCycles);
@@ -1071,15 +1083,24 @@ function uploadValuesTexture(pixelValues, width, height) {
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.R32F, width, height, 0, gl.RED, gl.FLOAT, pixelValues);
 }
 
-function uploadColormapTexture(colormapName, reverseColor, invertColor, colorStart = 0, colorCycles = 1) {
+function uploadColormapTexture(colormapName, reverseColor, invertColor, colorStart = 0, colorCycles = 1, hueShiftDegrees = 0, saturationPercent = 0, luminosityPercent = 0) {
   const gl = glState.gl;
-  const lut = createColormapLUT(colormapName, reverseColor, invertColor, colorStart, colorCycles);
+  const lut = createColormapLUT(
+    colormapName,
+    reverseColor,
+    invertColor,
+    colorStart,
+    colorCycles,
+    hueShiftDegrees,
+    saturationPercent,
+    luminosityPercent,
+  );
   gl.bindTexture(gl.TEXTURE_2D, glState.colormapTex);
   gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 256, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, lut);
 }
 
-function renderToCanvas(canvasElem, pixelValues, rawMin, rawMax, normMin, normMax, fuzzyValue, colormapName, reverseColor, invertColor, colorStart, colorCycles) {
+function renderToCanvas(canvasElem, pixelValues, rawMin, rawMax, normMin, normMax, fuzzyValue, colormapName, reverseColor, invertColor, colorStart, colorCycles, hueShiftDegrees, saturationPercent, luminosityPercent) {
   ensureCanvasSize(canvasElem);
   const width = canvasElem.width;
   const height = canvasElem.height;
@@ -1087,7 +1108,16 @@ function renderToCanvas(canvasElem, pixelValues, rawMin, rawMax, normMin, normMa
   const gl = glState.gl;
 
   uploadValuesTexture(pixelValues, width, height);
-  uploadColormapTexture(colormapName, reverseColor, invertColor, colorStart, colorCycles);
+  uploadColormapTexture(
+    colormapName,
+    reverseColor,
+    invertColor,
+    colorStart,
+    colorCycles,
+    hueShiftDegrees,
+    saturationPercent,
+    luminosityPercent,
+  );
 
   gl.useProgram(glState.program);
   gl.bindVertexArray(glState.vao);
@@ -1158,7 +1188,10 @@ export function displayGraph(graphParams, canvasElem) {
       graphParams['reverseColor'],
       graphParams['invertColor'],
       graphParams['colorStart'],
-      graphParams['colorCycles']);
+      graphParams['colorCycles'],
+      graphParams['hueShiftDegrees'] ?? 0,
+      graphParams['saturationPercent'] ?? 0,
+      graphParams['luminosityPercent'] ?? 0);
 
   if (graphParams['showAxes']) {
     const windowBounds2 = calcWindowBounds(graphParams['xCenter'], graphParams['yCenter'], graphParams['yHeight'], canvasWidth, canvasHeight);
